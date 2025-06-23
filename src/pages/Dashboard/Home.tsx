@@ -1,6 +1,6 @@
-import EcommerceMetrics from "../../components/ecommerce/EcommerceMetrics";
+import EcommerceMetrics from "./EcommerceMetrics";
 // import StatisticsChart from "../../components/ecommerce/StatisticsChart";
-import RecentOrders from "../../components/ecommerce/RecentOrders";
+import RecentOrders from "./RecentOrders";
 import PageMeta from "../../components/common/PageMeta";
 import BarChartOne from "../../components/charts/bar/BarChartOne";
 import LineChartOne from "../../components/charts/line/LineChartOne";

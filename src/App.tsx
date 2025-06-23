@@ -22,6 +22,8 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
+import Update from './pages/Forms/UpdateStaff';
+import menuItem from './pages/Forms/menuItem';
 
 export const theme = createTheme({
   typography: {
@@ -52,8 +54,8 @@ export default function App() {
           {/* Forms */}
           <Route path="/form-elements" element={<FormElements />} />
 
-          {/* Tables */}
-          <Route path="/basic-tables" element={<BasicTables />} />
+          {/* MENU ITEMS */}
+          <Route path="/menu" element={<menuItem />} />
 
           {/* Ui Elements */}
           <Route path="/alerts" element={<Alerts />} />
@@ -70,6 +72,7 @@ export default function App() {
           {/* Staff Page */}
           <Route path="/staff" element={<Staff />} />
           <Route path="/staff-list" element={<StaffList />} />
+          <Route path="/update" element={<Update />} />
         </Route>
 
         {/* Auth Layout */}

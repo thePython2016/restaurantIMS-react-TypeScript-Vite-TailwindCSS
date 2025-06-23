@@ -75,14 +75,14 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Add New", path: "/staff", pro: false, icon: <PlusIcon /> },
       { name: "Staff List", path: "/staff-list", pro: false, icon: <ListIcon /> },
-      { name: "Update", path: "/form-elements", pro: false, icon: <PencilIcon /> }
+      { name: "Update", path: "/update", pro: false, icon: <PencilIcon /> }
     ],
   },
   {
     name: "Menu Items",
     icon: <BoxIconLine />,
     subItems: [
-      { name: "Add New", path: "/basic-tables", pro: false, icon: <PlusIcon /> },
+      { name: "Menu Item", path: "/menu", pro: false, icon: <PlusIcon /> },
       { name: "View Item", path: "/basic-tables1", pro: false, icon: <ListIcon /> },
       { name: "Update Item", path: "/basic-tables2", pro: false, icon: <PencilIcon /> }
     ],
