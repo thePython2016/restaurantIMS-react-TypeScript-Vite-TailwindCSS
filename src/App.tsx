@@ -14,7 +14,7 @@ import Buttons from "./pages/UiElements/Buttons";
 import LineChart from "./pages/Charts/LineChart";
 import BarChart from "./pages/Charts/BarChart";
 import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
+// import BasicTables from "./pages/Tables/BasicTables";
 import FormElements from "./pages/Forms/FormElements";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
@@ -23,7 +23,12 @@ import Home from "./pages/Dashboard/Home";
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
 import Update from './pages/Forms/UpdateStaff';
-import menuItem from './pages/Forms/menuItem';
+import MenuItems from './pages/Forms/Menu';
+import MenuItemList from './pages/Forms/MenuItemList';
+import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
+import OrderForm from './pages/Forms/Order';
+import OrderList from './pages/Forms/OrderList';
+import UpdateOrder from './pages/Forms/UpdateOrder';
 
 export const theme = createTheme({
   typography: {
@@ -55,7 +60,14 @@ export default function App() {
           <Route path="/form-elements" element={<FormElements />} />
 
           {/* MENU ITEMS */}
-          <Route path="/menu" element={<menuItem />} />
+          <Route path="/menu" element={<MenuItems/>} />
+          <Route path="/item-list" element={<MenuItemList/>} />
+          <Route path="/update-menu" element={<UpdateMenuItem/>} />
+
+          {/* ORDERS */}
+          <Route path="/order" element={<OrderForm/>} />
+          <Route path="/order-list" element={<OrderList/>} />
+          <Route path="/update-order" element={<UpdateOrder/>} />
 
           {/* Ui Elements */}
           <Route path="/alerts" element={<Alerts />} />

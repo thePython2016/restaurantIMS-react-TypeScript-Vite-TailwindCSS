@@ -17,6 +17,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Container from '@mui/material/Container';
 
 const generateOrderData = (count: number) => {
   const customers = ['Anna', 'Mark', 'Liam', 'Sofia', 'James'];
@@ -58,6 +59,16 @@ const OrderList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [pageRows, setPageRows] = useState<typeof allOrderData>([]);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [amountOperator, setAmountOperator] = useState('>=');
+  const [amountFilter, setAmountFilter] = useState('');
+
+  const filteredRows = React.useMemo(() => {
+    return allOrderData.filter(row => {
+      const matchesSearch = Object.values(row).join(' ').toLowerCase().includes(search.toLowerCase());
+      const matchesAmount = amountFilter ? eval(`${row.amount} ${amountOperator} ${parseFloat(amountFilter) || 0}`) : true;
+      return matchesSearch && matchesAmount;
+    });
+  }, [allOrderData, search, amountFilter, amountOperator]);
 
   useEffect(() => {
     let filtered = allOrderData;
@@ -150,57 +161,74 @@ const OrderList: React.FC = () => {
   );
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-7xl p-6 mx-auto">
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-          borderBottom="1px solid #ccc"
-          pb={1}
-        >
-          <Typography variant="h5" fontWeight="bold">
+    <Container maxWidth="lg" sx={{ py: 5 }}>
+      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
+        <Box>
+          <Typography variant="h5" mb={1} align="left" fontWeight={700}>
             Order List
           </Typography>
+          <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
         </Box>
 
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            mb: 2,
-            flexWrap: 'wrap',
-            gap: 2,
-            alignItems: 'center',
-          }}
-        >
+        <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" justifyContent="flex-start" mb={2}>
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Rows per page</InputLabel>
+            <Select
+              value={paginationModel.pageSize}
+              label="Rows per page"
+              onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
+            >
+              {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Filter by Amount</InputLabel>
+            <Select
+              value={amountOperator}
+              label="Filter by Amount"
+              onChange={(e) => setAmountOperator(e.target.value)}
+            >
+              <MenuItem value="<">Less than</MenuItem>
+              <MenuItem value="<=">Less than or equal</MenuItem>
+              <MenuItem value=">">Greater than</MenuItem>
+              <MenuItem value=">=">Greater than or equal</MenuItem>
+              <MenuItem value="==">Equal</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            size="small"
+            label="Amount"
+            value={amountFilter}
+            onChange={(e) => setAmountFilter(e.target.value)}
+            type="number"
+            sx={{ minWidth: 100 }}
+          />
+
           <TextField
             size="small"
             placeholder="Search..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
-              startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
             }}
-            sx={{ width: 200 }}
+            sx={{ minWidth: 200 }}
           />
+        </Box>
 
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
-            Print
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<PictureAsPdfIcon />}
-            onClick={handlePDF}
-            color="primary"
-          >
-            PDF
-          </Button>
+        <Box display="flex" justifyContent="center" gap={2} mb={3}>
+          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
+          <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
         </Box>
 
         <DataGrid
-          rows={pageRows}
+          rows={filteredRows.slice(paginationModel.page * paginationModel.pageSize, (paginationModel.page + 1) * paginationModel.pageSize)}
           columns={columns}
           paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
@@ -220,7 +248,7 @@ const OrderList: React.FC = () => {
           }}
         />
       </Paper>
-    </Box>
+    </Container>
   );
 };
 
