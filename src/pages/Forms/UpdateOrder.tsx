@@ -65,7 +65,7 @@ const UpdateOrder = () => {
 
   const selectedRow = filteredRows.find(row => row.id === selectedId) || null;
 
-  const handleUpdateFormChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+  const handleUpdateFormChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }> | any) => {
     const { name, value } = e.target;
     setUpdateForm(prev => ({ ...prev, [name as string]: name === 'quantity' || name === 'amount' ? Number(value) : value }));
   };
@@ -132,7 +132,7 @@ const UpdateOrder = () => {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" fontWeight={700} mb={2}>Update Order</Typography>
+        <Typography variant="h5" fontWeight={700} mb={2} sx={{ borderBottom: '1px solid #e0e0e0', paddingBottom: 1 }}>Update Order</Typography>
 
         <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={3} justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={2}>
@@ -146,8 +146,24 @@ const UpdateOrder = () => {
                 {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
               </Select>
             </FormControl>
+          </Box>
+          <Box display="flex" alignItems="center" gap={2}>
+            <TextField
+              size="small"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ minWidth: 200 }}
+            />
             {selectedRow && (
-              <Box display="flex" alignItems="center" mr={1}>
+              <>
                 <Tooltip title="Update">
                   <IconButton onClick={() => {
                     setUpdateForm({
@@ -167,24 +183,8 @@ const UpdateOrder = () => {
                     <DeleteIcon />
                   </IconButton>
                 </Tooltip>
-              </Box>
+              </>
             )}
-          </Box>
-          <Box display="flex" alignItems="center" gap={2}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ minWidth: 200 }}
-            />
             <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
             <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
           </Box>
@@ -197,7 +197,7 @@ const UpdateOrder = () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
-            onRowClick={(params) => setSelectedId(params.id)}
+            onRowClick={(params) => setSelectedId(params.id as number)}
             getRowClassName={(params) => (params.id === selectedId ? 'selected-row' : '')}
             autoHeight
             disableRowSelectionOnClick
@@ -242,7 +242,7 @@ const UpdateOrder = () => {
               <TextField label="Amount" name="amount" type="number" value={updateForm.amount} onChange={handleUpdateFormChange} fullWidth />
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
-                <Select name="status" value={updateForm.status} label="Status" onChange={handleUpdateFormChange}>
+                <Select name="status" value={updateForm.status} label="Status" onChange={handleUpdateFormChange as any}>
                   <MenuItem value="Paid">Paid</MenuItem>
                   <MenuItem value="Pending">Pending</MenuItem>
                 </Select>

@@ -100,7 +100,9 @@ const navItems: NavItem[] = [
     name: "Active Customer",
     icon: <UserCircleIcon />,
     subItems: [
-      { name: "Customers List", path: "/blank", pro: false, icon: <ListIcon /> },
+      { name: "Add New", path: "/customer", pro: false, icon: <PlusIcon /> },
+      { name: "Customers List", path: "/customer-list", pro: false, icon: <ListIcon /> },
+      { name: "Update", path: "/update-customer", pro: false, icon: <PencilIcon /> },
     ],
   },
   {

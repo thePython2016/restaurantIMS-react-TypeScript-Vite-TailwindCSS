@@ -29,6 +29,9 @@ import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
 import OrderForm from './pages/Forms/Order';
 import OrderList from './pages/Forms/OrderList';
 import UpdateOrder from './pages/Forms/UpdateOrder';
+import Customer from './pages/Forms/Customer';
+import CustomerList from './pages/Forms/CustomerList';
+import UpdateCustomer from './pages/Forms/UpdateCustomer';
 
 export const theme = createTheme({
   typography: {
@@ -68,6 +71,11 @@ export default function App() {
           <Route path="/order" element={<OrderForm/>} />
           <Route path="/order-list" element={<OrderList/>} />
           <Route path="/update-order" element={<UpdateOrder/>} />
+
+          {/* CUSTOMER */}
+          <Route path="/customer" element={<Customer />} />
+          <Route path="/customer-list" element={<CustomerList />} />
+          <Route path="/update-customer" element={<UpdateCustomer />} />
 
           {/* Ui Elements */}
           <Route path="/alerts" element={<Alerts />} />
