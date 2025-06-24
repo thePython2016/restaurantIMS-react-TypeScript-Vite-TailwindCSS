@@ -109,8 +109,8 @@ const navItems: NavItem[] = [
     name: "Invoice",
     icon: <PageIcon />,
     subItems: [
-      { name: "Create Invoice", path: "/form-elements", pro: false, icon: <PlusIcon /> },
-      { name: "Invoice List", path: "/form-elements", pro: false, icon: <ListIcon /> }
+      { name: "Create Invoice", path: "/invoice", pro: false, icon: <PlusIcon /> },
+      { name: "Invoice List", path: "/invoice-list", pro: false, icon: <ListIcon /> }
     ],
   },
   {

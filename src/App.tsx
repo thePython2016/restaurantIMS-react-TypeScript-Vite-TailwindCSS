@@ -31,7 +31,9 @@ import OrderList from './pages/Forms/OrderList';
 import UpdateOrder from './pages/Forms/UpdateOrder';
 import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
-import UpdateCustomer from './pages/Forms/UpdateCustomer';
+import UpdateCustomer from './pages/Forms/UpdateCustomer';    
+import Invoice from './pages/Forms/Invoice';    
+import InvoiceList from './pages/Forms/InvoiceList';    
 
 export const theme = createTheme({
   typography: {
@@ -93,6 +95,9 @@ export default function App() {
           <Route path="/staff" element={<Staff />} />
           <Route path="/staff-list" element={<StaffList />} />
           <Route path="/update" element={<Update />} />
+          {/* Invoice inside layout */}
+          <Route path="/invoice" element={<Invoice />} />
+          <Route path="/invoice-list" element={<InvoiceList />} />
         </Route>
 
         {/* Auth Layout */}
