@@ -24,13 +24,10 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import UserCircleIcon from '../../icons/user-circle.svg';
-import { useNavigate } from 'react-router-dom';
 
-const StaffList: React.FC = () => {
+const Update: React.FC = () => {
   const [rows, setRows] = useState([
     {
       id: 1,
@@ -72,7 +69,6 @@ const StaffList: React.FC = () => {
   });
 
   const gridRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -204,19 +200,11 @@ const StaffList: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/staff')}>
-          Add Staff
-        </Button>
-      </Box>
       <Paper sx={{ p: 3 }}>
         <Box>
-          <Box display="flex" alignItems="center" mb={1}>
-            <img src={UserCircleIcon} alt="Staff Icon" style={{ width: 28, height: 28, marginRight: 10 }} />
-            <Typography variant="h5" align="left" fontWeight={700}>
+          <Typography variant="h5" mb={1} align="left" fontWeight={700}>
             Update Staff
           </Typography>
-          </Box>
           <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
         </Box>
 
@@ -390,4 +378,4 @@ const StaffList: React.FC = () => {
   );
 };
 
-export default StaffList;
+export default Update;

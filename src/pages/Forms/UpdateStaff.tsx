@@ -24,8 +24,10 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useNavigate } from 'react-router-dom';
 
 const Update: React.FC = () => {
   const [rows, setRows] = useState([
@@ -69,6 +71,7 @@ const Update: React.FC = () => {
   });
 
   const gridRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -200,6 +203,11 @@ const Update: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/staff')}>
+          Add Staff
+        </Button>
+      </Box>
       <Paper sx={{ p: 3 }}>
         <Box>
           <Typography variant="h5" mb={1} align="left" fontWeight={700}>

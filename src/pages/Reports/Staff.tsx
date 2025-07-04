@@ -12,7 +12,6 @@ import {
   MenuItem,
   InputAdornment,
 } from '@mui/material';
-import UserCircleIcon from '../../icons/user-circle.svg';
 
 interface StaffFormData {
   name: string;
@@ -124,12 +123,9 @@ const Staff: React.FC = () => {
         </div>
 
       <Paper elevation={3} className="w-full max-w-4xl p-8 mx-auto">
-        <Box display="flex" alignItems="center" className="mb-10 pb-4 border-b border-gray-200">
-          <img src={UserCircleIcon} alt="Staff Icon" style={{ width: 32, height: 32, marginRight: 12 }} />
-          <Typography variant="h5" className="font-bold">
+        <Typography variant="h5" className="mb-10 pb-4 border-b border-gray-200 text-center font-bold">
           Staff Registration Form
         </Typography>
-        </Box>
         <div className="mt-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* Row 1 */}

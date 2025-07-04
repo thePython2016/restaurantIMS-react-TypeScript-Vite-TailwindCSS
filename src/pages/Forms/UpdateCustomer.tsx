@@ -24,8 +24,10 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useNavigate } from 'react-router-dom';
 
 const generateCustomerData = (count: number) => {
   const names = ['John Doe', 'Jane Smith', 'Michael Johnson', 'Emily Davis', 'David Brown'];
@@ -60,6 +62,7 @@ const UpdateCustomer: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const dataGridRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -148,151 +151,163 @@ const UpdateCustomer: React.FC = () => {
   };
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-7xl p-6 mx-auto">
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} borderBottom="1px solid #ccc" pb={1}>
-          <Typography variant="h5" fontWeight="bold">
-            Update Customer
-          </Typography>
-        </Box>
-
-        {/* Controls Row: Rows per page left, search/print/pdf right */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            mb: 2,
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-          }}
+    <>
+      <div className="flex justify-end mb-2">
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/customer')}
         >
-          {/* Left: Rows per page */}
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Rows per page</InputLabel>
-            <Select
-              value={paginationModel.pageSize}
-              label="Rows per page"
-              onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
-            >
-              {[5, 10, 25, 50].map(size => (
-                <MenuItem key={size} value={size}>{size}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* Right: Search, Print, PDF, Icons */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TextField
-              size="small"
-              placeholder="Search customers..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
-              }}
-              sx={{ width: 250, mr: 2 }}
-            />
-            {selectedRowId !== null && (
-              <>
-                <IconButton
-                  color="primary"
-                  onClick={() => {
-                    alert(`Update customer id ${selectedRowId}`);
-                  }}
-                  sx={{ mr: 1 }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="error"
-                  onClick={() => {
-                    if (window.confirm(`Delete customer id ${selectedRowId}?`)) {
-                      setRows((prev) => prev.filter((r) => r.id !== selectedRowId));
-                      setSelectedRowId(null);
-                    }
-                  }}
-                  sx={{ mr: 1 }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </>
-            )}
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint} sx={{ mr: 1 }}>
-              Print
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<PictureAsPdfIcon />}
-              onClick={handlePDF}
-              color="primary"
-            >
-              PDF
-            </Button>
+          Add Customer
+        </Button>
+      </div>
+      <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
+        <Paper elevation={3} className="w-full max-w-7xl p-6 mx-auto">
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} borderBottom="1px solid #ccc" pb={1}>
+            <Typography variant="h5" fontWeight="bold">
+              Update Customer
+            </Typography>
           </Box>
-        </Box>
 
-        {/* Table */}
-        <div ref={dataGridRef}>
-          <DataGrid
-            rows={pagedRows}
-            columns={columns}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            rowCount={filteredSortedRows.length}
-            paginationMode="server"
-            sortingMode="server"
-            sortModel={sortModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => setSelectedRowId(params.id as number)}
-            getRowClassName={(params) =>
-              params.id === selectedRowId ? 'selected-row' : ''
-            }
-            autoHeight
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25, 50]}
+          {/* Controls Row: Rows per page left, search/print/pdf right */}
+          <Box
             sx={{
-              height: 500,
-              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-              '& .selected-row': { backgroundColor: '#d1eaff !important' },
-              '& .MuiDataGrid-footerContainer': {
-                borderTop: '1px solid #ccc',
-                backgroundColor: '#f5f5f5',
-                justifyContent: 'flex-end',
-              },
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              mb: 2,
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
             }}
-          />
-        </div>
-        {/* Bottom Update/Delete buttons with icons, only when a row is selected */}
-        {selectedRowId !== null && (
-          <Box display="flex" justifyContent="flex-end" gap={2} mt={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<EditIcon />}
-              onClick={() => {
-                alert(`Update customer id ${selectedRowId}`);
-              }}
-            >
-              Update
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<DeleteIcon />}
-              onClick={() => {
-                if (window.confirm(`Delete customer id ${selectedRowId}?`)) {
-                  setRows((prev) => prev.filter((r) => r.id !== selectedRowId));
-                  setSelectedRowId(null);
-                }
-              }}
-            >
-              Delete
-            </Button>
+          >
+            {/* Left: Rows per page */}
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Rows per page</InputLabel>
+              <Select
+                value={paginationModel.pageSize}
+                label="Rows per page"
+                onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
+              >
+                {[5, 10, 25, 50].map(size => (
+                  <MenuItem key={size} value={size}>{size}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Right: Search, Print, PDF, Icons */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <TextField
+                size="small"
+                placeholder="Search customers..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+                }}
+                sx={{ width: 250, mr: 2 }}
+              />
+              {selectedRowId !== null && (
+                <>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      alert(`Update customer id ${selectedRowId}`);
+                    }}
+                    sx={{ mr: 1 }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => {
+                      if (window.confirm(`Delete customer id ${selectedRowId}?`)) {
+                        setRows((prev) => prev.filter((r) => r.id !== selectedRowId));
+                        setSelectedRowId(null);
+                      }
+                    }}
+                    sx={{ mr: 1 }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )}
+              <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint} sx={{ mr: 1 }}>
+                Print
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<PictureAsPdfIcon />}
+                onClick={handlePDF}
+                color="primary"
+              >
+                PDF
+              </Button>
+            </Box>
           </Box>
-        )}
-      </Paper>
-    </Box>
+
+          {/* Table */}
+          <div ref={dataGridRef}>
+            <DataGrid
+              rows={pagedRows}
+              columns={columns}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              rowCount={filteredSortedRows.length}
+              paginationMode="server"
+              sortingMode="server"
+              sortModel={sortModel}
+              onSortModelChange={setSortModel}
+              onRowClick={(params) => setSelectedRowId(params.id as number)}
+              getRowClassName={(params) =>
+                params.id === selectedRowId ? 'selected-row' : ''
+              }
+              autoHeight
+              disableRowSelectionOnClick
+              pageSizeOptions={[5, 10, 25, 50]}
+              sx={{
+                height: 500,
+                '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+                '& .selected-row': { backgroundColor: '#d1eaff !important' },
+                '& .MuiDataGrid-footerContainer': {
+                  borderTop: '1px solid #ccc',
+                  backgroundColor: '#f5f5f5',
+                  justifyContent: 'flex-end',
+                },
+              }}
+            />
+          </div>
+          {/* Bottom Update/Delete buttons with icons, only when a row is selected */}
+          {selectedRowId !== null && (
+            <Box display="flex" justifyContent="flex-end" gap={2} mt={3}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<EditIcon />}
+                onClick={() => {
+                  alert(`Update customer id ${selectedRowId}`);
+                }}
+              >
+                Update
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<DeleteIcon />}
+                onClick={() => {
+                  if (window.confirm(`Delete customer id ${selectedRowId}?`)) {
+                    setRows((prev) => prev.filter((r) => r.id !== selectedRowId));
+                    setSelectedRowId(null);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </Box>
+          )}
+        </Paper>
+      </Box>
+    </>
   );
 };
 

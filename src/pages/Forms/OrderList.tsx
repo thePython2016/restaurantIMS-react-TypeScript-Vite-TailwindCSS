@@ -18,6 +18,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Container from '@mui/material/Container';
+import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
 
 const generateOrderData = (count: number) => {
   const customers = ['Anna', 'Mark', 'Liam', 'Sofia', 'James'];
@@ -50,6 +52,7 @@ const columns: GridColDef[] = [
 
 const OrderList: React.FC = () => {
   const allOrderData = React.useMemo(() => generateOrderData(300), []);
+  const navigate = useNavigate();
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
@@ -161,94 +164,106 @@ const OrderList: React.FC = () => {
   );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 5 }}>
-      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
-        <Box>
-          <Typography variant="h5" mb={1} align="left" fontWeight={700}>
-            Order List
-          </Typography>
-          <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
-        </Box>
+    <>
+      <div className="flex justify-end mb-2">
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/order')}
+        >
+          Add Order
+        </Button>
+      </div>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+        <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
+          <Box>
+            <Typography variant="h5" mb={1} align="left" fontWeight={700}>
+              Order List
+            </Typography>
+            <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
+          </Box>
 
-        <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" justifyContent="flex-start" mb={2}>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Rows per page</InputLabel>
-            <Select
-              value={paginationModel.pageSize}
-              label="Rows per page"
-              onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
-            >
-              {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
-            </Select>
-          </FormControl>
+          <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" justifyContent="flex-start" mb={2}>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Rows per page</InputLabel>
+              <Select
+                value={paginationModel.pageSize}
+                label="Rows per page"
+                onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
+              >
+                {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
+              </Select>
+            </FormControl>
 
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Filter by Amount</InputLabel>
-            <Select
-              value={amountOperator}
-              label="Filter by Amount"
-              onChange={(e) => setAmountOperator(e.target.value)}
-            >
-              <MenuItem value="<">Less than</MenuItem>
-              <MenuItem value="<=">Less than or equal</MenuItem>
-              <MenuItem value=">">Greater than</MenuItem>
-              <MenuItem value=">=">Greater than or equal</MenuItem>
-              <MenuItem value="==">Equal</MenuItem>
-            </Select>
-          </FormControl>
+            <FormControl size="small" sx={{ minWidth: 150 }}>
+              <InputLabel>Filter by Amount</InputLabel>
+              <Select
+                value={amountOperator}
+                label="Filter by Amount"
+                onChange={(e) => setAmountOperator(e.target.value)}
+              >
+                <MenuItem value="<">Less than</MenuItem>
+                <MenuItem value="<=">Less than or equal</MenuItem>
+                <MenuItem value=">">Greater than</MenuItem>
+                <MenuItem value=">=">Greater than or equal</MenuItem>
+                <MenuItem value="==">Equal</MenuItem>
+              </Select>
+            </FormControl>
 
-          <TextField
-            size="small"
-            label="Amount"
-            value={amountFilter}
-            onChange={(e) => setAmountFilter(e.target.value)}
-            type="number"
-            sx={{ minWidth: 100 }}
-          />
+            <TextField
+              size="small"
+              label="Amount"
+              value={amountFilter}
+              onChange={(e) => setAmountFilter(e.target.value)}
+              type="number"
+              sx={{ minWidth: 100 }}
+            />
 
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
+            <TextField
+              size="small"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{ minWidth: 200 }}
+            />
+          </Box>
+
+          <Box display="flex" justifyContent="center" gap={2} mb={3}>
+            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
+            <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
+          </Box>
+
+          <DataGrid
+            rows={filteredRows.slice(paginationModel.page * paginationModel.pageSize, (paginationModel.page + 1) * paginationModel.pageSize)}
+            columns={columns}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5, 10, 25, 50]}
+            sortingMode="server"
+            sortModel={sortModel}
+            onSortModelChange={setSortModel}
+            onRowClick={(params) => setSelectedRowId(params.id as number)}
+            getRowClassName={(params) => params.id === selectedRowId ? 'selected-row' : ''}
+            autoHeight
+            disableRowSelectionOnClick
+            sx={{
+              '& .MuiDataGrid-columnHeaders': { backgroundColor: '#bdbdbd' },
+              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+              '& .selected-row': { backgroundColor: '#d1eaff !important' },
+              border: 'none',
             }}
-            sx={{ minWidth: 200 }}
           />
-        </Box>
-
-        <Box display="flex" justifyContent="center" gap={2} mb={3}>
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
-          <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
-        </Box>
-
-        <DataGrid
-          rows={filteredRows.slice(paginationModel.page * paginationModel.pageSize, (paginationModel.page + 1) * paginationModel.pageSize)}
-          columns={columns}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pageSizeOptions={[5, 10, 25, 50]}
-          sortingMode="server"
-          sortModel={sortModel}
-          onSortModelChange={setSortModel}
-          onRowClick={(params) => setSelectedRowId(params.id as number)}
-          getRowClassName={(params) => params.id === selectedRowId ? 'selected-row' : ''}
-          autoHeight
-          disableRowSelectionOnClick
-          sx={{
-            height: calculatedHeight,
-            '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-            '& .selected-row': { backgroundColor: '#d1eaff !important' },
-            '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
-          }}
-        />
-      </Paper>
-    </Container>
+        </Paper>
+      </Box>
+    </>
   );
 };
 

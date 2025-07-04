@@ -117,8 +117,9 @@ const navItems: NavItem[] = [
     name: "Sales",
     icon: <DollarLineIcon />,
     subItems: [
-      { name: "Add New", path: "/form-elements", pro: false, icon: <PlusIcon /> },
-      { name: "Sales by Item details", path: "/form-elements", pro: false, icon: <BoxIconLine /> }
+      { name: "Add New", path: "/sales", pro: false, icon: <PlusIcon /> },
+      { name: "Sales by Item details", path: "/sales-item-report", pro: false, icon: <BoxIconLine /> },
+      { name: "Sales Customer details", path: "/sales Customer report", pro: false, icon: <UserCircleIcon /> }
     ]
   }
 ];
@@ -127,27 +128,14 @@ const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Reports",
-    subItems: [
-      { name: "Orders", path: "/line-chart", pro: false, icon: <ListIcon /> },
-      { name: "Menu Items", path: "/bar-chart", pro: false, icon: <BoxIconLine /> },
-      { name: "Active Customers", path: "/bar-chart", pro: false, icon: <UserCircleIcon /> },
-      { name: "Employees", path: "/bar-chart", pro: false, icon: <GroupIcon /> },
-      { name: "Invoices", path: "/bar-chart", pro: false, icon: <PageIcon /> },
-      { name: "Sales by Item details", path: "/bar-chart", pro: false, icon: <BoxIconLine /> },
-      { name: "Sales by Customer details", path: "/bar-chart", pro: false, icon: <UserCircleIcon /> }
-    ],
+    path: "/reports",
   },
   {
     icon: <BoxCubeIcon />,
     name: "Charts",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
+    path: "/charts",
+    
+    
   }
 ];
 

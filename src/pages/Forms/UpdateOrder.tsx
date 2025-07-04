@@ -30,6 +30,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
 
 const initialOrders = [
   { id: 1, customer: 'John Doe', menuItem: 'Chicken Burger', quantity: 2, amount: 17000, status: 'Paid' },
@@ -47,6 +49,7 @@ const UpdateOrder = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [updateForm, setUpdateForm] = useState({ customer: '', menuItem: '', quantity: 1, amount: 0, status: 'Pending' });
   const gridRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -130,143 +133,155 @@ const UpdateOrder = () => {
   ];
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" fontWeight={700} mb={2} sx={{ borderBottom: '1px solid #e0e0e0', paddingBottom: 1 }}>Update Order</Typography>
+    <>
+      <div className="flex justify-end mb-2">
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/order')}
+        >
+          Add Order
+        </Button>
+      </div>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+        <Paper sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%', overflow: 'hidden' }}>
+          <Typography variant="h5" fontWeight={700} mb={2} sx={{ borderBottom: '1px solid #e0e0e0', paddingBottom: 1 }}>Update Order</Typography>
 
-        <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={3} justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Rows per page</InputLabel>
-              <Select
-                value={paginationModel.pageSize}
-                label="Rows per page"
-                onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
-              >
-                {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
-              </Select>
-            </FormControl>
-          </Box>
-          <Box display="flex" alignItems="center" gap={2}>
-            <TextField
-              size="small"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ minWidth: 200 }}
-            />
-            {selectedRow && (
-              <>
-                <Tooltip title="Update">
-                  <IconButton onClick={() => {
-                    setUpdateForm({
-                      customer: selectedRow.customer,
-                      menuItem: selectedRow.menuItem,
-                      quantity: selectedRow.quantity,
-                      amount: selectedRow.amount,
-                      status: selectedRow.status,
-                    });
-                    setOpenUpdateDialog(true);
-                  }}>
-                    <EditIcon />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                  <IconButton onClick={() => setOpenDeleteDialog(true)} color="error">
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              </>
-            )}
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
-            <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
-          </Box>
-        </Box>
-
-        <Box ref={gridRef}>
-          <DataGrid
-            rows={filteredRows}
-            columns={columns}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            pageSizeOptions={[5, 10, 25, 50]}
-            onRowClick={(params) => setSelectedId(params.id as number)}
-            getRowClassName={(params) => (params.id === selectedId ? 'selected-row' : '')}
-            autoHeight
-            disableRowSelectionOnClick
-            sx={{
-              '& .MuiDataGrid-columnHeaders': { backgroundColor: '#bdbdbd' },
-              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-              '& .selected-row': { backgroundColor: '#d1eaff !important' },
-              border: 'none',
-            }}
-          />
-        </Box>
-
-        {selectedRow && (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-            <Button variant="outlined" color="primary" startIcon={<EditIcon />} onClick={() => {
-              setUpdateForm({
-                customer: selectedRow.customer,
-                menuItem: selectedRow.menuItem,
-                quantity: selectedRow.quantity,
-                amount: selectedRow.amount,
-                status: selectedRow.status,
-              });
-              setOpenUpdateDialog(true);
-            }}>
-              Update Selected Order
-            </Button>
-            <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => {
-              setOpenDeleteDialog(true);
-            }}>
-              Delete Selected Order
-            </Button>
-          </Box>
-        )}
-
-        <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
-          <DialogTitle>Update Order</DialogTitle>
-          <DialogContent>
-            <Box display="flex" flexDirection="column" gap={2} mt={1}>
-              <TextField label="Customer" name="customer" value={updateForm.customer} onChange={handleUpdateFormChange} fullWidth />
-              <TextField label="Menu Item" name="menuItem" value={updateForm.menuItem} onChange={handleUpdateFormChange} fullWidth />
-              <TextField label="Quantity" name="quantity" type="number" value={updateForm.quantity} onChange={handleUpdateFormChange} fullWidth />
-              <TextField label="Amount" name="amount" type="number" value={updateForm.amount} onChange={handleUpdateFormChange} fullWidth />
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select name="status" value={updateForm.status} label="Status" onChange={handleUpdateFormChange as any}>
-                  <MenuItem value="Paid">Paid</MenuItem>
-                  <MenuItem value="Pending">Pending</MenuItem>
+          <Box display="flex" flexWrap="wrap" alignItems="center" gap={2} mb={3} justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={2}>
+              <FormControl size="small" sx={{ minWidth: 150 }}>
+                <InputLabel>Rows per page</InputLabel>
+                <Select
+                  value={paginationModel.pageSize}
+                  label="Rows per page"
+                  onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
+                >
+                  {[5, 10, 25, 50].map(n => <MenuItem key={n} value={n}>{n}</MenuItem>)}
                 </Select>
               </FormControl>
             </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenUpdateDialog(false)}>Cancel</Button>
-            <Button variant="contained" onClick={handleUpdateSave}>Save</Button>
-          </DialogActions>
-        </Dialog>
+            <Box display="flex" alignItems="center" gap={2}>
+              <TextField
+                size="small"
+                placeholder="Search..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ minWidth: 200 }}
+              />
+              {selectedRow && (
+                <>
+                  <Tooltip title="Update">
+                    <IconButton onClick={() => {
+                      setUpdateForm({
+                        customer: selectedRow.customer,
+                        menuItem: selectedRow.menuItem,
+                        quantity: selectedRow.quantity,
+                        amount: selectedRow.amount,
+                        status: selectedRow.status,
+                      });
+                      setOpenUpdateDialog(true);
+                    }}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton onClick={() => setOpenDeleteDialog(true)} color="error">
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
+              <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
+              <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
+            </Box>
+          </Box>
 
-        <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogContent>
-            <DialogContentText>Are you sure you want to delete this order?</DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-            <Button onClick={handleDelete} color="error" variant="contained">Delete</Button>
-          </DialogActions>
-        </Dialog>
-      </Paper>
-    </Box>
+          <Box ref={gridRef}>
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              pageSizeOptions={[5, 10, 25, 50]}
+              onRowClick={(params) => setSelectedId(params.id as number)}
+              getRowClassName={(params) => (params.id === selectedId ? 'selected-row' : '')}
+              autoHeight
+              disableRowSelectionOnClick
+              sx={{
+                '& .MuiDataGrid-columnHeaders': { backgroundColor: '#bdbdbd' },
+                '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+                '& .selected-row': { backgroundColor: '#d1eaff !important' },
+                border: 'none',
+              }}
+            />
+          </Box>
+
+          {selectedRow && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+              <Button variant="outlined" color="primary" startIcon={<EditIcon />} onClick={() => {
+                setUpdateForm({
+                  customer: selectedRow.customer,
+                  menuItem: selectedRow.menuItem,
+                  quantity: selectedRow.quantity,
+                  amount: selectedRow.amount,
+                  status: selectedRow.status,
+                });
+                setOpenUpdateDialog(true);
+              }}>
+                Update Selected Order
+              </Button>
+              <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => {
+                setOpenDeleteDialog(true);
+              }}>
+                Delete Selected Order
+              </Button>
+            </Box>
+          )}
+
+          <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
+            <DialogTitle>Update Order</DialogTitle>
+            <DialogContent>
+              <Box display="flex" flexDirection="column" gap={2} mt={1}>
+                <TextField label="Customer" name="customer" value={updateForm.customer} onChange={handleUpdateFormChange} fullWidth />
+                <TextField label="Menu Item" name="menuItem" value={updateForm.menuItem} onChange={handleUpdateFormChange} fullWidth />
+                <TextField label="Quantity" name="quantity" type="number" value={updateForm.quantity} onChange={handleUpdateFormChange} fullWidth />
+                <TextField label="Amount" name="amount" type="number" value={updateForm.amount} onChange={handleUpdateFormChange} fullWidth />
+                <FormControl fullWidth>
+                  <InputLabel>Status</InputLabel>
+                  <Select name="status" value={updateForm.status} label="Status" onChange={handleUpdateFormChange as any}>
+                    <MenuItem value="Paid">Paid</MenuItem>
+                    <MenuItem value="Pending">Pending</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenUpdateDialog(false)}>Cancel</Button>
+              <Button variant="contained" onClick={handleUpdateSave}>Save</Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Are you sure you want to delete this order?</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+              <Button onClick={handleDelete} color="error" variant="contained">Delete</Button>
+            </DialogActions>
+          </Dialog>
+        </Paper>
+      </Box>
+    </>
   );
 };
 

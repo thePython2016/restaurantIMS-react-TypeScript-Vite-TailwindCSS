@@ -34,6 +34,15 @@ import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';    
 import Invoice from './pages/Forms/Invoice';    
 import InvoiceList from './pages/Forms/InvoiceList';    
+import SalesItem from './pages/Forms/SalesItem';
+import Sales from './pages/Forms/Sales';
+import SalesCustomer from './pages/Forms/SalesCustomer';
+import AllCharts from './pages/Forms/AllCharts';
+// import StaffList from './pages/Forms/StaffList';
+
+
+// Reports imports
+import Reports from './pages/Reports/Reports';
 
 export const theme = createTheme({
   typography: {
@@ -88,8 +97,8 @@ export default function App() {
           <Route path="/videos" element={<Videos />} />
 
           {/* Charts */}
-          <Route path="/line-chart" element={<LineChart />} />
-          <Route path="/bar-chart" element={<BarChart />} />
+          <Route path="/charts" element={<AllCharts/>} />
+        
 
           {/* Staff Page */}
           <Route path="/staff" element={<Staff />} />
@@ -98,6 +107,14 @@ export default function App() {
           {/* Invoice inside layout */}
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/invoice-list" element={<InvoiceList />} />
+
+          {/* Sales */}
+          <Route path="/sales" element={<Sales />} />
+          <Route path="/sales-item" element={<SalesItem />} />
+          <Route path="/sales-customer" element={<SalesCustomer />} />
+
+          {/* Reports */}
+          <Route path="/reports" element={<Reports />} />
         </Route>
 
         {/* Auth Layout */}

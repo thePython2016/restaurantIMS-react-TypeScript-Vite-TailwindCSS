@@ -10,6 +10,9 @@ import {
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
+import { ListIcon } from '../../icons';
 
 type MenuItemData = {
   name: string;
@@ -52,91 +55,110 @@ const MenuItems: React.FC = () => {
     },
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = (data: MenuItemData) => {
     console.log(data);
     reset();
   };
 
   return (
-    <Box className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-4xl p-8">
-        <Typography variant="h5" align="left" fontWeight={700} mb={1}>
-          Menu Item
-        </Typography>
-        <Box sx={{ borderBottom: '1px solid #ededed', mb: 3 }} />
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex gap-6">
-            <TextField
-              label="Item Name *"
-              fullWidth
-              {...register('name')}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-            <TextField
-              label="Category *"
-              select
-              fullWidth
-              value={watch('category') ?? ''}
-              {...register('category')}
-              error={!!errors.category}
-              helperText={errors.category?.message}
-            >
-              <MenuItem value="">Select Category</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  {cat}
-                </MenuItem>
-              ))}
-            </TextField>
-          </div>
-
-          <div className="flex gap-6">
-            <TextField
-              label="Price (Tsh) *"
-              type="number"
-              fullWidth
-              {...register('price')}
-              error={!!errors.price}
-              helperText={errors.price?.message}
-            />
-            <TextField
-              label="Availability *"
-              select
-              fullWidth
-              value={watch('availability') ?? ''}
-              {...register('availability')}
-              error={!!errors.availability}
-              helperText={errors.availability?.message}
-            >
-              <MenuItem value="">Select Availability</MenuItem>
-              {availabilityOptions.map((opt) => (
-                <MenuItem key={opt} value={opt}>
-                  {opt}
-                </MenuItem>
-              ))}
-            </TextField>
-          </div>
-
-          <TextField
-            label="Description *"
-            fullWidth
-            multiline
-            rows={3}
-            {...register('description')}
-            error={!!errors.description}
-            helperText={errors.description?.message}
-          />
-
-          <Box display="flex" justifyContent="flex-end">
-            <Button type="submit" variant="contained" color="primary" sx={{ mt: 4 }}>
-              Save
-            </Button>
+    <>
+      <div className="flex justify-end mb-2">
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => reset()}
+        >
+          Add Item
+        </Button>
+      </div>
+      <Box className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+        <Paper elevation={3} className="w-full max-w-4xl p-8">
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <ListIcon style={{ fontSize: 28, marginRight: 8 }} />
+              <Typography variant="h5" align="left" fontWeight={700}>
+                Menu Item
+              </Typography>
+            </Box>
           </Box>
-        </form>
-      </Paper>
-    </Box>
+          <Box sx={{ borderBottom: '1px solid #ededed', mb: 3 }} />
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="flex gap-6">
+              <TextField
+                label="Item Name *"
+                fullWidth
+                {...register('name')}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+              <TextField
+                label="Category *"
+                select
+                fullWidth
+                value={watch('category') ?? ''}
+                {...register('category')}
+                error={!!errors.category}
+                helperText={errors.category?.message}
+              >
+                <MenuItem value="">Select Category</MenuItem>
+                {categories.map((cat) => (
+                  <MenuItem key={cat} value={cat}>
+                    {cat}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </div>
+
+            <div className="flex gap-6">
+              <TextField
+                label="Price (Tsh) *"
+                type="number"
+                fullWidth
+                {...register('price')}
+                error={!!errors.price}
+                helperText={errors.price?.message}
+              />
+              <TextField
+                label="Availability *"
+                select
+                fullWidth
+                value={watch('availability') ?? ''}
+                {...register('availability')}
+                error={!!errors.availability}
+                helperText={errors.availability?.message}
+              >
+                <MenuItem value="">Select Availability</MenuItem>
+                {availabilityOptions.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </div>
+
+            <TextField
+              label="Description *"
+              fullWidth
+              multiline
+              rows={3}
+              {...register('description')}
+              error={!!errors.description}
+              helperText={errors.description?.message}
+            />
+
+            <Box display="flex" justifyContent="flex-end">
+              <Button type="submit" variant="contained" color="primary" sx={{ mt: 4 }}>
+                Save
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </>
   );
 };
 

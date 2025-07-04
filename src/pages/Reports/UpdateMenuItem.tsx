@@ -24,10 +24,8 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { useNavigate } from 'react-router-dom';
 
 export function UpdateMenuItem() {
   const [rows, setRows] = useState([
@@ -43,7 +41,6 @@ export function UpdateMenuItem() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [updateForm, setUpdateForm] = useState({ name: '', category: '', description: '', price: 0, availability: 'Available' });
   const gridRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -134,11 +131,6 @@ export function UpdateMenuItem() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/menu')}>
-          Add Item
-        </Button>
-      </Box>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h5" fontWeight={700} mb={2}>Update Menu</Typography>
 

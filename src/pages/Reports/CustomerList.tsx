@@ -19,10 +19,8 @@ import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { useNavigate } from 'react-router-dom';
 
 // Sample customer data generator
 const generateCustomerData = (count: number) => {
@@ -50,7 +48,6 @@ const columns: GridColDef[] = [
 const CustomerList: React.FC = () => {
   // Initial data
   const initialData = useMemo(() => generateCustomerData(50), []);
-  const navigate = useNavigate();
 
   const [rows, setRows] = useState(initialData);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
@@ -144,110 +141,107 @@ const CustomerList: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/customer')}
+    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
+      <Paper elevation={3} className="w-full max-w-7xl p-6 mx-auto">
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} borderBottom="1px solid #ccc" pb={1}>
+          <Typography variant="h5" fontWeight="bold">
+            Customers Report
+          </Typography>
+        </Box>
+
+        {/* Controls Row: Rows per page left, search/print/pdf right */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            mb: 2,
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+          }}
         >
-          Add Customer
-        </Button>
-      </div>
-      <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-        <Paper elevation={3} className="w-full max-w-7xl p-6 mx-auto">
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-            borderBottom="1px solid #ccc"
-            pb={1}
-          >
-            <Typography variant="h5" fontWeight="bold">
-              Customer List
-            </Typography>
+          {/* Left: Rows per page */}
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Rows per page</InputLabel>
+            <Select
+              value={paginationModel.pageSize}
+              label="Rows per page"
+              onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
+            >
+              {[5, 10, 25, 50].map(size => (
+                <MenuItem key={size} value={size}>{size}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Right: Search, Print, PDF */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              size="small"
+              placeholder="Search customers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+              }}
+              sx={{ width: 250 }}
+            />
+            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
+              Print
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<PictureAsPdfIcon />}
+              onClick={handlePDF}
+              color="primary"
+            >
+              PDF
+            </Button>
           </Box>
+        </Box>
 
-          {/* Controls Row: Rows per page left, search/print/pdf right */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-              mb: 2,
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-            }}
-          >
-            {/* Left: Rows per page */}
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Rows per page</InputLabel>
-              <Select
-                value={paginationModel.pageSize}
-                label="Rows per page"
-                onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
-              >
-                {[5, 10, 25, 50].map(size => (
-                  <MenuItem key={size} value={size}>{size}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            {/* Right: Search, Print, PDF */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <TextField
-                size="small"
-                placeholder="Search customers..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
-                }}
-                sx={{ width: 250 }}
-              />
-              <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
-                Print
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<PictureAsPdfIcon />}
-                onClick={handlePDF}
-                color="primary"
-              >
-                PDF
-              </Button>
-            </Box>
-          </Box>
-
-          <DataGrid
-            rows={pagedRows}
-            columns={columns}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            rowCount={filteredSortedRows.length}
-            paginationMode="server"
-            sortingMode="server"
-            sortModel={sortModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => setSelectedRowId(params.id as number)}
-            getRowClassName={(params) =>
-              params.id === selectedRowId ? 'selected-row' : ''
+        <DataGrid
+          rows={pagedRows}
+          columns={columns}
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          rowCount={filteredSortedRows.length}
+          paginationMode="server"
+          sortingMode="server"
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
+          onRowClick={(params) => setSelectedRowId(params.id as number)}
+          getRowClassName={(params) =>
+            params.id === selectedRowId ? 'selected-row' : ''
+          }
+          autoHeight
+          disableRowSelectionOnClick
+          pageSizeOptions={[5, 10, 25, 50]}
+          sx={{
+            height: 500,
+            '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+            '& .selected-row': { backgroundColor: '#d1eaff !important' },
+            '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
+            '& .MuiDataGrid-columnHeaders': { 
+              borderBottom: '2px solid #e0e0e0',
+              backgroundColor: '#f8f9fa'
+            },
+            '& .MuiDataGrid-columnHeader': {
+              borderRight: '1px solid #e0e0e0',
+              '&:last-child': {
+                borderRight: 'none'
+              }
+            },
+            '& .MuiDataGrid-cell': {
+              borderRight: '1px solid #f0f0f0',
+              '&:last-child': {
+                borderRight: 'none'
+              }
             }
-            autoHeight
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25, 50]}
-            sx={{
-              height: 500,
-              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-              '& .selected-row': { backgroundColor: '#d1eaff !important' },
-              '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
-            }}
-          />
-        </Paper>
-      </Box>
-    </>
+          }}
+        />
+      </Paper>
+    </Box>
   );
 };
 
