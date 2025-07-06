@@ -25,6 +25,8 @@ const RecentOrders: React.FC = () => {
   const [amountFilter, setAmountFilter] = useState('');
   const [amountOperator, setAmountOperator] = useState('>=');
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [printButtonColor, setPrintButtonColor] = useState<'blue' | 'green'>('blue');
+  const [pdfButtonColor, setPdfButtonColor] = useState<'blue' | 'green'>('blue');
 
   const filteredRows = useMemo(() => {
     return orders.filter(order => {
@@ -95,13 +97,12 @@ const RecentOrders: React.FC = () => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 5 }}>
-      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
+    <div className="rounded-2xl border border-gray-200 bg-white p-4">
         <Box>
-          <Typography variant="h5" mb={1} align="left" fontWeight={700}>
+        <Typography variant="h5" mb={1} align="left" fontWeight={700} className="text-gray-800">
             Recent Orders
           </Typography>
-          <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
+        <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
         </Box>
 
         <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" justifyContent="center" mb={3}>
@@ -155,8 +156,75 @@ const RecentOrders: React.FC = () => {
             sx={{ minWidth: 200 }}
           />
 
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
-          <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
+          {/* Print Button with Color Selection */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <FormControl size="small" sx={{ minWidth: 100 }}>
+              <InputLabel>Print Color</InputLabel>
+              <Select
+                value={printButtonColor}
+                label="Print Color"
+                onChange={(e) => setPrintButtonColor(e.target.value as 'blue' | 'green')}
+              >
+                <MenuItem value="blue">Blue</MenuItem>
+                <MenuItem value="green">Green</MenuItem>
+              </Select>
+            </FormControl>
+            <button 
+              style={{
+                padding: '8px 16px',
+                border: `2px solid ${printButtonColor === 'blue' ? '#3b82f6' : '#10b981'}`,
+                borderRadius: '6px',
+                backgroundColor: 'transparent',
+                color: printButtonColor === 'blue' ? '#3b82f6' : '#10b981',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={handlePrint}
+            >
+              <PrintIcon style={{ fontSize: '16px' }} />
+              Print
+            </button>
+          </Box>
+
+          {/* PDF Button with Color Selection */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <FormControl size="small" sx={{ minWidth: 100 }}>
+              <InputLabel>PDF Color</InputLabel>
+              <Select
+                value={pdfButtonColor}
+                label="PDF Color"
+                onChange={(e) => setPdfButtonColor(e.target.value as 'blue' | 'green')}
+              >
+                <MenuItem value="blue">Blue</MenuItem>
+                <MenuItem value="green">Green</MenuItem>
+              </Select>
+            </FormControl>
+            <button 
+              style={{
+                padding: '8px 16px',
+                border: `2px solid ${pdfButtonColor === 'blue' ? '#3b82f6' : '#10b981'}`,
+                borderRadius: '6px',
+                backgroundColor: pdfButtonColor === 'blue' ? '#3b82f6' : '#10b981',
+                color: 'white',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s ease',
+              }}
+              onClick={handlePDF}
+            >
+              <PictureAsPdfIcon style={{ fontSize: '16px' }} />
+              PDF
+            </button>
+          </Box>
         </Box>
 
         <DataGrid
@@ -170,14 +238,14 @@ const RecentOrders: React.FC = () => {
           autoHeight
           disableRowSelectionOnClick
           sx={{
-            '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-            '& .selected-row': { backgroundColor: '#d1eaff !important' },
-            '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
+          '& .MuiDataGrid-row:hover': { backgroundColor: 'var(--color-gray-100)' },
+          '& .selected-row': { backgroundColor: 'var(--color-brand-50) !important' },
+          '& .MuiDataGrid-footerContainer': { borderTop: '1px solid var(--color-gray-200)' },
+          '& .MuiDataGrid-columnHeaders': { backgroundColor: 'var(--color-gray-50)' },
             mt: 2,
           }}
         />
-      </Paper>
-    </Container>
+    </div>
   );
 };
 

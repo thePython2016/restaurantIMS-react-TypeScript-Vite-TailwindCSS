@@ -118,8 +118,8 @@ const navItems: NavItem[] = [
     icon: <DollarLineIcon />,
     subItems: [
       { name: "Add New", path: "/sales", pro: false, icon: <PlusIcon /> },
-      { name: "Sales by Item details", path: "/sales-item-report", pro: false, icon: <BoxIconLine /> },
-      { name: "Sales Customer details", path: "/sales Customer report", pro: false, icon: <UserCircleIcon /> }
+      { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },
+      { name: "Sales Customer details", path: "/sales-Customer", pro: false, icon: <UserCircleIcon /> }
     ]
   }
 ];

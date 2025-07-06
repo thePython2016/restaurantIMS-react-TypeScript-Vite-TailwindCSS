@@ -19,24 +19,17 @@ import LineChartOne from "../../components/charts/line/LineChartOne";
 import PieChart from "../../components/charts/pie/pieChart";
 import { SelectChangeEvent } from '@mui/material/Select';
 
-const cardStyle = {
-  background: '#f7f7f9',
-  padding: 16,
-  borderRadius: 8,
-  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-};
-
 const Charts: React.FC = () => {
   
   
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-7xl mx-auto p-6">
+    <Box className="flex flex-col min-h-screen bg-gray-100 p-4 dark:bg-gray-900">
+      <Paper elevation={3} className="w-full max-w-7xl mx-auto p-6 bg-white dark:bg-gray-800">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} borderBottom="1px solid #ccc" pb={2}>
           <Box display="flex" alignItems="center" gap={2}>
             <PieChartIcon />
-            <Typography variant="h5" fontWeight="bold">Charts Dashboard</Typography>
+            <Typography variant="h5" fontWeight="bold" className="text-gray-800 dark:text-white">Charts Dashboard</Typography>
           </Box>
         </Box>
 
@@ -51,12 +44,12 @@ const Charts: React.FC = () => {
               alignItems: 'stretch',
             }}
           >
-            <div style={cardStyle}>
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
               <BarChartOne />
             </div>
             <div
+              className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]"
               style={{
-                ...cardStyle,
                 gridColumn: 2,
                 gridRow: '1 / span 2',
                 height: '100%',
@@ -67,7 +60,7 @@ const Charts: React.FC = () => {
             >
               <PieChart />
             </div>
-            <div style={cardStyle}>
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
               <LineChartOne />
             </div>
           </div>

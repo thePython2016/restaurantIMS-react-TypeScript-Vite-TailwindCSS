@@ -72,11 +72,11 @@ const barData = {
 
 export default function StatisticsChart() {
   return (
-    <div style={{ display: 'flex', gap: 16 }}>
-      <div style={{ background: '#fff', padding: 16, borderRadius: 8, flex: 1 }}>
+    <div className="flex gap-4">
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] flex-1">
         <Line options={options} data={data} />
       </div>
-      <div style={{ background: '#fff', padding: 16, borderRadius: 8, flex: 1 }}>
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03] flex-1">
         <Bar options={options} data={barData} />
       </div>
     </div>

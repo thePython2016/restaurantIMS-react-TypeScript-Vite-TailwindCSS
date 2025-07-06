@@ -25,7 +25,7 @@ export default function MonthlyTarget() {
           size: "80%",
         },
         track: {
-          background: "#E4E7EC",
+          background: "var(--color-gray-200)",
           strokeWidth: "100%",
           margin: 5, // margin is in pixels
         },
@@ -37,7 +37,7 @@ export default function MonthlyTarget() {
             fontSize: "36px",
             fontWeight: "600",
             offsetY: -40,
-            color: "#1D2939",
+            color: "var(--color-gray-800)",
             formatter: function (val) {
               return val + "%";
             },
@@ -72,7 +72,7 @@ export default function MonthlyTarget() {
               Monthly Target
             </h3>
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-              Target you’ve set for each month
+              Target you've set for each month
             </p>
           </div>
           <div className="relative inline-block">

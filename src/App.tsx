@@ -38,6 +38,8 @@ import SalesItem from './pages/Forms/SalesItem';
 import Sales from './pages/Forms/Sales';
 import SalesCustomer from './pages/Forms/SalesCustomer';
 import AllCharts from './pages/Forms/AllCharts';
+import Login from './pages/Forms/Login';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 // import StaffList from './pages/Forms/StaffList';
 
 
@@ -62,7 +64,7 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         {/* Dashboard Layout */}
-        <Route element={<AppLayout />}>
+        <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route index path="/" element={<Home />} />
 
           {/* Others Page */}
@@ -120,10 +122,12 @@ export default function App() {
         {/* Auth Layout */}
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
 
         {/* Fallback Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
+    
   );
 }

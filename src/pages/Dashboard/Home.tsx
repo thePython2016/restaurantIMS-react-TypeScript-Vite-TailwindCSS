@@ -19,13 +19,13 @@ export default function Home() {
           <EcommerceMetrics />
         </div>
 
-        <div className="col-span-6" style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
+        <div className="col-span-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <BarChartOne />
         </div>
-        <div className="col-span-6 row-span-2" style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
+        <div className="col-span-6 row-span-2 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <PieChart />
         </div>
-        <div className="col-span-6" style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
+        <div className="col-span-6 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
           <LineChartOne />
         </div>
         <div className="col-span-12">
