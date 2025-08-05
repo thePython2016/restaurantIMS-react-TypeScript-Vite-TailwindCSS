@@ -1,135 +1,147 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+// src/context/AuthContext.tsx
 
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-}
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  user: any;
+  accessToken: string | null;
+  login: (username: string, password: string, keepLoggedIn: boolean) => Promise<boolean>;
+  googleLogin: (accessToken: string) => Promise<boolean>;
   logout: () => void;
-  register: (username: string, email: string, password: string) => Promise<boolean>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<any>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // Check if user is already logged in on app start
+  // ✅ Load token from either localStorage or sessionStorage
   useEffect(() => {
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('user');
+    const storedToken = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
+    
+    if (storedToken) {
+      setAccessToken(storedToken);
+      
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Failed to parse stored user data:', error);
+          setUser({}); // fallback placeholder user
+        }
+      } else {
+        setUser({}); // optional placeholder user
       }
     }
-    setIsLoading(false);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
+  const login = async (
+    username: string,
+    password: string,
+    keepLoggedIn: boolean
+  ): Promise<boolean> => {
     try {
-      // Simulate API call (replace with real backend)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // YOUR CUSTOM CREDENTIALS - Replace these with your own
-      const validCredentials = [
-        { username: 'admin', password: 'admin123' },
-        { username: 'user', password: 'password123' },
-        // Add more users here if needed
-        // { username: 'yourname', password: 'yourpassword' },
-      ];
-      
-      // Check if provided credentials match
-      const isValidUser = validCredentials.find(
-        cred => cred.username === username && cred.password === password
-      );
-      
-      if (isValidUser) {
-        const mockUser: User = {
-          id: '1',
-          username: username,
-          email: `${username}@example.com`,
-          role: 'user'
-        };
-        
-        // Store user data
-        setUser(mockUser);
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        return true;
+      const response = await fetch("http://127.0.0.1:8000/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) throw new Error("Login failed");
+
+      const data = await response.json();
+      const token = data.access;
+
+      // ✅ Store token based on keepLoggedIn
+      if (keepLoggedIn) {
+        localStorage.setItem("access_token", token);
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+        }
       } else {
-        return false; // Invalid credentials
+        sessionStorage.setItem("access_token", token);
+        if (data.user) {
+          sessionStorage.setItem("user", JSON.stringify(data.user));
+        }
       }
+
+      setAccessToken(token);
+      setUser(data.user || { username }); // use response user data or fallback
+
+      return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       return false;
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  // ✅ Google OAuth login function
+  const googleLogin = async (googleAccessToken: string): Promise<boolean> => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/auth/google/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ access_token: googleAccessToken }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Google login failed");
+      }
+
+      const data = await response.json();
+      
+      if (data.access_token) {
+        // Always store Google login in localStorage (keep logged in by default)
+        localStorage.setItem("access_token", data.access_token);
+        
+        if (data.refresh_token) {
+          localStorage.setItem("refresh_token", data.refresh_token);
+        }
+        
+        if (data.user) {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          setUser(data.user);
+        }
+        
+        setAccessToken(data.access_token);
+        return true;
+      }
+      
+      throw new Error("No access token received from server");
+    } catch (error: any) {
+      console.error("Google login error:", error);
+      throw new Error(error.message || "Google login failed");
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('user');
-  };
-
-  const register = async (username: string, email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
-    
-    try {
-      // Simulate API call - replace with actual backend integration
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, create a new user
-      const newUser: User = {
-        id: Date.now().toString(),
-        username: username,
-        email: email,
-        role: 'user'
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      return true;
-    } catch (error) {
-      console.error('Registration error:', error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    logout,
-    register
+    setAccessToken(null);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, accessToken, login, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}; 
+};

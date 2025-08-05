@@ -50,6 +50,7 @@ import {
   DollarLineIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
+import { useAuth } from "../context/AuthContext";
 
 type NavItem = {
   name: string;
@@ -70,11 +71,17 @@ const navItems: NavItem[] = [
     path: "/profile",
   },
   {
+    icon: <UserCircleIcon />,
+    name: "demo",
+    path: "/demo",
+  },
+  {
     name: "Staff",
     icon: <GroupIcon />,
     subItems: [
       { name: "Add New", path: "/staff", pro: false, icon: <PlusIcon /> },
       { name: "Staff List", path: "/staff-list", pro: false, icon: <ListIcon /> },
+      // { name: "demo", path: "/demo", pro: false, icon: <ListIcon /> },
       { name: "Update", path: "/update", pro: false, icon: <PencilIcon /> }
     ],
   },
@@ -141,6 +148,7 @@ const othersItems: NavItem[] = [
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { user, accessToken } = useAuth();
   const location = useLocation();
 
   const [openSubmenu, setOpenSubmenu] = useState<{
@@ -360,6 +368,7 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
+        {user && accessToken && (
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
@@ -398,6 +407,7 @@ const AppSidebar: React.FC = () => {
           </div>
         </nav>
       </div>
+        )}
     </aside>
     </>
   );

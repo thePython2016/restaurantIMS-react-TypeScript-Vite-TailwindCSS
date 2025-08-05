@@ -7,14 +7,25 @@ import App from "./App.tsx";
 import { AppWrapper } from "./components/common/PageMeta.tsx";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
+import { BrowserRouter } from "react-router-dom";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
-        <AppWrapper>
-          <App />
-        </AppWrapper>
+        <BrowserRouter>
+          <AppWrapper>
+            <GoogleOAuthProvider 
+              clientId="378902318323-mts3fdjf8hpqbh15pme2ilat8438iq2r.apps.googleusercontent.com"
+              onScriptLoadError={(error) => {
+                console.error('Google OAuth script failed to load:', error);
+              }}
+            >
+              <App />
+            </GoogleOAuthProvider>
+          </AppWrapper>
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   </StrictMode>,

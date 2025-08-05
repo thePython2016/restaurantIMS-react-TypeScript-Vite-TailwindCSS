@@ -5,6 +5,8 @@ import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
 import Footer from "../components/common/Footer";
 import { Box } from '@mui/material';
+import LogoutButton from "../components/pages/AuthPages/LogoutButton";
+
 
 const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();

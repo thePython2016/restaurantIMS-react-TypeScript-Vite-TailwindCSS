@@ -189,7 +189,13 @@ const SalesItem: React.FC = () => {
 
   return (
     <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-7xl mx-auto p-6">
+      <Paper elevation={3} sx={{
+        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
+        border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
+        borderRadius: 3,
+        p: 6,
+        mx: 'auto'
+      }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} borderBottom="1px solid #ccc" pb={1}>
           <Typography variant="h5" fontWeight="bold">Sales by Item</Typography>
         </Box>
