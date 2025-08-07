@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-
+import PasswordResetRequest from "./pages/AuthPages/PasswordResetRequest.jsx";
+import PasswordResetConfirm from "./pages/AuthPages/PasswordResetConfirm.jsx";
 import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -19,6 +20,8 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
+import Welcome from "./pages/Forms/WelcomePage";
+
 
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
@@ -33,6 +36,7 @@ import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
 import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton';
+import PasswordResetPage from './pages/AuthPages/PasswordResetRequest';
 
 
 import Invoice from './pages/Forms/Invoice';
@@ -74,17 +78,25 @@ export default function App() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         {/* Public Routes - No Authentication Required */}
-        <Route path="/public-order" element={<PublicOrderForm />} />
-
+        <Route path="/public-order" element={<PublicOrderForm/>} />
+      
+        <Route
+          path="/password-reset-confirm/:uid/:token"
+          element={<PasswordResetConfirm />}
+        />
+          <Route path="/password-reset" element={<PasswordResetPage/>} />
+        <Route path="/welcome" element={<Welcome />} />
         {/* Protected App Routes */}
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Home />} />
           <Route path="/profile" element={<UserProfiles />} />
           <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/google-login" element={<GoogleLoginButton />} />
+          {/* <Route path="/google-login" element={<GoogleLoginButton />} /> */}
+          
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
           <Route path="/form-elements" element={<FormElements />} />
+        
 
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />

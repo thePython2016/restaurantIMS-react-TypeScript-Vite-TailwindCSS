@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
+import PasswordResetPage from "./passwordResetRequest"
 
 function SignIn() {
   const navigate = useNavigate();
@@ -49,12 +50,11 @@ function SignIn() {
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        console.log('Google login successful, token received');
+        console.log("Google login successful, token received:", tokenResponse);
         setLoading(true);
-        
-        // Use the googleLogin function from AuthContext
+
         const success = await googleLogin(tokenResponse.access_token);
-        
+
         if (success) {
           setToast({ message: "Google login successful!", type: "success" });
           setTimeout(() => navigate("/dashboard"), 1500);
@@ -63,9 +63,9 @@ function SignIn() {
         }
       } catch (error: any) {
         console.error("Google login error:", error);
-        setToast({ 
-          message: error.message || "Google login failed", 
-          type: "error" 
+        setToast({
+          message: error.message || "Google login failed",
+          type: "error",
         });
       } finally {
         setLoading(false);
@@ -73,21 +73,23 @@ function SignIn() {
     },
     onError: (error) => {
       console.error("Google OAuth error:", error);
-      setToast({ 
-        message: "Google login was cancelled or failed. Please try again.", 
-        type: "error" 
+      setToast({
+        message: "Google login was cancelled or failed. Please try again.",
+        type: "error",
       });
     },
-    scope: 'email profile',
-    flow: 'auth-code'
+    scope: "email profile",
+    flow: "implicit",
   });
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4 relative">
+    // Removed bg-gray-100 here
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative">
       <h1 className="text-3xl font-extrabold mb-8">RMIS</h1>
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white p-8 rounded-xl shadow-md flex flex-col"
+        // Increased max width here
+        className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-md flex flex-col"
       >
         <h2 className="text-2xl font-bold mb-2">Sign In</h2>
         <p className="text-gray-500 mb-6">
@@ -101,7 +103,7 @@ function SignIn() {
           <input
             type="email"
             placeholder="info@gmail.com"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            className="w-full border border-gray-300 rounded-lg px-6 py-3 text-md"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -116,7 +118,7 @@ function SignIn() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-10 text-md"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -143,7 +145,7 @@ function SignIn() {
           </label>
           <button
             type="button"
-            onClick={() => navigate("/forgot-password")}
+            onClick={() => navigate("/password-reset")}
             className="text-sm text-blue-600 hover:underline"
           >
             Forgot password?
@@ -153,7 +155,7 @@ function SignIn() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg mb-4 ${
+          className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg mb-4 ${
             loading ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
@@ -166,12 +168,11 @@ function SignIn() {
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        {/* Google Button */}
         <div className="mb-4">
           <button
             type="button"
             onClick={() => handleGoogleLogin()}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:bg-gray-50 shadow-sm hover:shadow-md"
+            className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:bg-gray-50 shadow-sm hover:shadow-md"
           >
             <img
               src="https://img.icons8.com/color/16/google-logo.png"

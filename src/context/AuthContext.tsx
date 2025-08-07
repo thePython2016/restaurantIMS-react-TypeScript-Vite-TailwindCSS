@@ -90,24 +90,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // ✅ Google OAuth login function
   const googleLogin = async (googleAccessToken: string): Promise<boolean> => {
     try {
+      console.log('Sending Google token to backend:', googleAccessToken);
+      
       const response = await fetch("http://127.0.0.1:8000/auth/google/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ access_token: googleAccessToken }),
+        body: JSON.stringify({ 
+          access_token: googleAccessToken,
+          token_type: "Bearer"
+        }),
       });
 
+      console.log('Backend response status:', response.status);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Google login failed");
+        let errorMessage = "Google login failed";
+        try {
+          const errorData = await response.json();
+          console.log('Backend error data:', errorData);
+          errorMessage = errorData.message || errorData.detail || errorData.error || "Google login failed";
+        } catch (parseError) {
+          console.log('Could not parse error response');
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log('Backend success data:', data);
       
-      if (data.access_token) {
+      // Handle different response formats
+      const token = data.access_token || data.access || data.token;
+      
+      if (token) {
         // Always store Google login in localStorage (keep logged in by default)
-        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("access_token", token);
         
         if (data.refresh_token) {
           localStorage.setItem("refresh_token", data.refresh_token);
@@ -116,9 +134,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
           setUser(data.user);
+        } else if (data.username) {
+          // If backend returns username instead of full user object
+          const userData = { username: data.username, email: data.email };
+          localStorage.setItem("user", JSON.stringify(userData));
+          setUser(userData);
         }
         
-        setAccessToken(data.access_token);
+        setAccessToken(token);
         return true;
       }
       
