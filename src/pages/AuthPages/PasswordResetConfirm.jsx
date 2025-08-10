@@ -29,7 +29,6 @@ const PasswordResetConfirm = () => {
     e.preventDefault();
     setMessage("");
     setError("");
-
     if (password !== confirmPassword) {
       setError("❌ Passwords do not match.");
       return;

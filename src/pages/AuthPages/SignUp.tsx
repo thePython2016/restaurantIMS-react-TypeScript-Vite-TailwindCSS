@@ -229,3 +229,7 @@ export function SignupForm() {
     </div>
   );
 }
+
+export default function SignUp() {
+  return <SignupForm />;
+}

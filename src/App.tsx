@@ -1,8 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import PasswordResetRequest from "./pages/AuthPages/PasswordResetRequest.jsx";
 import PasswordResetConfirm from "./pages/AuthPages/PasswordResetConfirm.jsx";
 import SignIn from "./pages/AuthPages/SignIn";
-// Removed: import of inner form; route will use the SignupForm page wrapper
+import { SignupForm as SignUp } from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 
 import UserProfiles from "./pages/UserProfiles";
@@ -12,8 +13,6 @@ import Alerts from "./pages/UiElements/Alerts";
 import Badges from "./pages/UiElements/Badges";
 import Avatars from "./pages/UiElements/Avatars";
 import Buttons from "./pages/UiElements/Buttons";
-// import PasswordResetPage from './pages/AuthPages/PasswordResetRequest';
-// import PasswordResetConfirm from './pages/AuthPages/PasswordResetConfirm';
 
 import Calendar from "./pages/Calendar";
 import FormElements from "./pages/Forms/FormElements";
@@ -23,7 +22,6 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Welcome from "./pages/Forms/WelcomePage";
 import SignupForm from "./pages/AuthPages/SignupForm";
-import SignupPage from "./pages/AuthPages/SignupForm";
 
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
@@ -37,8 +35,8 @@ import UpdateOrder from './pages/Forms/UpdateOrder';
 import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
-
-import PasswordResetRequest from './pages/AuthPages/PasswordResetRequest.jsx';
+import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton';
+import PasswordResetPage from './pages/AuthPages/PasswordResetRequest.jsx';
 
 import Invoice from './pages/Forms/Invoice';
 import InvoiceList from './pages/Forms/InvoiceList';
@@ -52,7 +50,6 @@ import Demo from './pages/Forms/Demo';
 import ChangePassword from './pages/AuthPages/ChangePassword';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
-// import UserDropdown from './header/UserDropdown';
 
 export default function App() {
   const location = useLocation();
@@ -81,22 +78,16 @@ export default function App() {
         {/* Public Routes - No Authentication Required */}
         <Route path="/public-order" element={<PublicOrderForm/>} />
         <Route path="/signup-form" element={<SignupForm/>} />
-        <Route path="/signup-page" element={<SignupPage/>} />
-        {/* <Route path="/password-reset" element={<PasswordResetRequest />} /> */}
+        <Route path="/signup-page" element={<SignupForm/>} />
+        <Route path="/password-reset" element={<PasswordResetRequest/>} />
         <Route path="/password/reset/confirm/:uid/:token" element={<PasswordResetConfirm />} />
-      
-        {/* <Route
-          path="/password-reset-confirm/:uid/:token"
-          element={<PasswordResetConfirm />}
-        /> */}
-          <Route path="/password-reset" element={<PasswordResetRequest/>} />
         <Route path="/welcome" element={<Welcome />} />
+        
         {/* Protected App Routes */}
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/dashboard" element={<Home />} />
           <Route path="/profile" element={<UserProfiles />} />
           <Route path="/change-password" element={<ChangePassword />} />
-          {/* <Route path="/google-login" element={<GoogleLoginButton />} /> */}
           
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
@@ -139,9 +130,9 @@ export default function App() {
 
         {/* Auth Pages */}
         <Route path="/log" element={<SignIn />} />
+        <Route path="/login" element={<SignIn />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignupForm />} />
-
+        <Route path="/signup" element={<SignUp />} />
 
         {/* Catch-all 404 */}
         <Route path="*" element={<NotFound />} />

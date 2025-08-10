@@ -20,8 +20,7 @@ export default function UserDropdown() {
   function handleLogout() {
     closeDropdown();
     logout();
-    // Use window.location to force navigation outside React Router
-    window.location.href = "/welcome";
+    navigate("/login");
   }
 
   return (

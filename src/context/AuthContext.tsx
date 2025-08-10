@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 interface AuthContextType {
   user: any;
   accessToken: string | null;
-  login: (username: string, password: string, keepLoggedIn: boolean) => Promise<boolean>;
+  login: (usernameOrEmail: string, password: string, keepLoggedIn: boolean) => Promise<boolean>;
   googleLogin: (accessToken: string) => Promise<boolean>;
   logout: () => void;
 }

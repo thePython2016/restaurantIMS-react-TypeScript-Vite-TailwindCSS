@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
+import PasswordResetPage from "./PasswordResetRequest.jsx";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ function SignIn() {
       const success = await login(email, password, keepLoggedIn);
       if (success) {
         setToast({ message: "Login successful!", type: "success" });
-        navigate("/dashboard", { replace: true });
+        setTimeout(() => navigate("/dashboard"), 1500);
       } else {
         setToast({ message: "Login failed", type: "error" });
       }
@@ -56,7 +57,7 @@ function SignIn() {
 
         if (success) {
           setToast({ message: "Google login successful!", type: "success" });
-          navigate("/dashboard", { replace: true });
+          setTimeout(() => navigate("/dashboard"), 1500);
         } else {
           setToast({ message: "Google login failed", type: "error" });
         }
