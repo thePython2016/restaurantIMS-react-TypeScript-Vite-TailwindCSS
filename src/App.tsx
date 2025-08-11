@@ -47,6 +47,8 @@ import SalesCustomer from './pages/Forms/SalesCustomer';
 import AllCharts from './pages/Forms/AllCharts';
 import Reports from './pages/Reports/Reports';
 import PublicOrderForm from './pages/Forms/PublicOrderForm';
+import Multilingual from './pages/Forms/Multilingual';
+
 import Demo from './pages/Forms/Demo';
 import ChangePassword from './pages/AuthPages/ChangePassword';
 import ProtectedRoute from './components/auth/ProtectedRoute';

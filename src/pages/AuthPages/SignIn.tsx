@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
 import PasswordResetPage from "./PasswordResetRequest.jsx";
+import Multilingual from "../Forms/multilingual.jsx";
+import { useTranslation } from "react-i18next";
+
 
 function SignIn() {
   const navigate = useNavigate();
   const { login, googleLogin } = useAuth();
+  const { t } = useTranslation();
 
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
@@ -85,6 +89,10 @@ function SignIn() {
   return (
     // Removed bg-gray-100 here
     <div className="min-h-screen flex flex-col items-center justify-center px-4 relative pb-8">
+      {/* Multilingual Component */}
+      <div className="absolute top-16 left-8 z-50">
+        <Multilingual />
+      </div>
       <div className="relative w-full max-w-2xl mt-32">
         <h1 className="text-2xl font-extrabold text-center absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-4 z-10">RIMS</h1>
         <form
@@ -92,33 +100,33 @@ function SignIn() {
           // Increased max width here
           className="w-full bg-white p-8 rounded-xl shadow-md flex flex-col border-2 border-gray-200"
         >
-        <h2 className="text-2xl font-bold mb-2">Sign In</h2>
+        <h2 className="text-2xl font-bold mb-2">{t('sign_in')}</h2>
         <p className="text-gray-500 mb-6">
-          Enter your email and password to sign in!
+          {t('sign_in_description')}
         </p>
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email <span className="text-red-500">*</span>
+            {t('email')} <span className="text-red-500">*</span>
           </label>
-          <input
-            type="email"
-            placeholder="info@gmail.com"
-            className="w-full border border-gray-300 rounded-lg px-6 py-3 text-md"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+                      <input
+              type="email"
+              placeholder={t('email_placeholder')}
+              className="w-full border border-gray-300 rounded-lg px-6 py-3 text-md"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
         </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Password <span className="text-red-500">*</span>
+            {t('password')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder={t('password_placeholder')}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 pr-10 text-md"
               required
               value={password}
@@ -142,14 +150,14 @@ function SignIn() {
               onChange={handleCheckboxChange}
               className="mr-2"
             />
-            Keep me logged in
+            {t('keep_logged_in')}
           </label>
           <button
             type="button"
             onClick={() => navigate("/password-reset")}
             className="text-sm text-blue-600 hover:underline"
           >
-            Forgot password?
+            {t('forgot_password')}
           </button>
         </div>
 
@@ -160,7 +168,7 @@ function SignIn() {
             loading ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? t('signing_in') : t('sign_in')}
         </button>
 
         <div className="flex items-center my-4">
@@ -179,18 +187,18 @@ function SignIn() {
               src="https://img.icons8.com/color/16/google-logo.png"
               alt="Google"
             />
-            Continue with Google
+            {t('continue_with_google')}
           </button>
         </div>
 
         <p className="text-center text-sm text-gray-600 mt-4">
-          Don't have an account?{" "}
+          {t('dont_have_account')}{" "}
           <button
             type="button"
             onClick={() => navigate("/signup-form")}
             className="text-blue-600 hover:underline"
           >
-            Sign up
+            {t('sign_up')}
           </button>
         </p>
 

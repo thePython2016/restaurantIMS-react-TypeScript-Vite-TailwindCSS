@@ -1,0 +1,17 @@
+{
+    "welcome": "Bienvenue sur notre site",
+    "order_now": "Commander maintenant",
+    "sign_in": "Se connecter",
+    "sign_in_description": "Entrez votre email et mot de passe pour vous connecter !",
+    "email": "Email",
+    "password": "Mot de passe",
+    "keep_logged_in": "Rester connecté",
+    "forgot_password": "Mot de passe oublié ?",
+    "signing_in": "Connexion en cours...",
+    "continue_with_google": "Continuer avec Google",
+    "dont_have_account": "Vous n'avez pas de compte ?",
+    "sign_up": "S'inscrire",
+    "email_placeholder": "info@gmail.com",
+    "password_placeholder": "Entrez votre mot de passe"
+  }
+  
