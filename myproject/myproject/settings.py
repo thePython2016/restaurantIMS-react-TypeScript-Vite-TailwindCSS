@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import environ
 import warnings
+from django.utils.translation import gettext_lazy as _
 
 # -------------------------
 # Paths
@@ -12,8 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Environment Variables
 # -------------------------
 env = environ.Env(DEBUG=(bool, False))
-
-# Always load .env from the same place as manage.py
 env_file = os.path.join(BASE_DIR, '.env')
 
 if not os.path.exists(env_file):
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Your apps
     'Customers',
     'Items',
     'Menus',
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'Staffs',
     'Orders',
     'Useraccount',
+    # Third-party
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.sites',
@@ -71,9 +72,10 @@ INSTALLED_APPS = [
 # -------------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # NEW for translations
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -132,9 +134,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # -------------------------
 # Localization
 # -------------------------
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+LANGUAGES = [
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('sw', _('Swahili')),  # Example extra language
+]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 TIME_ZONE = 'UTC'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 # -------------------------
@@ -217,15 +226,6 @@ REST_AUTH = {
 # -------------------------
 # allauth config
 # -------------------------
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_USERNAME_REQUIRED = True
-# ACCOUNT_UNIQUE_EMAIL = True
-# ACCOUNT_EMAIL_VERIFICATION = 'none'
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
-# ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Your Site] '
-
-
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
