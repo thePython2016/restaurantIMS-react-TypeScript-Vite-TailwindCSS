@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
-
+import Multilingual from "../Forms/multilingual.jsx";
+import { useTranslation } from "react-i18next";
 export function SignupForm() {
   const navigate = useNavigate();
   const { googleLogin } = useAuth();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -40,23 +42,23 @@ export function SignupForm() {
     setSubmitError(null);
 
     if (!firstName.trim()) {
-      setSubmitError("First name is required");
+      setSubmitError(t("First name is required"));
       return;
     }
     if (!lastName.trim()) {
-      setSubmitError("Last name is required");
+      setSubmitError(t("Last name is required"));
       return;
     }
     if (!email.trim()) {
-      setSubmitError("Email is required");
+      setSubmitError(t("Email is required"));
       return;
     }
     if (!password.trim()) {
-      setSubmitError("Password is required");
+      setSubmitError(t("Password is required"));
       return;
     }
     if (password.length < 8) {
-      setSubmitError("Password must be at least 8 characters long");
+      setSubmitError(t("Password must be at least 8 characters long"));
       return;
     }
 
@@ -74,7 +76,7 @@ export function SignupForm() {
         }),
       });
       if (!response.ok) {
-        let message = "Registration failed";
+        let message = t("Registration failed");
         try {
           const err = await response.json();
           if (typeof err === "object" && err !== null) {
@@ -93,7 +95,7 @@ export function SignupForm() {
       }
       setSignupSuccess(true);
     } catch (err: any) {
-      setSubmitError(err.message || "Registration failed");
+      setSubmitError(err.message || t("Registration failed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -102,11 +104,15 @@ export function SignupForm() {
   return (
     // No width or height restrictions here; page container controls size
     <div className="min-h-screen flex flex-col items-center justify-center px-4 relative">
+      {/* Multilingual Component */}
+      <div className="absolute top-16 left-8 z-50">
+        <Multilingual />
+      </div>
       <div className="relative w-full max-w-2xl mt-32">
       <h1 className="text-2xl font-extrabold text-center absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-4 z-10">RIMS</h1>
       <div className="bg-white rounded-lg shadow p-8 w-full border-2 border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-900">Sign Up</h2>
-      <p className="mt-1 text-sm text-gray-600">Enter your details to create an account!</p>
+        <h2 className="text-3xl font-bold text-gray-900">{t("Sign Up")}</h2>
+              <p className="mt-1 text-sm text-gray-600">{t("Enter your details to create an account!")}</p>
 
       {googleSignedIn && (
         <div className="mt-4 text-sm text-green-700 bg-green-100 border border-green-200 rounded-md px-4 py-2">
@@ -128,7 +134,7 @@ export function SignupForm() {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="font-semibold">Registration Error</span>
+            <span className="font-semibold">{t("Registration Error")}</span>
           </div>
           <p className="mt-1">{submitError}</p>
         </div>
@@ -148,18 +154,17 @@ export function SignupForm() {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="font-semibold">Account Created Successfully!</span>
+            <span className="font-semibold">{t("Account Created Successfully!")}</span>
           </div>
           <p className="mb-3">
-            Your account has been created. You can now sign in with your email and
-            password.
+            {t("Your account has been created. You can now sign in with your email and password.")}
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <Link
               to="/login"
               className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
             >
-              Sign In Now
+                              {t("Sign In Now")}
             </Link>
             <button
               onClick={() => {
@@ -171,7 +176,7 @@ export function SignupForm() {
               }}
               className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
             >
-              Create Another Account
+                              {t("Create Another Account")}
             </button>
           </div>
         </div>
@@ -181,11 +186,11 @@ export function SignupForm() {
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700">
-              First Name<span className="text-red-500">*</span>
+              {t("First Name")}<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="Enter your first name"
+              placeholder={t("Enter your first name")}
               className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -195,11 +200,11 @@ export function SignupForm() {
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700">
-              Last Name<span className="text-red-500">*</span>
+              {t("Last Name")}<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="Enter your last name"
+              placeholder={t("Enter your last name")}
               className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -211,11 +216,11 @@ export function SignupForm() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Email<span className="text-red-500">*</span>
+            {t("Email")}<span className="text-red-500">*</span>
           </label>
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder={t("Enter your email")}
             className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -226,12 +231,12 @@ export function SignupForm() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700">
-            Password<span className="text-red-500">*</span>
+            {t("Password")}<span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
+              placeholder={t("Enter your password")}
               className="mt-1 block w-full rounded-md border border-gray-300 p-2 pr-10 focus:ring-2 focus:ring-blue-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -248,13 +253,13 @@ export function SignupForm() {
         <div className="flex items-start gap-2 text-sm">
           <input type="checkbox" className="mt-1" />
           <span>
-            By creating an account you agree to our{" "}
+            {t("By creating an account you agree to our")}{" "}
             <a href="#" className="text-blue-600 underline">
-              Terms and Conditions
+              {t("Terms and Conditions")}
             </a>{" "}
-            and{" "}
+                          {t("and")}{" "}
             <a href="#" className="text-blue-600 underline">
-              Privacy Policy
+                              {t("Privacy Policy")}
             </a>
           </span>
         </div>
@@ -272,12 +277,12 @@ export function SignupForm() {
             isSubmitting ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
-          {isSubmitting ? "Signing up..." : "Sign Up"}
+          {isSubmitting ? t("Signing up...") : t("Sign Up")}
         </button>
 
         <div className="flex items-center my-4">
           <hr className="flex-grow border-gray-300" />
-          <span className="mx-2 text-gray-500 text-sm">or</span>
+          <span className="mx-2 text-gray-500 text-sm">{t('or')}</span>
           <hr className="flex-grow border-gray-300" />
         </div>
 
@@ -290,13 +295,13 @@ export function SignupForm() {
           }`}
         >
           <img src="https://img.icons8.com/color/16/google-logo.png" alt="Google" />
-          {googleSignedIn ? "Signed in with Google" : "Continue with Google"}
+                      {googleSignedIn ? t("Signed in with Google") : t("Continue with Google")}
         </button>
 
         <p className="mt-4 text-sm text-gray-600 text-center">
-          Already have an account?{" "}
+          {t("Already have an account?")}{" "}
           <Link to="/welcome" className="text-blue-600 hover:underline">
-            Sign in
+                          {t("Sign in")}
           </Link>
         </p>
       </form>
