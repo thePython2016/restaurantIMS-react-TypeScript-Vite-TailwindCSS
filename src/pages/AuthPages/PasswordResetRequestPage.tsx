@@ -1,8 +1,9 @@
 import React from "react";
 import SignIn from "../AuthPages/SignIn";
-import PublicOrderForm from "./PublicOrderForm";
+import PublicOrderForm from "../Forms/PublicOrderForm";
+import PasswordResetRequest from "./PasswordResetRequest.jsx";
 
-const Welcome = () => {
+const PasswordResetPage = () => {
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       {/* Left Side - Gradient with circles */}
@@ -18,14 +19,14 @@ const Welcome = () => {
         </div>
       </div>
 
-      {/* Right Side - Sign In */}
+      {/* Right Side - Password Reset */}
       <div className="flex-1 h-full bg-white flex items-center justify-center">
         <div className="w-full max-w-2xl">
-          <SignIn />
+          <PasswordResetRequest/>
         </div>
       </div>
     </div>
   );
 };
 
-export default Welcome;
+export default PasswordResetPage;

@@ -72,8 +72,10 @@ const PasswordResetRequest = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-center">Reset Password</h2>
+    <div className="relative w-full h-full flex flex-col justify-center mt-32">
+      <h1 className="text-2xl font-extrabold text-center absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-4 z-10">RIMS</h1>
+      <div className="p-8 bg-white rounded-lg shadow-md border-2 border-gray-200 w-full">
+        <h2 className="text-2xl font-bold mb-4 text-center">Reset Password</h2>
       
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -113,10 +115,11 @@ const PasswordResetRequest = () => {
       )}
 
       <p className="text-center text-sm text-gray-600 mt-4">
-        <Link to="/login" className="text-blue-600 hover:underline">
+        <Link to="/welcome" className="text-blue-600 hover:underline">
           Back to Login
         </Link>
       </p>
+      </div>
     </div>
   );
 };

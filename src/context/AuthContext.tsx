@@ -56,7 +56,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ? usernameOrEmail.split('@')[0]
         : usernameOrEmail;
 
-      const response = await fetch("http://127.0.0.1:8000/login/", {
+      console.log('Attempting login with:', { 
+        originalInput: usernameOrEmail, 
+        derivedUsername, 
+        passwordLength: password.length 
+      });
+
+      // First try with derived username
+      let response = await fetch("http://127.0.0.1:8000/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,9 +71,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify({ username: derivedUsername, password }),
       });
 
-      if (!response.ok) throw new Error("Login failed");
+      // If that fails and the input looks like an email, try with the email directly
+      if (!response.ok && usernameOrEmail?.includes('@')) {
+        console.log('First attempt failed, trying with email directly...');
+        response = await fetch("http://127.0.0.1:8000/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: usernameOrEmail, password }),
+        });
+      }
+
+      if (!response.ok) {
+        let errorMessage = "Login failed";
+        try {
+          const errorData = await response.json();
+          console.log('Login error response:', errorData);
+          errorMessage = errorData.message || errorData.detail || errorData.error || "Login failed";
+        } catch (parseError) {
+          console.log('Could not parse error response');
+        }
+        throw new Error(errorMessage);
+      }
 
       const data = await response.json();
+      console.log('Login response data:', data);
       const token = data.access;
 
       // ✅ Store token based on keepLoggedIn
@@ -165,6 +195,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("user");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("user");
+    
+    // Redirect to welcome page after logout
+    window.location.href = "/welcome";
   };
 
   return (

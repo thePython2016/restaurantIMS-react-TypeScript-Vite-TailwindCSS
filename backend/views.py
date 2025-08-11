@@ -181,3 +181,65 @@ def login_view(request):
         return JsonResponse({
             'error': f'Server error: {str(e)}'
         }, status=500) 
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def registration_view(request):
+    """
+    Handle user registration
+    Expects: {"username": "user", "email": "email@example.com", "password1": "pass", "password2": "pass"}
+    Returns: {"message": "User created successfully"}
+    """
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        email = data.get('email')
+        password1 = data.get('password1')
+        password2 = data.get('password2')
+        
+        if not username or not email or not password1 or not password2:
+            return JsonResponse({
+                'error': 'Username, email, and both passwords are required'
+            }, status=400)
+        
+        if password1 != password2:
+            return JsonResponse({
+                'error': 'Passwords do not match'
+            }, status=400)
+        
+        # Check if username already exists
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({
+                'error': 'Username already exists'
+            }, status=400)
+        
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({
+                'error': 'Email already exists'
+            }, status=400)
+        
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1
+        )
+        
+        return JsonResponse({
+            'message': 'User created successfully',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email
+            }
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'error': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Server error: {str(e)}'
+        }, status=500) 

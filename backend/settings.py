@@ -23,11 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-<<<<<<< HEAD
-    'auth_app',
-=======
-    'backend',  # your app name
->>>>>>> df12485cdc20b355d9aa4f7bf4cb880c5fedca9b
+    'auth_app',  # your app name
 ]
 
 MIDDLEWARE = [

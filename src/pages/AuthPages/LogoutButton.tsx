@@ -10,8 +10,7 @@ const LogoutButton = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/signin"); // 👈 safely redirect
-    document.title = "Sign In"; // 👈 reset tab title
+    // logout() now handles the redirect to /welcome
   };
 
   return (

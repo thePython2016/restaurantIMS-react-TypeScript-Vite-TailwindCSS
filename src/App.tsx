@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import PasswordResetRequest from "./pages/AuthPages/PasswordResetRequest.jsx";
+import PasswordResetPage from "./pages/AuthPages/PasswordResetRequestPage";
 import PasswordResetConfirm from "./pages/AuthPages/PasswordResetConfirm.jsx";
 import SignIn from "./pages/AuthPages/SignIn";
 import { SignupForm as SignUp } from "./pages/AuthPages/SignUp";
@@ -21,7 +22,7 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Welcome from "./pages/Forms/WelcomePage";
-import SignupForm from "./pages/AuthPages/SignupForm";
+import SignupForm from "./pages/AuthPages/SignupPage";
 
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
@@ -36,7 +37,7 @@ import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
 import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton';
-import PasswordResetPage from './pages/AuthPages/PasswordResetRequest.jsx';
+
 
 import Invoice from './pages/Forms/Invoice';
 import InvoiceList from './pages/Forms/InvoiceList';
@@ -79,7 +80,7 @@ export default function App() {
         <Route path="/public-order" element={<PublicOrderForm/>} />
         <Route path="/signup-form" element={<SignupForm/>} />
         <Route path="/signup-page" element={<SignupForm/>} />
-        <Route path="/password-reset" element={<PasswordResetRequest/>} />
+        <Route path="/password-reset" element={<PasswordResetPage/>} />
         <Route path="/password/reset/confirm/:uid/:token" element={<PasswordResetConfirm />} />
         <Route path="/welcome" element={<Welcome />} />
         

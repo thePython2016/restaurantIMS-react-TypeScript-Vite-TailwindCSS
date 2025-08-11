@@ -84,13 +84,14 @@ function SignIn() {
 
   return (
     // Removed bg-gray-100 here
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative">
-      <h1 className="text-3xl font-extrabold mb-8">RMIS</h1>
-      <form
-        onSubmit={handleSubmit}
-        // Increased max width here
-        className="w-full max-w-2xl bg-white p-8 rounded-xl shadow-md flex flex-col"
-      >
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative pb-8">
+      <div className="relative w-full max-w-2xl mt-32">
+        <h1 className="text-2xl font-extrabold text-center absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-4 z-10">RIMS</h1>
+        <form
+          onSubmit={handleSubmit}
+          // Increased max width here
+          className="w-full bg-white p-8 rounded-xl shadow-md flex flex-col border-2 border-gray-200"
+        >
         <h2 className="text-2xl font-bold mb-2">Sign In</h2>
         <p className="text-gray-500 mb-6">
           Enter your email and password to sign in!
@@ -186,7 +187,7 @@ function SignIn() {
           Don't have an account?{" "}
           <button
             type="button"
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/signup-form")}
             className="text-blue-600 hover:underline"
           >
             Sign up
@@ -205,6 +206,7 @@ function SignIn() {
           </div>
         )}
       </form>
+      </div>
     </div>
   );
 }
