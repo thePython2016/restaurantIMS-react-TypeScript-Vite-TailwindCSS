@@ -7,6 +7,8 @@ interface AlertProps {
   showLink?: boolean; // Whether to show the "Learn More" link
   linkHref?: string; // Link URL
   linkText?: string; // Link text
+  onClose?: () => void; // Close button handler
+  closable?: boolean; // Whether to show close button
 }
 
 const Alert: React.FC<AlertProps> = ({
@@ -16,6 +18,8 @@ const Alert: React.FC<AlertProps> = ({
   showLink = false,
   linkHref = "#",
   linkText = "Learn more",
+  onClose,
+  closable = false,
 }) => {
   // Tailwind classes for each variant
   const variantClasses = {
@@ -113,14 +117,30 @@ const Alert: React.FC<AlertProps> = ({
 
   return (
     <div
-      className={`rounded-xl border p-4 ${variantClasses[variant].container}`}
+      className={`rounded-xl border p-4 ${variantClasses[variant].container} relative`}
     >
+      {closable && onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          aria-label="Close alert"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      )}
+      
       <div className="flex items-start gap-3">
         <div className={`-mt-0.5 ${variantClasses[variant].icon}`}>
           {icons[variant]}
         </div>
 
-        <div>
+        <div className={closable ? 'pr-8' : ''}>
           <h4 className="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
             {title}
           </h4>

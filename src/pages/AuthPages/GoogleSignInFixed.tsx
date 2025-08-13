@@ -84,7 +84,7 @@ export default function GoogleSignInFixed() {
             />
           </svg>
         )}
-        {loading ? "Signing in..." : "Continue with Google"}
+        {loading ? "Signing in..." : "Sign in"}
       </button>
 
       {/* Toast Notification */}

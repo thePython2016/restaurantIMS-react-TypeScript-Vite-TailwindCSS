@@ -16,6 +16,8 @@ interface BadgeProps {
   startIcon?: React.ReactNode; // Icon at the start
   endIcon?: React.ReactNode; // Icon at the end
   children: React.ReactNode; // Badge content
+  onClose?: () => void; // Close button handler
+  closable?: boolean; // Whether to show close button
 }
 
 const Badge: React.FC<BadgeProps> = ({
@@ -25,6 +27,8 @@ const Badge: React.FC<BadgeProps> = ({
   startIcon,
   endIcon,
   children,
+  onClose,
+  closable = false,
 }) => {
   const baseStyles =
     "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
@@ -66,10 +70,25 @@ const Badge: React.FC<BadgeProps> = ({
   const colorStyles = variants[variant][color];
 
   return (
-    <span className={`${baseStyles} ${sizeClass} ${colorStyles}`}>
+    <span className={`${baseStyles} ${sizeClass} ${colorStyles} ${closable ? 'pr-1' : ''}`}>
       {startIcon && <span className="mr-1">{startIcon}</span>}
       {children}
       {endIcon && <span className="ml-1">{endIcon}</span>}
+      {closable && onClose && (
+        <button
+          onClick={onClose}
+          className="ml-1 p-0.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          aria-label="Close badge"
+        >
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      )}
     </span>
   );
 };

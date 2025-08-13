@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
+
 import PasswordResetPage from "./PasswordResetRequest.jsx";
 import Multilingual from "../Forms/multilingual.jsx";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleSignedIn, setGoogleSignedIn] = useState(false);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
@@ -26,6 +28,28 @@ function SignIn() {
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setKeepLoggedIn(e.target.checked);
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const success = await googleLogin(tokenResponse.access_token);
+        if (success) {
+          setGoogleSignedIn(true);
+          setToast({ message: "Google sign-in successful!", type: "success" });
+          setTimeout(() => navigate("/dashboard"), 1500);
+        }
+      } catch (error) {
+        console.error("Google login error:", error);
+        setToast({ message: "Google sign-in failed", type: "error" });
+      }
+    },
+    onError: (error) => {
+      console.error("Google OAuth error:", error);
+      setToast({ message: "Google sign-in failed", type: "error" });
+    },
+    scope: "email profile",
+    flow: "implicit",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,60 +74,30 @@ function SignIn() {
     }
   };
 
-  // Google Login Logic
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        console.log("Google login successful, token received:", tokenResponse);
-        setLoading(true);
 
-        const success = await googleLogin(tokenResponse.access_token);
-
-        if (success) {
-          setToast({ message: "Google login successful!", type: "success" });
-          setTimeout(() => navigate("/dashboard"), 1500);
-        } else {
-          setToast({ message: "Google login failed", type: "error" });
-        }
-      } catch (error: any) {
-        console.error("Google login error:", error);
-        setToast({
-          message: error.message || "Google login failed",
-          type: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    onError: (error) => {
-      console.error("Google OAuth error:", error);
-      setToast({
-        message: "Google login was cancelled or failed. Please try again.",
-        type: "error",
-      });
-    },
-    scope: "email profile",
-    flow: "implicit",
-  });
 
   return (
-    // Removed bg-gray-100 here
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative pb-8">
-      {/* Multilingual Component */}
-      <div className="absolute top-16 left-8 z-50">
+    // No width or height restrictions here; page container controls size
+    <div className="min-h-screen flex flex-col items-center justify-start px-4 relative pt-8">
+      {/* Multilingual Component - Always visible at top center of left section */}
+      <div className="fixed top-8 left-1/4 transform -translate-x-1/2 z-50 pointer-events-auto">
         <Multilingual />
       </div>
-      <div className="relative w-full max-w-2xl mt-32">
-        <h1 className="text-2xl font-extrabold text-center absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-4 z-10">RIMS</h1>
-        <form
-          onSubmit={handleSubmit}
-          // Increased max width here
-          className="w-full bg-white p-8 rounded-xl shadow-md flex flex-col border-2 border-gray-200"
-        >
-        <h2 className="text-2xl font-bold mb-2">{t('sign_in')}</h2>
-        <p className="text-gray-500 mb-6">
-          {t('sign_in_description')}
-        </p>
+      <div className="relative w-full max-w-2xl">
+
+        <div className="bg-white rounded-lg shadow p-8 w-full border-2 border-gray-200 min-h-[600px] overflow-visible">
+          {/* Form Header - Always visible and fixed at top */}
+          <div className="mb-6 sticky top-0 bg-white z-20 pb-4 border-b border-gray-100 shadow-sm">
+            <h2 className="text-3xl font-bold text-gray-900">{t('sign_in')}</h2>
+            <p className="mt-1 text-sm text-gray-600">{t('sign_in_description')}</p>
+          </div>
+
+          {/* Content area with consistent top spacing */}
+          <div className="mt-6">
+                         <form
+               onSubmit={handleSubmit}
+               className="space-y-4 w-full"
+             >
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -177,19 +171,19 @@ function SignIn() {
           <hr className="flex-grow border-gray-300" />
         </div>
 
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={() => handleGoogleLogin()}
-            className="w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:bg-gray-50 shadow-sm hover:shadow-md"
-          >
-            <img
-              src="https://img.icons8.com/color/16/google-logo.png"
-              alt="Google"
-            />
-            {t('continue_with_google')}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => handleGoogleLogin()}
+          disabled={googleSignedIn}
+          className={`w-full flex items-center justify-center gap-2 border border-gray-300 rounded-full py-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:bg-gray-50 shadow-sm hover:shadow-md ${
+            googleSignedIn ? "opacity-60 cursor-not-allowed" : ""
+          }`}
+        >
+          <img src="https://img.icons8.com/color/16/google-logo.png" alt="Google" />
+          {googleSignedIn ? t("Signed in with Google") : t("Continue with Google")}
+        </button>
+
+
 
         <p className="text-center text-sm text-gray-600 mt-4">
           {t('dont_have_account')}{" "}
@@ -213,7 +207,9 @@ function SignIn() {
             {toast.message}
           </div>
         )}
-      </form>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );
