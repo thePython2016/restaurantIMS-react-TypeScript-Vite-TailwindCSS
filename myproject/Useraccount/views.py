@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
+from dj_rest_auth.registration.views import RegisterView
+from .serializers import CustomRegisterSerializer
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -43,6 +45,28 @@ def change_password(request):
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class CustomRegisterView(RegisterView):
+    """
+    Custom registration view that provides clear success response
+    for frontend form clearing
+    """
+    serializer_class = CustomRegisterSerializer
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save(request)
+        
+        # Return a clear success response
+        return Response({
+            'success': True,
+            'message': 'Account created successfully! Please check your email for verification.',
+            'user_id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'clear_form': True  # This flag tells frontend to clear the form
+        }, status=status.HTTP_201_CREATED)
 
 # GOOGLE AUTH
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
