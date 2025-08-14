@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
@@ -8,6 +8,40 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
 from dj_rest_auth.registration.views import RegisterView
 from .serializers import CustomRegisterSerializer
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
+
+class CustomRegisterView(RegisterView):
+    """
+    Custom registration view that provides clear success response
+    for frontend form clearing
+    """
+    serializer_class = CustomRegisterSerializer
+    permission_classes = []  # Allow unauthenticated access
+    
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            user = serializer.save(request)
+            
+            # Return a clear success response
+            return Response({
+                'success': True,
+                'message': 'Account created successfully! Please check your email for verification.',
+                'user_id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'clear_form': True  # This flag tells frontend to clear the form
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(f"Registration error: {e}")
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -45,28 +79,6 @@ def change_password(request):
         return Response({
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-class CustomRegisterView(RegisterView):
-    """
-    Custom registration view that provides clear success response
-    for frontend form clearing
-    """
-    serializer_class = CustomRegisterSerializer
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save(request)
-        
-        # Return a clear success response
-        return Response({
-            'success': True,
-            'message': 'Account created successfully! Please check your email for verification.',
-            'user_id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'clear_form': True  # This flag tells frontend to clear the form
-        }, status=status.HTTP_201_CREATED)
 
 # GOOGLE AUTH
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -196,3 +208,154 @@ class GoogleLogin(SocialLoginView):
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def custom_registration(request):
+    """
+    Custom registration view that handles the frontend data format
+    """
+    try:
+        data = request.data
+        
+        # Extract data from request
+        username = data.get('username', '')
+        email = data.get('email', '')
+        password1 = data.get('password1', '')
+        password2 = data.get('password2', '')
+        first_name = data.get('first_name', '')
+        last_name = data.get('last_name', '')
+        phone_number = data.get('phone_number', '')
+        
+        # Validate required fields
+        if not username:
+            return Response({
+                'username': ['Username is required.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not email:
+            return Response({
+                'email': ['Email is required.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not password1:
+            return Response({
+                'password1': ['Password is required.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if password1 != password2:
+            return Response({
+                'password2': ['Passwords do not match.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if user already exists
+        if User.objects.filter(username=username).exists():
+            return Response({
+                'username': ['A user with this username already exists.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        if User.objects.filter(email=email).exists():
+            return Response({
+                'email': ['A user with this email already exists.']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create user
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password1,
+            first_name=first_name,
+            last_name=last_name
+        )
+        
+        # Store phone number if provided (you might want to create a separate profile model)
+        if phone_number:
+            print(f"Phone number for user {username}: {phone_number}")
+            # You can store this in a separate model or user profile
+        
+        return Response({
+            'success': True,
+            'message': 'Account created successfully!',
+            'user_id': user.id,
+            'username': user.username,
+            'email': user.email
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        print(f"Registration error: {e}")
+        return Response({
+            'error': 'Registration failed. Please try again.'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def custom_password_reset(request):
+    """
+    Custom password reset view that sends reset email
+    """
+    try:
+        email = request.data.get('email')
+        if not email:
+            return Response({
+                'error': 'Email is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if user exists
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Don't reveal if user exists or not for security
+            return Response({
+                'message': 'If an account with this email exists, a password reset link has been sent.'
+            }, status=status.HTTP_200_OK)
+        
+        # Generate token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        # Create reset URL
+        reset_url = f"http://localhost:5173/password-reset-confirm?uid={uid}&token={token}"
+        
+        # Send email
+        subject = 'Password Reset Request'
+        message = f"""
+        Hello {user.username},
+        
+        You requested a password reset for your account.
+        
+        Please click the following link to reset your password:
+        {reset_url}
+        
+        If you didn't request this, please ignore this email.
+        
+        Best regards,
+        Your Site Team
+        """
+        
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+            
+            print(f"Password reset email sent to {email}")
+            print(f"Reset URL: {reset_url}")
+            
+            return Response({
+                'message': 'Password reset email sent successfully'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Email sending error: {e}")
+            return Response({
+                'error': 'Failed to send email. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        print(f"Password reset error: {e}")
+        return Response({
+            'error': 'An error occurred. Please try again.'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
