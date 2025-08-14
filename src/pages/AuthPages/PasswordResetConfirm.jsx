@@ -73,7 +73,13 @@ const PasswordResetConfirm = () => {
       
       if (err.response?.status === 400) {
         const errorData = err.response.data;
-        if (errorData.error) {
+        if (errorData.new_password) {
+          setError(`❌ ${errorData.new_password[0]}`);
+        } else if (errorData.uid) {
+          setError(`❌ ${errorData.uid[0]}`);
+        } else if (errorData.token) {
+          setError(`❌ ${errorData.token[0]}`);
+        } else if (errorData.error) {
           setError(`❌ ${errorData.error}`);
         } else {
           setError("❌ Invalid request. Please check your input.");

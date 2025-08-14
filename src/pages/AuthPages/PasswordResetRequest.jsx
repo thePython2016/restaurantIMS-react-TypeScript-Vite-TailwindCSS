@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Multilingual from "../Forms/multilingual.jsx";
+import { TextField } from "@mui/material";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
@@ -19,9 +20,10 @@ const PasswordResetRequest = () => {
 
     try {
       console.log(`Attempting to call: ${API_BASE_URL}/auth/users/reset_password/`);
+      console.log(`Email being sent: ${email.toLowerCase().trim()}`);
       
       const response = await axios.post(
-        `${API_BASE_URL}/auth/users/reset_password/`,
+        `${API_BASE_URL}/auth/custom-password-reset/`,
         { email: email.toLowerCase().trim() },
         { 
           headers: { 'Content-Type': 'application/json' },
@@ -29,9 +31,11 @@ const PasswordResetRequest = () => {
         }
       );
 
-      // Handle both 200 and 204 status codes as success
-      if (response.status === 200 || response.status === 204) {
-        setMessage("✅ Password reset request sent successfully! Check your console for the reset URL.");
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+      
+      if (response.status === 200) {
+        setMessage("✅ Password reset request sent successfully! Please check your email for the reset link. If you don't see it, check your spam folder.");
         setEmail("");
       } else {
         setError("❌ Unexpected response from server.");
@@ -39,27 +43,22 @@ const PasswordResetRequest = () => {
       
     } catch (err) {
       console.error("Password reset error:", err);
-      console.error("Error details:", {
-        message: err.message,
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        config: {
-          url: err.config?.url,
-          method: err.config?.method,
-          headers: err.config?.headers
-        }
-      });
+      console.error("Error response:", err.response?.data);
+      console.error("Error status:", err.response?.status);
       
       if (err.code === 'ECONNREFUSED' || err.code === 'ERR_NETWORK') {
         setError("❌ Cannot connect to server. Please check if the backend is running.");
       } else if (err.response?.status === 404) {
         setError("❌ Password reset endpoint not found. This feature may not be implemented yet.");
       } else if (err.response?.status === 204) {
-        // 204 No Content - this might be a successful response without content
         setMessage("✅ Password reset request sent successfully! Check your console for the reset URL.");
       } else if (err.response?.status === 400) {
-        setError("❌ Please enter a valid email address.");
+        const errorData = err.response.data;
+        if (errorData.email) {
+          setError(`❌ ${errorData.email[0]}`);
+        } else {
+          setError("❌ Please enter a valid email address.");
+        }
       } else if (err.response?.status === 500) {
         setError("❌ Server error. Check email configuration.");
       } else if (err.response?.status === 405) {
@@ -74,13 +73,11 @@ const PasswordResetRequest = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start px-4 relative">
-      {/* Multilingual Component - Always visible at top center of left section */}
       <div className="fixed top-8 left-1/4 transform -translate-x-1/2 z-50 pointer-events-auto">
         <Multilingual />
       </div>
       <div className="relative w-full max-w-2xl mt-5 sm:pt-10">
         <div className="bg-white rounded-lg shadow p-8 w-full border-2 border-gray-200 min-h-[600px] overflow-visible">
-          {/* Form Header - Always visible and fixed at top */}
           <div className="mb-6 sticky top-0 bg-white z-20 pb-4 border-b border-gray-100 shadow-sm">
             <h2 className="text-3xl font-bold text-gray-900">Reset Password</h2>
             <p className="mt-1 text-sm text-gray-600">Enter your email to receive a password reset link</p>
@@ -88,7 +85,6 @@ const PasswordResetRequest = () => {
 
           {message && (
             <div className="mt-4 p-4 text-sm text-green-800 bg-green-100 border border-green-200 rounded-md relative">
-              {/* Close button */}
               <button
                 onClick={() => setMessage("")}
                 className="absolute top-2 right-2 text-green-600 hover:text-green-800 transition-colors"
@@ -123,7 +119,6 @@ const PasswordResetRequest = () => {
           
           {error && (
             <div className="mt-4 p-4 text-sm text-red-800 bg-red-100 border border-red-200 rounded-md relative">
-              {/* Close button */}
               <button
                 onClick={() => setError("")}
                 className="absolute top-2 right-2 text-red-600 hover:text-red-800 transition-colors"
@@ -157,25 +152,26 @@ const PasswordResetRequest = () => {
           )}
 
           <form className="space-y-4 mt-6 w-full" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email Address<span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                className="mt-1 block w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
-            
+            <TextField
+              label="Email Address"
+              variant="outlined"
+              fullWidth
+              required
+              size="small"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              placeholder=""
+              InputLabelProps={{
+                sx: { "& .MuiFormLabel-asterisk": { color: "red" } }
+              }}
+            />
+
             <button 
               type="submit" 
               disabled={loading}
-              className={`w-full bg-blue-600 text-white rounded-md py-2 hover:bg-blue-700 ${
+              className={`w-full bg-blue-600 text-white rounded-md py-2 mt-2 hover:bg-blue-700 ${
                 loading ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
