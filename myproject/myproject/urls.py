@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from custom_password_reset import custom_password_reset
 
 
 urlpatterns = [
@@ -23,14 +24,9 @@ urlpatterns = [
     path('',include('Customers.urls'),name='customers'),
     path('',include('Useraccount.urls'),name='user')
 ]
+# Custom and Djoser Authentication URLs
 urlpatterns += [
+    path('auth/users/reset_password/', custom_password_reset, name='custom_password_reset'),
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    # Add password reset confirmation URL
-    path('auth/password/reset/confirm/<str:uid>/<str:token>/', 
-         include('djoser.urls'), name='password_reset_confirm'),
 ]
-# urlpatterns +=[
-#     path('auth/password/reset/confirm/<str:uid>/<str:token>/', 
-#      include('djoser.urls'), name='password_reset_confirm'),
-# ]
