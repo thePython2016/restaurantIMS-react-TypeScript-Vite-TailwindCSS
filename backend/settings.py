@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'djoser',  # for password reset functionality
     'auth_app',  # your app name
 ]
 
@@ -119,4 +120,20 @@ JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION_DELTA = 7  # days
 
 # Google OAuth settings
-GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id') 
+GOOGLE_CLIENT_ID = config('GOOGLE_CLIENT_ID', default='your-google-client-id')
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+
+# Djoser settings for password reset
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': False,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+} 

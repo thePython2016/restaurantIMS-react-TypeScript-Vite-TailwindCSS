@@ -1,8 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
-import PasswordResetRequest from "./pages/AuthPages/PasswordResetRequest.jsx";
+// import PasswordResetRequest from "./pages/AuthPages/PasswordResetRequest.jsx"; // Not directly used in routing
 import PasswordResetPage from "./pages/AuthPages/PasswordResetRequestPage";
 import PasswordResetConfirm from "./pages/AuthPages/PasswordResetConfirm.jsx";
+import PasswordConfirmPage from "./pages/AuthPages/PasswordResetConfirmPage";
 import SignIn from "./pages/AuthPages/SignIn";
 import { SignupForm as SignUp } from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
@@ -36,7 +37,7 @@ import UpdateOrder from './pages/Forms/UpdateOrder';
 import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
-import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton';
+// import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton'; // Component not found
 
 
 import Invoice from './pages/Forms/Invoice';
@@ -47,7 +48,7 @@ import SalesCustomer from './pages/Forms/SalesCustomer';
 import AllCharts from './pages/Forms/AllCharts';
 import Reports from './pages/Reports/Reports';
 import PublicOrderForm from './pages/Forms/PublicOrderForm';
-import Multilingual from './pages/Forms/Multilingual';
+// import Multilingual from './pages/Forms/Multilingual'; // TypeScript declaration issue
 
 import Demo from './pages/Forms/Demo';
 import ChangePassword from './pages/AuthPages/ChangePassword';
@@ -83,7 +84,7 @@ export default function App() {
         <Route path="/signup-form" element={<SignupForm/>} />
         <Route path="/signup-page" element={<SignupForm/>} />
         <Route path="/password-reset" element={<PasswordResetPage/>} />
-        <Route path="/password/reset/confirm/:uid/:token" element={<PasswordResetConfirm />} />
+        <Route path="/password/reset/confirm" element={<PasswordConfirmPage />} />
         <Route path="/welcome" element={<Welcome />} />
         
         {/* Protected App Routes */}
