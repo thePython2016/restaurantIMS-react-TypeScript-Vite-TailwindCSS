@@ -15,18 +15,38 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from custom_password_reset import custom_password_reset
+from bulkSMS import views
 
+# Create router for bulkSMS API
+# router = DefaultRouter()
+# router.register(r'sms-campaigns', views.SMSCampaignViewSet, basename='smscampaign')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('Customers.urls'),name='customers'),
-    path('',include('Useraccount.urls'),name='user')
-]
-# Custom and Djoser Authentication URLs
-urlpatterns += [
+    path('', include('Customers.urls'), name='customers'),
+    path('', include('Useraccount.urls'), name='user'),
+    
+    # Custom and Djoser Authentication URLs
     path('auth/users/reset_password/', custom_password_reset, name='custom_password_reset'),
     path('auth/', include('djoser.urls')),
-    path('auth/', include('djoser.urls.authtoken')),
+    path('auth/', include('djoser.urls.jwt')),
+    
+    # SMS app URLs
+    # path('api/sms/', include('sms.urls')),
+    
+    # bulkSMS API URLs
+    # path('api/', include(router.urls)),
+    # path('api/sms/', include('bulkSMS.urls')),
+    
+    # Direct SMS endpoint for cleaner URL
+    path('', include('bulkSMS.urls')),
+]
+
+
+urlpatterns += [
+    # path('admin/', admin.site.urls),
+    path('api/', include('airtime_app.urls')),
 ]

@@ -33,7 +33,10 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 # -------------------------
 CORS_ALLOWED_ORIGINS = env.list('CORS_ALLOWED_ORIGINS', default=[
     "http://localhost:5173",
+    "http://localhost:3000",
     "http://127.0.0.1:8000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
 ])
 CORS_ALLOW_CREDENTIALS = True
 
@@ -67,6 +70,9 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'djoser',
+    'sms',
+    'bulkSMS',
+    'airtime_app',
 ]
 
 # -------------------------
@@ -162,6 +168,31 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# -------------------------
+# Simple JWT Configuration
+# -------------------------
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
 }
 
 # -------------------------
@@ -177,7 +208,34 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='infonet20th@gmail.com
 SERVER_EMAIL = config('SERVER_EMAIL', default='infonet20th@gmail.com')
 
 # -------------------------
+
+# TWILIO SMS CONFIGURATION
+# TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
+# TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
+# TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER')
+# # Webhook security
+# TWILIO_WEBHOOK_AUTH_TOKEN = config('TWILIO_WEBHOOK_AUTH_TOKEN', default='')
 # Site Configuration
+
+# --------------------------------
+# AFRICAN TALK SMS CONFIG
+
+
+
+from dotenv import load_dotenv
+
+load_dotenv()
+AFRICASTALKING_USERNAME = config('AFRICASTALKING_USERNAME', default='sandbox')
+AFRICASTALKING_API_KEY = config('AFRICASTALKING_API_KEY')
+
+# Celery configuration
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
 # -------------------------
 SITE_ID = 1
 SITE_NAME = config('SITE_NAME', default='ReactLife')
