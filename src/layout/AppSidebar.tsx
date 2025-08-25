@@ -128,6 +128,20 @@ const navItems: NavItem[] = [
       { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },
       { name: "Sales Customer details", path: "/sales-Customer", pro: false, icon: <UserCircleIcon /> }
     ]
+  },
+  {
+    name: "Bulk SMS",
+    icon: <DollarLineIcon />,
+    subItems: [
+      { name: "Add New", path: "/sms-form", pro: false, icon: <PlusIcon /> },
+      { name: "Airtime", path: "/airtime-form", pro: false, icon: <PlusIcon /> },
+      { name: "MamboSMS", path: "/mambo-sms", pro: false, icon: <PlusIcon /> },
+      
+
+
+      // { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },
+      // { name: "Sales Customer details", path: "/sales-Customer", pro: false, icon: <UserCircleIcon /> }
+    ]
   }
 ];
 

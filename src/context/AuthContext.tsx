@@ -56,12 +56,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         ? usernameOrEmail.split('@')[0]
         : usernameOrEmail;
 
-      console.log('Attempting login with:', { 
-        originalInput: usernameOrEmail, 
-        derivedUsername, 
-        passwordLength: password.length 
-      });
-
       // First try with derived username
       let response = await fetch("http://127.0.0.1:8000/login/", {
         method: "POST",

@@ -18,12 +18,15 @@ import Buttons from "./pages/UiElements/Buttons";
 
 import Calendar from "./pages/Calendar";
 import FormElements from "./pages/Forms/FormElements";
+import MamboSMSUserForm from "./pages/Forms/MamboSMSForm";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Welcome from "./pages/Forms/WelcomePage";
 import SignupForm from "./pages/AuthPages/SignupPage";
+
+import ViewSMS from "./pages/Forms/ViewSMS";
 
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
@@ -37,14 +40,16 @@ import UpdateOrder from './pages/Forms/UpdateOrder';
 import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
+import BulkSMSForm from './pages/Forms/BulkSMSForm';
 // import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton'; // Component not found
-
+import AirtimeForm from './pages/Forms/AirTimeForm';
 
 import Invoice from './pages/Forms/Invoice';
 import InvoiceList from './pages/Forms/InvoiceList';
 import SalesItem from './pages/Forms/SalesItem';
 import Sales from './pages/Forms/Sales';
 import SalesCustomer from './pages/Forms/SalesCustomer';
+
 import AllCharts from './pages/Forms/AllCharts';
 import Reports from './pages/Reports/Reports';
 import PublicOrderForm from './pages/Forms/PublicOrderForm';
@@ -85,6 +90,8 @@ export default function App() {
         <Route path="/signup-page" element={<SignupForm/>} />
         <Route path="/password-reset" element={<PasswordResetPage/>} />
         <Route path="/password/reset/confirm" element={<PasswordConfirmPage />} />
+        <Route path="/all-sms" element={<ViewSMS />} />
+        
         <Route path="/welcome" element={<Welcome />} />
         
         {/* Protected App Routes */}
@@ -96,11 +103,15 @@ export default function App() {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
           <Route path="/form-elements" element={<FormElements />} />
-        
+          <Route path="/sms-form" element={<BulkSMSForm />} />
+          <Route path="/airtime-form" element={<AirtimeForm />} />
 
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
+          <Route path="/mambo-sms" element={<MamboSMSUserForm />} />
+
+
 
           <Route path="/order" element={<OrderForm />} />
           <Route path="/order-list" element={<OrderList />} />

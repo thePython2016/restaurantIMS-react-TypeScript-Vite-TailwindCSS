@@ -37,6 +37,7 @@
     "install": "^0.13.0",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
+    "lucide-react": "^0.539.0",
     "npm": "^11.5.2",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
