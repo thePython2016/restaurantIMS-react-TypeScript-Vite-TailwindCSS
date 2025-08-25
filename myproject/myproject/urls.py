@@ -48,5 +48,16 @@ urlpatterns = [
 
 urlpatterns += [
     # path('admin/', admin.site.urls),
-    path('api/', include('airtime_app.urls')),
+    path('', include('airtime.urls')),
+]
+# urlpatterns += [
+#     # path('admin/', admin.site.urls),
+#     path("api/", include("mambosms.urls")),
+
+# ]
+# project/urls.py
+
+
+urlpatterns += [
+    path("api/", include("mambosms.urls")),
 ]

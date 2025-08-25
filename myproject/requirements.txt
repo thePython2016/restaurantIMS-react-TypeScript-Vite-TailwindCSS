@@ -5,3 +5,4 @@ django_environ==0.12.0
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.1
 Requests==2.32.4
+africastalking==3.0.0

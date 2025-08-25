@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     'djoser',
     'sms',
     'bulkSMS',
-    'airtime_app',
+    'airtime',
+    'mambosms',
 ]
 
 # -------------------------
@@ -228,6 +229,16 @@ load_dotenv()
 AFRICASTALKING_USERNAME = config('AFRICASTALKING_USERNAME', default='sandbox')
 AFRICASTALKING_API_KEY = config('AFRICASTALKING_API_KEY')
 
+
+
+# MAMBO SMS
+MAMBOSMS_API_URL = "https://mambosms.co.tz/api/v1/sms/single"
+MAMBOSMS_API_KEY = "127|3rs4mH7ao7AM817LqKoyKIbHO7EnEwe9nJOGBLJSc7088e40"
+MAMBOSMS_SENDER_ID = "MAMBO SMS"
+
+MAMBO_SMS_API_KEY = os.getenv('MAMBO_SMS_API_KEY')
+MAMBO_SMS_BASE_URL = os.getenv('MAMBO_SMS_BASE_URL', 'https://api.mambo.co.tz')
+# ..........
 # Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
