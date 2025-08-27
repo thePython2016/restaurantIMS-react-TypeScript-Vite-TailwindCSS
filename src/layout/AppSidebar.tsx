@@ -71,9 +71,14 @@ const navItems: NavItem[] = [
     path: "/profile",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "demo",
-    path: "/demo",
+    name: "Contacts",
+    icon: <GroupIcon />,
+    subItems: [
+      { name: "Staff", path: "/staff-contacts", pro: false, icon: <PlusIcon /> },
+      { name: "Customers", path: "/customers-contacts", pro: false, icon: <ListIcon /> },
+      // { name: "demo", path: "/demo", pro: false, icon: <ListIcon /> },
+      // { name: "Update", path: "/update", pro: false, icon: <PencilIcon /> }
+    ],
   },
   {
     name: "Staff",
@@ -130,13 +135,13 @@ const navItems: NavItem[] = [
     ]
   },
   {
-    name: "Bulk SMS",
+    name: "Message",
     icon: <DollarLineIcon />,
     subItems: [
-      { name: "Add New", path: "/sms-form", pro: false, icon: <PlusIcon /> },
-      { name: "Airtime", path: "/airtime-form", pro: false, icon: <PlusIcon /> },
-      { name: "MamboSMS", path: "/mambo-sms", pro: false, icon: <PlusIcon /> },
-      
+
+      { name: "Send Single Message", path: "/single-sms", pro: false, icon: <PlusIcon /> },
+      { name: "Send Bulk Message", path: "/bulk-sms", pro: false, icon: <PlusIcon /> },
+      { name: "All Messages", path: "/all-sms", pro: false, icon: <PlusIcon /> },
 
 
       // { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },

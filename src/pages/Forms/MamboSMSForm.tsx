@@ -1,7 +1,22 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import {
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider
+} from "@mui/material";
 
-const API_BASE_URL = 'http://127.0.0.1:8000';
+const API_BASE_URL = "http://127.0.0.1:8000";
+const MESSAGE_LIMIT = 160; // max characters allowed
 
 export default function MamboSMSUserForm() {
   const [mobile, setMobile] = useState("");
@@ -10,37 +25,28 @@ export default function MamboSMSUserForm() {
   const [status, setStatus] = useState("");
   const { accessToken } = useAuth();
 
-  // SMS service function
   const sendSMS = async (smsData) => {
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-    
-    // Add auth token if available
-    if (accessToken) {
-      headers.Authorization = `Bearer ${accessToken}`;
-    }
-    
+    const headers = { "Content-Type": "application/json" };
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+
     try {
-      console.log('🚀 Sending SMS request to:', `${API_BASE_URL}/api/api/v1/sms/single/`);
-      console.log('📱 Request data:', smsData);
-      
-      const response = await fetch(`${API_BASE_URL}/api/api/v1/sms/single/`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(smsData)
-      });
-      
+      const response = await fetch(
+        `${API_BASE_URL}/api/api/v1/sms/single/`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(smsData),
+        }
+      );
       const result = await response.json();
-      console.log('✅ Response:', result);
-      
-      if (!response.ok) {
-        throw new Error(result.error || result.details || `HTTP error! status: ${response.status}`);
-      }
-      
+      if (!response.ok)
+        throw new Error(
+          result.error ||
+            result.details ||
+            `HTTP error! status: ${response.status}`
+        );
       return result;
     } catch (error) {
-      console.error('❌ SMS Service Error:', error);
       throw error;
     }
   };
@@ -48,53 +54,138 @@ export default function MamboSMSUserForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
-    
+
     try {
-      const smsData = {
-        sender_id: senderId,
-        message: message,
-        mobile: mobile
-      };
-      
-      const result = await sendSMS(smsData);
-      setStatus(`Message sent successfully!`);
+      const smsData = { sender_id: senderId, message, mobile };
+      await sendSMS(smsData);
+      setStatus("Message sent successfully!");
+
+      // Clear form fields
+      setSenderId("");
+      setMobile("");
+      setMessage("");
+
+      // Clear success message after 3s
+      setTimeout(() => {
+        setStatus("");
+      }, 3000);
     } catch (error) {
       setStatus(`Error: ${error.message}`);
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "20px auto" }}>
-      <h2>Send SMS</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Sender ID"
-          value={senderId}
-          onChange={(e) => setSenderId(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Mobile number"
-          value={mobile}
-          onChange={(e) => setMobile(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          required
-        />
-        <textarea
-          placeholder="Message"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          required
-        />
-        <button type="submit" style={{ padding: "10px 20px" }}>
-          Send SMS
-        </button>
-      </form>
-      {status && <p style={{ marginTop: "10px" }}>{status}</p>}
-    </div>
+    <Box display="flex" justifyContent="center" mt={5}>
+      <Card sx={{ width: 1000, p: 5, boxShadow: 2 }}>
+        <CardContent>
+          {/* Header */}
+          <Typography variant="h5" gutterBottom>
+            Send SMS
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+
+          {/* Status Message */}
+          {status && (
+            <Typography
+              variant="subtitle1"
+              textAlign="center"
+              color={status.startsWith("Error") ? "error" : "success.main"}
+              sx={{ fontWeight: "bold", mb: 2 }}
+            >
+              {status}
+            </Typography>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={4}>
+              {/* Sender ID */}
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  fullWidth
+                  variant="outlined"
+                  required
+                  sx={{ minWidth: 250 }}
+                >
+                  <InputLabel id="sender-id-label">Sender ID</InputLabel>
+                  <Select
+                    labelId="sender-id-label"
+                    id="sender-id-select"
+                    value={senderId}
+                    onChange={(e) => setSenderId(e.target.value)}
+                    label="Sender ID"
+                  >
+                    <MenuItem value="">
+                      <em>Select Sender ID</em>
+                    </MenuItem>
+                    <MenuItem value="MAMBO SMS">MAMBO SMS</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Mobile */}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Mobile Number"
+                  variant="outlined"
+                  fullWidth
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                  required
+                  sx={{ minWidth: 250 }}
+                  placeholder="Enter mobile number (e.g. +255712345678)"
+                />
+              </Grid>
+
+              {/* Message */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Message"
+                  variant="outlined"
+                  fullWidth
+                  multiline
+                  rows={8}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  placeholder="Enter your SMS message here..."
+                  sx={{ minWidth: 500 }}
+                  inputProps={{ maxLength: MESSAGE_LIMIT }} // Limit characters
+                  helperText={`${message.length} / ${MESSAGE_LIMIT} characters`}
+                />
+              </Grid>
+            </Grid>
+
+            {/* Send Button aligned left */}
+            <Box
+              sx={{
+                mt: 6,
+                pt: 3,
+                borderTop: "1px solid #e0e0e0",
+                display: "flex",
+                justifyContent: "flex-start",
+              }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large"
+                disabled={status === "Sending..."}
+                sx={{
+                  px: 8,
+                  py: 2,
+                  minWidth: 250,
+                  fontSize: "1.1rem",
+                  borderRadius: "50px", // Rounded button
+                }}
+              >
+                {status === "Sending..." ? "Sending..." : "Send SMS"}
+              </Button>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }

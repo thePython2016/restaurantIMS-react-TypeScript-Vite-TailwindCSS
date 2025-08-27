@@ -25,6 +25,8 @@ import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import Welcome from "./pages/Forms/WelcomePage";
 import SignupForm from "./pages/AuthPages/SignupPage";
+import { StaffContacts } from './pages/Forms/StaffContacts';
+import { CustomerContacts } from './pages/Forms/CustomerContacts';
 
 import ViewSMS from "./pages/Forms/ViewSMS";
 
@@ -109,7 +111,7 @@ export default function App() {
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
-          <Route path="/mambo-sms" element={<MamboSMSUserForm />} />
+          <Route path="/single-sms" element={<MamboSMSUserForm />} />
 
 
 
@@ -134,6 +136,9 @@ export default function App() {
           <Route path="/charts" element={<AllCharts />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/demo" element={<Demo />} />
+
+          <Route path="/staff-contacts" element={<StaffContacts />} />
+          <Route path="/customers-contacts" element={<CustomerContacts />} /> 
 
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />
