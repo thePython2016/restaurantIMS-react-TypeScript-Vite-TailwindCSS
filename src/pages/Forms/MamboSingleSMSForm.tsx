@@ -75,14 +75,13 @@ export default function MamboSMSUserForm() {
   };
 
   return (
-    <Box display="flex" justifyContent="center" mt={5}>
-      <Card sx={{ width: 1000, p: 5, boxShadow: 2 }}>
-        <CardContent>
-          {/* Header */}
-          <Typography variant="h5" gutterBottom>
-            Send SMS
-          </Typography>
-          <Divider sx={{ mb: 3 }} />
+    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
+      <CardContent>
+        {/* Header */}
+        <Typography variant="h6" gutterBottom>
+          Send SMS
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
 
           {/* Status Message */}
           {status && (
@@ -186,6 +185,5 @@ export default function MamboSMSUserForm() {
           </form>
         </CardContent>
       </Card>
-    </Box>
   );
 }

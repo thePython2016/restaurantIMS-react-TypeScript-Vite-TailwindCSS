@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Card, CardContent, Typography } from '@mui/material';
 
 function BulkSMSForm() {
   const { accessToken } = useAuth();
@@ -219,11 +220,14 @@ function BulkSMSForm() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>📱 Bulk SMS</h1>
-        <p style={styles.subtitle}>Send messages to multiple recipients</p>
-      </div>
+    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          📱 Bulk SMS
+        </Typography>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          Send messages to multiple recipients
+        </Typography>
 
       {success && (
         <div style={{...styles.alert, ...styles.alertSuccess}}>
@@ -305,31 +309,8 @@ function BulkSMSForm() {
         </ul>
       </div>
 
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        
-        .bulk-sms-form input:focus,
-        .bulk-sms-form textarea:focus {
-          border-color: #3498db !important;
-          box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-        
-        .bulk-sms-form button:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-        }
-        
-        @media (max-width: 768px) {
-          .bulk-sms-form {
-            margin: 1rem;
-            padding: 1rem;
-          }
-        }
-      `}</style>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -175,7 +175,7 @@ const OrderList: React.FC = () => {
           Add Order
         </Button>
       </div>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
           <Box>
             <Typography variant="h5" mb={1} align="left" fontWeight={700}>

@@ -110,7 +110,7 @@ const Staff: React.FC = () => {
   };
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
+    <Box className="flex flex-col min-h-screen bg-gray-100 p-4" sx={{ mt: 6 }}>
       <div className="flex justify-end mb-6">
         <Button
           variant="contained"

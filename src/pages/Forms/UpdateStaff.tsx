@@ -202,7 +202,7 @@ const Update: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/staff')}>
           Add Staff

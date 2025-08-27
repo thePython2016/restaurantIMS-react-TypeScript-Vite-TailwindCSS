@@ -18,7 +18,6 @@ import Buttons from "./pages/UiElements/Buttons";
 
 import Calendar from "./pages/Calendar";
 import FormElements from "./pages/Forms/FormElements";
-import MamboSMSUserForm from "./pages/Forms/MamboSMSForm";
 import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
@@ -42,9 +41,13 @@ import UpdateOrder from './pages/Forms/UpdateOrder';
 import Customer from './pages/Forms/Customer';
 import CustomerList from './pages/Forms/CustomerList';
 import UpdateCustomer from './pages/Forms/UpdateCustomer';
-import BulkSMSForm from './pages/Forms/BulkSMSForm';
+import SentMessages from './pages/Forms/SentMessages';
 // import GoogleLoginButton from './pages/AuthPages/GoogleLoginButton'; // Component not found
 import AirtimeForm from './pages/Forms/AirTimeForm';
+import MamboBulkSMSUserForm from './pages/Forms/MamboBulkSMSForm.jsx';
+import MamboSMSUserForm from './pages/Forms/MamboSingleSMSForm';
+
+
 
 import Invoice from './pages/Forms/Invoice';
 import InvoiceList from './pages/Forms/InvoiceList';
@@ -105,13 +108,14 @@ export default function App() {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
           <Route path="/form-elements" element={<FormElements />} />
-          <Route path="/sms-form" element={<BulkSMSForm />} />
+          <Route path="/sms-bulk" element={<MamboBulkSMSUserForm />} />
           <Route path="/airtime-form" element={<AirtimeForm />} />
 
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
           <Route path="/single-sms" element={<MamboSMSUserForm />} />
+          <Route path="/sent-sms" element={<SentMessages />} />
 
 
 
@@ -138,7 +142,10 @@ export default function App() {
           <Route path="/demo" element={<Demo />} />
 
           <Route path="/staff-contacts" element={<StaffContacts />} />
-          <Route path="/customers-contacts" element={<CustomerContacts />} /> 
+          <Route path="/customers-contacts" element={<CustomerContacts />} />
+
+
+
 
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/avatars" element={<Avatars />} />

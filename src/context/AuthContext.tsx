@@ -97,17 +97,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (keepLoggedIn) {
         localStorage.setItem("access_token", token);
         if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
+          // Ensure email is included in user data
+          const userData = {
+            ...data.user,
+            email: data.user.email || data.email || usernameOrEmail // Fallback to login email
+          };
+          localStorage.setItem("user", JSON.stringify(userData));
+          console.log('Stored user data with email:', userData);
         }
       } else {
         sessionStorage.setItem("access_token", token);
         if (data.user) {
-          sessionStorage.setItem("user", JSON.stringify(data.user));
+          // Ensure email is included in user data
+          const userData = {
+            ...data.user,
+            email: data.user.email || data.email || usernameOrEmail // Fallback to login email
+          };
+          sessionStorage.setItem("user", JSON.stringify(userData));
+          console.log('Stored user data with email:', userData);
         }
       }
 
+      // Create user object with email
+      const userWithEmail = data.user ? {
+        ...data.user,
+        email: data.user.email || data.email || usernameOrEmail
+      } : { username: derivedUsername, email: usernameOrEmail };
+
       setAccessToken(token);
-      setUser(data.user || { username: derivedUsername }); // use response user data or fallback
+      setUser(userWithEmail);
+      console.log('Set user state with email:', userWithEmail);
 
       return true;
     } catch (error) {

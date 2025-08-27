@@ -61,11 +61,6 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
-    name: "Dashboard",
-    path: "/",
-  },
-  {
     icon: <UserCircleIcon />,
     name: "User Profile",
     path: "/profile",
@@ -140,10 +135,9 @@ const navItems: NavItem[] = [
     subItems: [
 
       { name: "Send Single Message", path: "/single-sms", pro: false, icon: <PlusIcon /> },
-      { name: "Send Bulk Message", path: "/bulk-sms", pro: false, icon: <PlusIcon /> },
-      { name: "All Messages", path: "/all-sms", pro: false, icon: <PlusIcon /> },
-
-
+      { name: "Send Bulk Messages", path: "/bulk-sms", pro: false, icon: <PlusIcon /> },
+      { name: "Sent Messages", path: "/sent-sms", pro: false, icon: <PlusIcon /> },
+      
       // { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },
       // { name: "Sales Customer details", path: "/sales-Customer", pro: false, icon: <UserCircleIcon /> }
     ]
@@ -166,7 +160,7 @@ const othersItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, toggleSidebar } = useSidebar();
   const { user, accessToken } = useAuth();
   const location = useLocation();
 
@@ -238,17 +232,22 @@ const AppSidebar: React.FC = () => {
       {items.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
-            <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group ${
+                         <button
+               onClick={() => {
+                 if (!isExpanded) {
+                   toggleSidebar();
+                 }
+                 handleSubmenuToggle(index, menuType);
+               }}
+               className={`menu-item group ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "lg:justify-start"
-              }`}
+                             } cursor-pointer ${
+                 !isExpanded
+                   ? "lg:justify-center"
+                   : "lg:justify-start"
+               }`}
             >
               <span
                 className={`menu-item-icon-size  ${
@@ -259,11 +258,11 @@ const AppSidebar: React.FC = () => {
               >
                 {nav.icon}
               </span>
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <span className="menu-item-text">{nav.name}</span>
-              )}
-              {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
+                             {(isExpanded || isMobileOpen) && (
+                 <span className="menu-item-text">{nav.name}</span>
+               )}
+               {(isExpanded || isMobileOpen) && (
+                 <ChevronDownIcon
                   className={`ml-auto w-5 h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
@@ -275,12 +274,13 @@ const AppSidebar: React.FC = () => {
             </button>
           ) : (
             nav.path && (
-              <Link
-                to={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
-              >
+                             <Link
+                 to={nav.path}
+                 onClick={() => !isExpanded && toggleSidebar()}
+                 className={`menu-item group ${
+                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                 }`}
+               >
                 <span
                   className={`menu-item-icon-size ${
                     isActive(nav.path)
@@ -290,13 +290,13 @@ const AppSidebar: React.FC = () => {
                 >
                   {nav.icon}
                 </span>
-                {(isExpanded || isHovered || isMobileOpen) && (
+                {(isExpanded || isMobileOpen) && (
                   <span className="menu-item-text">{nav.name}</span>
                 )}
               </Link>
             )
           )}
-          {nav.subItems && (isExpanded || isHovered || isMobileOpen) && (
+          {nav.subItems && (isExpanded || isMobileOpen) && (
             <div
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
@@ -345,22 +345,18 @@ const AppSidebar: React.FC = () => {
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
             : "w-[90px]"
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div
         className={`py-8 flex ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          !isExpanded ? "lg:justify-center" : "justify-start"
         }`}
       >
         <Link to="/">
-          {isExpanded || isHovered || isMobileOpen ? (
+          {isExpanded || isMobileOpen ? (
             <>
               <img
                 className="dark:hidden"
@@ -387,19 +383,92 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-        {user && accessToken && (
+
+      {/* User Profile Section - At Top */}
+      {user && accessToken && (
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+          <div className={`flex items-center ${
+            !isExpanded ? "lg:justify-center" : "justify-start"
+          }`}>
+            {/* User Avatar */}
+            <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-semibold text-lg">
+              {(() => {
+                // Try to get the best available name for the avatar
+                const displayName = user.first_name || user.last_name || user.full_name || 
+                                  user.name || user.display_name || user.username || 'U';
+                return displayName.charAt(0).toUpperCase();
+              })()}
+            </div>
+            
+            {/* User Info */}
+            {(isExpanded || isMobileOpen) && (
+              <div className="ml-3 flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {(() => {
+                    // Try to get the best available name for display
+                    const realName = user.first_name || user.last_name || user.full_name || 
+                                   user.name || user.display_name;
+                    const displayName = realName || user.username || 'User';
+                    return `Hi, ${displayName}`;
+                  })()}
+                </p>
+                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                   {(() => {
+                     // Try multiple possible email fields
+                     const userEmail = user.email || user.user_email || user.email_address || 
+                                     user.primary_email || user.contact_email;
+                     
+                     return userEmail || 'No email available';
+                   })()}
+                 </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {user && accessToken && (
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
+            {/* Dashboard - No Label */}
+            <div>
+              <ul className="flex flex-col gap-4">
+                <li>
+                                     <Link
+                     to="/dashboard"
+                     onClick={() => !isExpanded && toggleSidebar()}
+                     className={`menu-item group ${
+                       location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
+                     }`}
+                   >
+                    <span
+                      className={`menu-item-icon-size ${
+                        location.pathname === "/dashboard"
+                          ? "menu-item-icon-active"
+                          : "menu-item-icon-inactive"
+                      }`}
+                    >
+                      <GridIcon />
+                    </span>
+                    {(isExpanded || isMobileOpen) && (
+                      <span className="menu-item-text">Dashboard</span>
+                    )}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Menu Section */}
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2 ${
+                  !isExpanded
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {isExpanded || isMobileOpen ? (
                   "Menu"
                 ) : (
                   <HorizontaLDots className="size-6" />
@@ -409,13 +478,13 @@ const AppSidebar: React.FC = () => {
             </div>
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2 ${
+                  !isExpanded
                     ? "lg:justify-center"
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
+                {isExpanded || isMobileOpen ? (
                   "Others"
                 ) : (
                   <HorizontaLDots />

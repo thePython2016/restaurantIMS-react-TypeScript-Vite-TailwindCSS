@@ -144,7 +144,7 @@ const MenuItemList = () => {
           Add Item
         </Button>
       </div>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h5" fontWeight={700} mb={2}>Update Menu</Typography>
 

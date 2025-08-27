@@ -144,7 +144,7 @@ const UpdateOrder = () => {
           Add Order
         </Button>
       </div>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%', overflow: 'hidden' }}>
           <Typography variant="h5" fontWeight={700} mb={2} sx={{ borderBottom: '1px solid #e0e0e0', paddingBottom: 1 }}>Update Order</Typography>
 
