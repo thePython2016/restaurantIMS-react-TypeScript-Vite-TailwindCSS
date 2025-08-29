@@ -51,6 +51,36 @@ export default function MamboSMSUserForm() {
     }
   };
 
+  const saveSentMessage = (recipient: string, message: string, senderId: string, status: string) => {
+    try {
+      const existingMessages = localStorage.getItem('sentMessages');
+      const messages = existingMessages ? JSON.parse(existingMessages) : [];
+      
+      const currentDate = new Date().toLocaleString();
+      
+      const newMessage = {
+        id: `${Date.now()}`,
+        recipient: recipient,
+        message: message,
+        status: status,
+        date: currentDate,
+        senderId: senderId
+      };
+      
+      messages.unshift(newMessage); // Add to beginning of array
+      
+      // Keep only the last 100 messages to prevent localStorage from getting too large
+      const trimmedMessages = messages.slice(0, 100);
+      
+      localStorage.setItem('sentMessages', JSON.stringify(trimmedMessages));
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('messageSent'));
+    } catch (error) {
+      console.error('Error saving sent message:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
@@ -59,6 +89,9 @@ export default function MamboSMSUserForm() {
       const smsData = { sender_id: senderId, message, mobile };
       await sendSMS(smsData);
       setStatus("Message sent successfully!");
+
+      // Save sent message to localStorage
+      saveSentMessage(mobile, message, senderId, 'Sent');
 
       // Clear form fields
       setSenderId("");
@@ -99,7 +132,7 @@ export default function MamboSMSUserForm() {
           <form onSubmit={handleSubmit}>
             <Grid container spacing={4}>
               {/* Sender ID */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <FormControl
                   fullWidth
                   variant="outlined"
@@ -123,7 +156,7 @@ export default function MamboSMSUserForm() {
               </Grid>
 
               {/* Mobile */}
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   label="Mobile Number"
                   variant="outlined"
@@ -137,7 +170,7 @@ export default function MamboSMSUserForm() {
               </Grid>
 
               {/* Message */}
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <TextField
                   label="Message"
                   variant="outlined"

@@ -46,6 +46,10 @@ import SentMessages from './pages/Forms/SentMessages';
 import AirtimeForm from './pages/Forms/AirTimeForm';
 import MamboBulkSMSUserForm from './pages/Forms/MamboBulkSMSForm.jsx';
 import MamboSMSUserForm from './pages/Forms/MamboSingleSMSForm';
+import WhatsAppButtonIn from './pages/Forms/WhatsAppButtonIn.jsx';
+import WhatsAppButtonOut from './pages/Forms/WhatsAppButtonOut.tsx';
+
+
 
 
 
@@ -58,6 +62,7 @@ import SalesCustomer from './pages/Forms/SalesCustomer';
 import AllCharts from './pages/Forms/AllCharts';
 import Reports from './pages/Reports/Reports';
 import PublicOrderForm from './pages/Forms/PublicOrderForm';
+import MessageBalanceDetails from './pages/Forms/MessageBalanceDetails';
 // import Multilingual from './pages/Forms/Multilingual'; // TypeScript declaration issue
 
 import Demo from './pages/Forms/Demo';
@@ -108,7 +113,7 @@ export default function App() {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/blank" element={<Blank />} />
           <Route path="/form-elements" element={<FormElements />} />
-          <Route path="/sms-bulk" element={<MamboBulkSMSUserForm />} />
+          <Route path="/bulk-sms" element={<MamboBulkSMSUserForm />} />
           <Route path="/airtime-form" element={<AirtimeForm />} />
 
           <Route path="/menu" element={<MenuItems />} />
@@ -116,6 +121,9 @@ export default function App() {
           <Route path="/update-menu" element={<UpdateMenuItem />} />
           <Route path="/single-sms" element={<MamboSMSUserForm />} />
           <Route path="/sent-sms" element={<SentMessages />} />
+          <Route path="/whatsapp" element={<WhatsAppButtonIn />} />
+          <Route path="/whatsapp-out" element={<WhatsAppButtonOut />} />
+          <Route path="/message-balance" element={<MessageBalanceDetails />} />
 
 
 

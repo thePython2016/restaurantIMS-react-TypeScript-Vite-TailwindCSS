@@ -12,13 +12,13 @@ const Dashboard: React.FC = () => {
       
       {/* Top Cards Grid */}
       <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <StaffCard />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <StaffCard />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid size={{ xs: 12, sm: 4 }}>
           <StaffCard />
         </Grid>
       </Grid>

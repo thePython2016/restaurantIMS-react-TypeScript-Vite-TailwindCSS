@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useGoogleLogin } from "@react-oauth/google";
 import Multilingual from "../Forms/multilingual.jsx";
 import { useTranslation } from "react-i18next";
+import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 
 import {
   TextField,
@@ -202,6 +203,9 @@ function SignIn() {
           </form>
         </div>
       </div>
+
+      {/* WhatsApp Button at bottom left */}
+      <WhatsAppButtonOut />
     </div>
   );
 }

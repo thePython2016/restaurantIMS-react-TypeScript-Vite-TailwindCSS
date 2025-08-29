@@ -137,6 +137,7 @@ const navItems: NavItem[] = [
       { name: "Send Single Message", path: "/single-sms", pro: false, icon: <PlusIcon /> },
       { name: "Send Bulk Messages", path: "/bulk-sms", pro: false, icon: <PlusIcon /> },
       { name: "Sent Messages", path: "/sent-sms", pro: false, icon: <PlusIcon /> },
+      { name: "Message Balance", path: "/message-balance", pro: false, icon: <PlusIcon /> },
       
       // { name: "Sales by Item details", path: "/sales-item", pro: false, icon: <BoxIconLine /> },
       // { name: "Sales Customer details", path: "/sales-Customer", pro: false, icon: <UserCircleIcon /> }
@@ -386,7 +387,7 @@ const AppSidebar: React.FC = () => {
 
       {/* User Profile Section - At Top */}
       {user && accessToken && (
-        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+        <div className="pb-4 mb-4">
           <div className={`flex items-center ${
             !isExpanded ? "lg:justify-center" : "justify-start"
           }`}>
@@ -431,17 +432,30 @@ const AppSidebar: React.FC = () => {
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {/* Dashboard - No Label */}
+            {/* Dashboard Section */}
             <div>
+              <h2
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 border-b border-gray-200 dark:border-gray-700 pb-2 ${
+                  !isExpanded
+                    ? "lg:justify-center"
+                    : "justify-start"
+                }`}
+              >
+                {isExpanded || isMobileOpen ? (
+                  "Dashboard"
+                ) : (
+                  <HorizontaLDots className="size-6" />
+                )}
+              </h2>
               <ul className="flex flex-col gap-4">
                 <li>
-                                     <Link
-                     to="/dashboard"
-                     onClick={() => !isExpanded && toggleSidebar()}
-                     className={`menu-item group ${
-                       location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
-                     }`}
-                   >
+                  <Link
+                    to="/dashboard"
+                    onClick={() => !isExpanded && toggleSidebar()}
+                    className={`menu-item group ${
+                      location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
+                    }`}
+                  >
                     <span
                       className={`menu-item-icon-size ${
                         location.pathname === "/dashboard"
