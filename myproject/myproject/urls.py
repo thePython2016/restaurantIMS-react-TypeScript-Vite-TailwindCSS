@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from custom_password_reset import custom_password_reset
-from bulkSMS import views
+# from bulkSMS import views
 
 # Create router for bulkSMS API
 # router = DefaultRouter()
@@ -42,7 +42,7 @@ urlpatterns = [
     # path('api/sms/', include('bulkSMS.urls')),
     
     # Direct SMS endpoint for cleaner URL
-    path('', include('bulkSMS.urls')),
+    # path('', include('bulkSMS.urls')),
 ]
 
 
@@ -59,5 +59,8 @@ urlpatterns += [
 
 
 urlpatterns += [
-    path("api/", include("mambosms.urls")),
+    path("api/", include("mambosmssingle.urls")),
+    path("api/", include("mambosmsbulk.urls")),
+     path("", include("whatsapplinkin.urls")),  # include the app URLs
 ]
+

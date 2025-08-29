@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class MambosmsConfig(AppConfig):
+class BulksmsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'mambosms'
+    name = 'mambosmsbulk'

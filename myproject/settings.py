@@ -1014,16 +1014,16 @@ SIMPLE_JWT = {
 #     print("⚠️  WARNING: Using console email backend - emails will NOT be sent!")
 # else:
 # SendGrid SMTP backend for real email delivery 
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_USE_SSL = False
-    EMAIL_HOST_USER = 'apikey'  # This is literally 'apikey' for SendGrid
-    EMAIL_HOST_PASSWORD = env('SENDGRID_API_KEY')
-    EMAIL_TIMEOUT = 60
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@yourdomain.com')
-    SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST_USER = 'apikey'  # This is literally 'apikey' for SendGrid
+EMAIL_HOST_PASSWORD = env('SENDGRID_API_KEY')
+EMAIL_TIMEOUT = 60
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@yourdomain.com')
+SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 
 
 
@@ -1036,7 +1036,8 @@ SIMPLE_JWT = {
 TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID', default='')
 TWILIO_AUTH_TOKEN = env('TWILIO_AUTH_TOKEN', default='')
 TWILDEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@yourdomain.com')
-SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)IO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
+SERVER_EMAIL = env('SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+TWILIO_PHONE_NUMBER = env('TWILIO_PHONE_NUMBER', default='')
 
 # ================== DJOSER CONFIGURATION - COMPLETE ==================
 DJOSER = {
