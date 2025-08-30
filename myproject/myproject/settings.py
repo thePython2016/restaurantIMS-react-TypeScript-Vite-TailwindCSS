@@ -75,7 +75,7 @@ INSTALLED_APPS = [
     'airtime',
     'mambosmssingle',
     'whatsapplinkin',
-
+    'mambosmsbalance',
 ]
 
 # -------------------------
@@ -231,8 +231,10 @@ SERVER_EMAIL = config('SERVER_EMAIL', default='infonet20th@gmail.com')
 
 
 
+from dotenv import load_dotenv
 
-MAMBO_SMS_API_KEY = os.getenv('MAMBOSMS_SENDER_ID')
+load_dotenv()
+MAMBO_SMS_API_KEY = os.getenv('MAMBO_SMS_SENDER_ID')
 MAMBO_SMS_API_KEY = os.getenv('MAMBO_SMS_API_KEY')
 MAMBO_SMS_BASE_URL = os.getenv('MAMBO_SMS_BASE_URL', 'https://api.mambo.co.tz')
 
