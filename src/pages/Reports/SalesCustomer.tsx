@@ -172,8 +172,7 @@ const SalesCustomer: React.FC = () => {
   };
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} className="w-full max-w-7xl mx-auto p-6">
+    <Box className="col-span-12 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} borderBottom="1px solid #ccc" pb={1}>
           <Box display="flex" alignItems="center" gap={1}>
             <PeopleIcon sx={{ color: '#1976d2' }} />
@@ -344,7 +343,6 @@ const SalesCustomer: React.FC = () => {
             }
           }}
         />
-      </Paper>
     </Box>
   );
 };

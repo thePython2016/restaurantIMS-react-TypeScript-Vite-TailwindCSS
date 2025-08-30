@@ -5,9 +5,11 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 interface AuthContextType {
   user: any;
   accessToken: string | null;
+  isLoading: boolean;
   login: (usernameOrEmail: string, password: string, keepLoggedIn: boolean) => Promise<boolean>;
   googleLogin: (accessToken: string) => Promise<boolean>;
   logout: () => void;
+  checkTokenExpiration: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -23,6 +25,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // ✅ Load token from either localStorage or sessionStorage
   useEffect(() => {
@@ -30,6 +33,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const storedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     
     if (storedToken) {
+      // Check if token is expired before setting it
+      if (isTokenExpired(storedToken)) {
+        console.log('Stored token is expired, logging out...');
+        handleTokenExpiration();
+        return;
+      }
+      
       setAccessToken(storedToken);
       
       if (storedUser) {
@@ -43,7 +53,90 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser({}); // optional placeholder user
       }
     }
+    
+    // Mark loading as complete
+    setIsLoading(false);
   }, []);
+
+  // ✅ Periodic token expiration check (every 5 minutes)
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const checkTokenInterval = setInterval(() => {
+      if (accessToken && isTokenExpired(accessToken)) {
+        console.log('Token expired during session, logging out...');
+        handleTokenExpiration();
+      }
+    }, 5 * 60 * 1000); // Check every 5 minutes
+
+    return () => clearInterval(checkTokenInterval);
+  }, [accessToken]);
+
+  // ✅ Global fetch interceptor to catch 401 responses
+  useEffect(() => {
+    if (!accessToken) return;
+
+    // Store original fetch
+    const originalFetch = window.fetch;
+
+    // Override fetch to intercept 401 responses
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      try {
+        const response = await originalFetch(input, init);
+        
+        // Check for 401 Unauthorized response
+        if (response.status === 401) {
+          console.log('Global fetch interceptor caught 401 response');
+          // Check if token is actually expired
+          if (accessToken && isTokenExpired(accessToken)) {
+            handleTokenExpiration();
+            return response; // Return response but redirect will happen
+          }
+        }
+        
+        return response;
+      } catch (error) {
+        throw error;
+      }
+    };
+
+    // Cleanup: restore original fetch
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [accessToken]);
+
+  // ✅ Check if JWT token is expired
+  const isTokenExpired = (token: string): boolean => {
+    try {
+      // Decode JWT token (without verification - just for expiration check)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      
+      // Check if token has expired (with 5 minute buffer)
+      const bufferTime = 5 * 60; // 5 minutes in seconds
+      return payload.exp < (currentTime + bufferTime);
+    } catch (error) {
+      console.error('Error checking token expiration:', error);
+      return true; // If we can't decode, assume expired
+    }
+  };
+
+  // ✅ Handle token expiration
+  const handleTokenExpiration = () => {
+    console.log('Token expired, redirecting to welcome page...');
+    setUser(null);
+    setAccessToken(null);
+    setIsLoading(false);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("user");
+    
+    // Redirect to welcome page
+    window.location.href = "/welcome";
+  };
 
   const login = async (
     usernameOrEmail: string,
@@ -97,36 +190,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (keepLoggedIn) {
         localStorage.setItem("access_token", token);
         if (data.user) {
-          // Ensure email is included in user data
-          const userData = {
-            ...data.user,
-            email: data.user.email || data.email || usernameOrEmail // Fallback to login email
-          };
-          localStorage.setItem("user", JSON.stringify(userData));
-          console.log('Stored user data with email:', userData);
+          localStorage.setItem("user", JSON.stringify(data.user));
         }
       } else {
         sessionStorage.setItem("access_token", token);
         if (data.user) {
-          // Ensure email is included in user data
-          const userData = {
-            ...data.user,
-            email: data.user.email || data.email || usernameOrEmail // Fallback to login email
-          };
-          sessionStorage.setItem("user", JSON.stringify(userData));
-          console.log('Stored user data with email:', userData);
+          sessionStorage.setItem("user", JSON.stringify(data.user));
         }
       }
 
-      // Create user object with email
-      const userWithEmail = data.user ? {
-        ...data.user,
-        email: data.user.email || data.email || usernameOrEmail
-      } : { username: derivedUsername, email: usernameOrEmail };
-
       setAccessToken(token);
-      setUser(userWithEmail);
-      console.log('Set user state with email:', userWithEmail);
+      setUser(data.user || { username: derivedUsername }); // use response user data or fallback
 
       return true;
     } catch (error) {
@@ -203,6 +277,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     setUser(null);
     setAccessToken(null);
+    setIsLoading(false);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("user");
@@ -213,8 +288,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     window.location.href = "/welcome";
   };
 
+  // ✅ Public function to check token expiration (can be called from other components)
+  const checkTokenExpiration = () => {
+    if (accessToken && isTokenExpired(accessToken)) {
+      handleTokenExpiration();
+      return true; // Token is expired
+    }
+    return false; // Token is valid
+  };
+
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, googleLogin, logout }}>
+    <AuthContext.Provider value={{ user, accessToken, isLoading, login, googleLogin, logout, checkTokenExpiration }}>
       {children}
     </AuthContext.Provider>
   );

@@ -72,8 +72,8 @@ const Sales: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 5 }}>
-      <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3 }}>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
         <Typography variant="h5" mb={1} fontWeight={700}>
           Sales Form
         </Typography>
@@ -155,7 +155,7 @@ const Sales: React.FC = () => {
           </Box>
         </form>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

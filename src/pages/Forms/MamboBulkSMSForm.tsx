@@ -3,8 +3,6 @@ import { useAuth } from "../../context/AuthContext";
 import {
   TextField,
   Button,
-  Card,
-  CardContent,
   Typography,
   Grid,
   Box,
@@ -12,7 +10,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Divider
+  Divider,
+  Paper
 } from "@mui/material";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -137,8 +136,8 @@ export default function BulkSMSPage() {
   };
 
   return (
-    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
-      <CardContent>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
         {/* Header */}
         <Typography variant="h6" gutterBottom>
           Send Bulk SMS
@@ -285,7 +284,7 @@ export default function BulkSMSPage() {
             </Button>
           </Box>
         </form>
-      </CardContent>
-    </Card>
+      </Paper>
+    </Box>
   );
 }

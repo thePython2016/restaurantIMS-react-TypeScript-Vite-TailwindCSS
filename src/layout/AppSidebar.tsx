@@ -385,48 +385,7 @@ const AppSidebar: React.FC = () => {
         </Link>
       </div>
 
-      {/* User Profile Section - At Top */}
-      {user && accessToken && (
-        <div className="pb-4 mb-4">
-          <div className={`flex items-center ${
-            !isExpanded ? "lg:justify-center" : "justify-start"
-          }`}>
-            {/* User Avatar */}
-            <div className="w-10 h-10 rounded-full bg-brand-500 flex items-center justify-center text-white font-semibold text-lg">
-              {(() => {
-                // Try to get the best available name for the avatar
-                const displayName = user.first_name || user.last_name || user.full_name || 
-                                  user.name || user.display_name || user.username || 'U';
-                return displayName.charAt(0).toUpperCase();
-              })()}
-            </div>
-            
-            {/* User Info */}
-            {(isExpanded || isMobileOpen) && (
-              <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {(() => {
-                    // Try to get the best available name for display
-                    const realName = user.first_name || user.last_name || user.full_name || 
-                                   user.name || user.display_name;
-                    const displayName = realName || user.username || 'User';
-                    return `Hi, ${displayName}`;
-                  })()}
-                </p>
-                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                   {(() => {
-                     // Try multiple possible email fields
-                     const userEmail = user.email || user.user_email || user.email_address || 
-                                     user.primary_email || user.contact_email;
-                     
-                     return userEmail || 'No email available';
-                   })()}
-                 </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+
 
       {user && accessToken && (
         <div className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
@@ -449,13 +408,13 @@ const AppSidebar: React.FC = () => {
               </h2>
               <ul className="flex flex-col gap-4">
                 <li>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => !isExpanded && toggleSidebar()}
-                    className={`menu-item group ${
-                      location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
-                    }`}
-                  >
+                                     <Link
+                     to="/dashboard"
+                     onClick={() => !isExpanded && toggleSidebar()}
+                     className={`menu-item group ${
+                       location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
+                     }`}
+                   >
                     <span
                       className={`menu-item-icon-size ${
                         location.pathname === "/dashboard"

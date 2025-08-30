@@ -3,8 +3,6 @@ import { useAuth } from "../../context/AuthContext";
 import {
   TextField,
   Button,
-  Card,
-  CardContent,
   Typography,
   Grid,
   Box,
@@ -12,7 +10,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Divider
+  Divider,
+  Paper
 } from "@mui/material";
 
 const API_BASE_URL = "http://127.0.0.1:8000";
@@ -51,36 +50,6 @@ export default function MamboSMSUserForm() {
     }
   };
 
-  const saveSentMessage = (recipient: string, message: string, senderId: string, status: string) => {
-    try {
-      const existingMessages = localStorage.getItem('sentMessages');
-      const messages = existingMessages ? JSON.parse(existingMessages) : [];
-      
-      const currentDate = new Date().toLocaleString();
-      
-      const newMessage = {
-        id: `${Date.now()}`,
-        recipient: recipient,
-        message: message,
-        status: status,
-        date: currentDate,
-        senderId: senderId
-      };
-      
-      messages.unshift(newMessage); // Add to beginning of array
-      
-      // Keep only the last 100 messages to prevent localStorage from getting too large
-      const trimmedMessages = messages.slice(0, 100);
-      
-      localStorage.setItem('sentMessages', JSON.stringify(trimmedMessages));
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new Event('messageSent'));
-    } catch (error) {
-      console.error('Error saving sent message:', error);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
@@ -89,9 +58,6 @@ export default function MamboSMSUserForm() {
       const smsData = { sender_id: senderId, message, mobile };
       await sendSMS(smsData);
       setStatus("Message sent successfully!");
-
-      // Save sent message to localStorage
-      saveSentMessage(mobile, message, senderId, 'Sent');
 
       // Clear form fields
       setSenderId("");
@@ -108,8 +74,8 @@ export default function MamboSMSUserForm() {
   };
 
   return (
-    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
-      <CardContent>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
         {/* Header */}
         <Typography variant="h6" gutterBottom>
           Send SMS
@@ -216,7 +182,7 @@ export default function MamboSMSUserForm() {
               </Button>
             </Box>
           </form>
-        </CardContent>
-      </Card>
+      </Paper>
+    </Box>
   );
 }

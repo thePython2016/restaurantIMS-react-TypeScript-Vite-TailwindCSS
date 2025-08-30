@@ -164,18 +164,7 @@ const OrderList: React.FC = () => {
   );
 
   return (
-    <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/order')}
-        >
-          Add Order
-        </Button>
-      </div>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, width: '100%' }}>
           <Box>
             <Typography variant="h5" mb={1} align="left" fontWeight={700}>
@@ -237,7 +226,6 @@ const OrderList: React.FC = () => {
           </Box>
 
           <Box display="flex" justifyContent="center" gap={2} mb={3}>
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
             <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
           </Box>
 
@@ -263,7 +251,6 @@ const OrderList: React.FC = () => {
           />
         </Paper>
       </Box>
-    </>
   );
 };
 

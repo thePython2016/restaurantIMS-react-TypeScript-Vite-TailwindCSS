@@ -35,7 +35,7 @@ const Invoice: React.FC = () => {
     items.reduce((sum, item) => sum + item.quantity * item.price, 0).toFixed(2);
 
   return (
-    <Box className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
+    <Box className="flex flex-col items-center min-h-screen p-6" sx={{ mt: 6 }}>
       <Paper elevation={3} sx={{
         backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
         border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,

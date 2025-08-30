@@ -145,23 +145,13 @@ const CustomerList: React.FC = () => {
 
   return (
     <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/customer')}
-        >
-          Add Customer
-        </Button>
-      </div>
-      <Box className="flex flex-col min-h-screen bg-gray-100 p-4" sx={{ mt: 6 }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper elevation={3} sx={{
           backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
           border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
           borderRadius: 3,
           p: 6,
-          mx: 'auto'
+          width: '100%'
         }}>
           <Box
             display="flex"
@@ -213,9 +203,6 @@ const CustomerList: React.FC = () => {
                 }}
                 sx={{ width: 250 }}
               />
-              <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
-                Print
-              </Button>
               <Button
                 variant="contained"
                 startIcon={<PictureAsPdfIcon />}

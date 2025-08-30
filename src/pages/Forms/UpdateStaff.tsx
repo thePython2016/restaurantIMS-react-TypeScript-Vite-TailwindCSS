@@ -203,11 +203,6 @@ const Update: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/staff')}>
-          Add Staff
-        </Button>
-      </Box>
       <Paper sx={{ p: 3 }}>
         <Box>
           <Typography variant="h5" mb={1} align="left" fontWeight={700}>
@@ -303,9 +298,6 @@ const Update: React.FC = () => {
               </>
             )}
 
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
-              Print
-            </Button>
             <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF} color="primary">
               PDF
             </Button>

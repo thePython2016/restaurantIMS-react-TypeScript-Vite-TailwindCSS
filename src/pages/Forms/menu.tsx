@@ -69,19 +69,10 @@ const MenuItems: React.FC = () => {
   };
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <div className="flex justify-end mb-6">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleAddNewMenu}
-        >
-          Add New Item
-        </Button>
-      </div>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
 
-      <Paper elevation={3} className="w-full max-w-4xl p-8 mx-auto">
+
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
         <Box display="flex" alignItems="center" className="mb-10 pb-4 border-b border-gray-200">
           <ListIcon style={{ width: 32, height: 32, marginRight: 12 }} />
           <Typography variant="h5" className="font-bold">

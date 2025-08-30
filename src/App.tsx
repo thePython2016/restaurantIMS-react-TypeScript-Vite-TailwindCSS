@@ -72,9 +72,14 @@ import { useAuth } from './context/AuthContext';
 
 export default function App() {
   const location = useLocation();
-  const { user, accessToken } = useAuth ? useAuth() : { user: null, accessToken: null };
+  const { user, accessToken, isLoading } = useAuth ? useAuth() : { user: null, accessToken: null, isLoading: false };
 
   React.useEffect(() => {
+    // Don't change title while loading authentication state
+    if (isLoading) {
+      return;
+    }
+    
     if (!user || !accessToken) {
       document.title = 'Login';
     } else if (location.pathname === '/dashboard') {
@@ -84,7 +89,7 @@ export default function App() {
     } else {
       document.title = 'App';
     }
-  }, [user, accessToken, location.pathname]);
+  }, [user, accessToken, location.pathname, isLoading]);
 
   return (
     <>

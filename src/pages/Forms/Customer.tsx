@@ -43,92 +43,80 @@ const Customer: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => reset()}
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
+        <Typography
+          variant="h5"
+          className="text-left font-bold"
+          sx={{
+            mb: 4,
+            pb: 1,
+            borderBottom: '1px solid #ccc',
+          }}
         >
-          Add Customer
-        </Button>
-      </div>
-      <Box className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-        <Paper elevation={3} className="w-full max-w-4xl p-8">
-          <Typography
-            variant="h5"
-            className="text-left font-bold"
-            sx={{
-              mb: 4,
-              pb: 1,
-              borderBottom: '1px solid #ccc',
-            }}
-          >
-            Customer Registration Form
-          </Typography>
+          Customer Registration Form
+        </Typography>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Row 1 */}
-            <div className="flex gap-6">
-              <TextField
-                label={<span>Full Name <span style={{ color: 'red' }}>*</span></span>}
-                fullWidth
-                {...register('name')}
-                error={!!errors.name}
-                helperText={errors.name?.message}
-              />
-              <TextField
-                label={<span>Phone <span style={{ color: 'red' }}>*</span></span>}
-                fullWidth
-                {...register('phone')}
-                error={!!errors.phone}
-                helperText={errors.phone?.message}
-              />
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Row 1 */}
+          <div className="flex gap-6">
+            <TextField
+              label={<span>Full Name <span style={{ color: 'red' }}>*</span></span>}
+              fullWidth
+              {...register('name')}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+            />
+            <TextField
+              label={<span>Phone <span style={{ color: 'red' }}>*</span></span>}
+              fullWidth
+              {...register('phone')}
+              error={!!errors.phone}
+              helperText={errors.phone?.message}
+            />
+          </div>
 
-            {/* Row 2 */}
-            <div className="flex gap-6">
-              <TextField
-                label={<span>Address <span style={{ color: 'red' }}>*</span></span>}
-                fullWidth
-                {...register('address')}
-                error={!!errors.address}
-                helperText={errors.address?.message}
-              />
-              <Controller
-                name="city"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={<span>Region <span style={{ color: 'red' }}>*</span></span>}
-                    select
-                    fullWidth
-                    error={!!errors.city}
-                    helperText={errors.city?.message}
-                  >
-                    {tanzaniaRegions.map((region) => (
-                      <MenuItem key={region} value={region}>
-                        {region}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </div>
+          {/* Row 2 */}
+          <div className="flex gap-6">
+            <TextField
+              label={<span>Address <span style={{ color: 'red' }}>*</span></span>}
+              fullWidth
+              {...register('address')}
+              error={!!errors.address}
+              helperText={errors.address?.message}
+            />
+            <Controller
+              name="city"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label={<span>Region <span style={{ color: 'red' }}>*</span></span>}
+                  select
+                  fullWidth
+                  error={!!errors.city}
+                  helperText={errors.city?.message}
+                >
+                  {tanzaniaRegions.map((region) => (
+                    <MenuItem key={region} value={region}>
+                      {region}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+          </div>
 
-            {/* Save Button */}
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-              <Button type="submit" variant="contained" color="primary">
-                Save
-              </Button>
-            </Box>
-          </form>
-        </Paper>
-      </Box>
-    </>
+          {/* Save Button */}
+          <Box display="flex" justifyContent="flex-end" mt={2}>
+            <Button type="submit" variant="contained" color="primary">
+              Save
+            </Button>
+          </Box>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 

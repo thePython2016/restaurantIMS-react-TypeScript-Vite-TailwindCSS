@@ -133,18 +133,7 @@ const MenuItemList = () => {
   ];
 
   return (
-    <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/menu')}
-        >
-          Add Item
-        </Button>
-      </div>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
         <Paper sx={{ p: 3 }}>
           <Typography variant="h5" fontWeight={700} mb={2}>Update Menu</Typography>
 
@@ -204,7 +193,6 @@ const MenuItemList = () => {
               </>
             )}
 
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
             <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
           </Box>
 
@@ -258,7 +246,6 @@ const MenuItemList = () => {
           </Dialog>
         </Paper>
       </Box>
-    </>
   );
 }
 

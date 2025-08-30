@@ -35,29 +35,8 @@ const Invoice: React.FC = () => {
     items.reduce((sum, item) => sum + item.quantity * item.price, 0).toFixed(2);
 
   return (
-    <>
-      <div className="flex justify-end mb-2">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => {
-            setCustomerName('');
-            setInvoiceNumber(`INV-${Math.floor(Math.random() * 10000)}`);
-            setDate(new Date().toISOString().slice(0, 10));
-            setItems([{ name: '', quantity: 1, price: 0 }]);
-          }}
-        >
-          Create Invoice
-        </Button>
-      </div>
-      <Box className="flex flex-col items-center min-h-screen bg-gray-50 p-6">
-        <Paper elevation={3} sx={{
-          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
-          border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
-          borderRadius: 3,
-          p: 6
-        }}>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
           <Typography variant="h5" gutterBottom className="mb-4 font-bold">
             Invoice Form
           </Typography>
@@ -150,7 +129,6 @@ const Invoice: React.FC = () => {
           </Box>
         </Paper>
       </Box>
-    </>
   );
 };
 

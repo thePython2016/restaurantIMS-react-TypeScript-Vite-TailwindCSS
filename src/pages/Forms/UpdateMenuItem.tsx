@@ -134,11 +134,6 @@ export function UpdateMenuItem() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/menu')}>
-          Add Item
-        </Button>
-      </Box>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h5" fontWeight={700} mb={2}>Update Menu</Typography>
 
@@ -198,7 +193,6 @@ export function UpdateMenuItem() {
             </>
           )}
 
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
           <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
         </Box>
 

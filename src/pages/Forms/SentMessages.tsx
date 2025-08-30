@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Card, 
-  CardContent, 
   Typography, 
   Box, 
   Button, 
@@ -179,8 +177,8 @@ export default function SentMessages() {
   const isSomeSelected = currentPageRows.some(row => isSelected(row.id));
 
   return (
-    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
-      <CardContent>
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h5">
             Sent Messages
@@ -364,7 +362,7 @@ export default function SentMessages() {
             </Button>
           </DialogActions>
         </Dialog>
-      </CardContent>
-    </Card>
+      </Paper>
+    </Box>
   );
 }

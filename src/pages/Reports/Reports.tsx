@@ -34,14 +34,7 @@ const Reports: React.FC = () => {
   const ReportComponent = selectedReportData?.component;
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <Paper elevation={3} sx={{
-        backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
-        border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
-        borderRadius: 3,
-        p: 6,
-        mx: 'auto'
-      }}>
+    <Box className="col-span-12 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} borderBottom="1px solid #ccc" pb={2}>
           <Box display="flex" alignItems="center" gap={2}>
             <PieChartIcon />
@@ -79,7 +72,6 @@ const Reports: React.FC = () => {
             </Box>
           )}
         </Box>
-      </Paper>
     </Box>
   );
 };

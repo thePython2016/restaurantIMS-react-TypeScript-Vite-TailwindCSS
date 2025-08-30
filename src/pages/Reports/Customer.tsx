@@ -42,7 +42,7 @@ const Customer: React.FC = () => {
   };
 
   return (
-    <Box className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+    <Box className="flex justify-center items-center min-h-screen p-4" sx={{ mt: 6 }}>
       <Paper elevation={3} sx={{
         backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
         border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,

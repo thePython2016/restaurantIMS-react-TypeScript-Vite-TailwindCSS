@@ -199,7 +199,7 @@ const Update: React.FC = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
       <Paper sx={{ p: 3 }}>
         <Box>
           <Typography variant="h5" mb={1} align="left" fontWeight={700}>

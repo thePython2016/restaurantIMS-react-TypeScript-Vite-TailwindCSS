@@ -109,19 +109,7 @@ const Staff: React.FC = () => {
   };
 
   return (
-    <Box className="flex flex-col min-h-screen bg-gray-100 p-4">
-      <div className="flex justify-end mb-6">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<span className="text-xl">+</span>}
-          className="bg-blue-600 hover:bg-blue-700"
-            onClick={handleAddNewStaff}
-        >
-            Add New Staff
-        </Button>
-        </div>
-
+    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
       <Paper elevation={3} className="w-full max-w-4xl p-8 mx-auto">
         <Typography variant="h5" className="mb-10 pb-4 border-b border-gray-200 text-center font-bold">
           Staff Registration Form

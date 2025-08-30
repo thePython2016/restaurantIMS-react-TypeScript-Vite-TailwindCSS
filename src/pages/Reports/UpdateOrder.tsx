@@ -185,8 +185,6 @@ const UpdateOrder = () => {
                 </Tooltip>
               </>
             )}
-            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
-            <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
           </Box>
         </Box>
 
@@ -209,28 +207,6 @@ const UpdateOrder = () => {
             }}
           />
         </Box>
-
-        {selectedRow && (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
-            <Button variant="outlined" color="primary" startIcon={<EditIcon />} onClick={() => {
-              setUpdateForm({
-                customer: selectedRow.customer,
-                menuItem: selectedRow.menuItem,
-                quantity: selectedRow.quantity,
-                amount: selectedRow.amount,
-                status: selectedRow.status,
-              });
-              setOpenUpdateDialog(true);
-            }}>
-              Update Selected Order
-            </Button>
-            <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => {
-              setOpenDeleteDialog(true);
-            }}>
-              Delete Selected Order
-            </Button>
-          </Box>
-        )}
 
         <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
           <DialogTitle>Update Order</DialogTitle>

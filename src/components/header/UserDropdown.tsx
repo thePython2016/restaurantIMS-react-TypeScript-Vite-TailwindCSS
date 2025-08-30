@@ -19,8 +19,7 @@ export default function UserDropdown() {
 
   function handleLogout() {
     closeDropdown();
-    logout();
-    navigate("/login");
+    logout(); // This will redirect to /welcome by default
   }
 
   return (
