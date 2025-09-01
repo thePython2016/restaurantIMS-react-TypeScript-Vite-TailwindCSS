@@ -12,8 +12,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TablePagination,
 } from '@mui/material';
-import { DataGrid, GridColDef, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import TableWithCheckboxes from '../../components/TableWithCheckboxes';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
@@ -40,7 +41,7 @@ const generateCustomerData = (count: number) => {
   }));
 };
 
-const columns: GridColDef[] = [
+const columns = [
   { field: 'name', headerName: 'Full Name', flex: 1 },
   { field: 'phone', headerName: 'Phone', flex: 1 },
   { field: 'address', headerName: 'Address', flex: 1 },
@@ -145,13 +146,13 @@ const CustomerList: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
+      <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
         <Paper elevation={3} sx={{
           backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
           border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
           borderRadius: 3,
           p: 6,
-          width: '100%'
+          mx: 'auto'
         }}>
           <Box
             display="flex"
@@ -214,30 +215,30 @@ const CustomerList: React.FC = () => {
             </Box>
           </Box>
 
-          <DataGrid
-            rows={pagedRows}
+          <TableWithCheckboxes
+            rows={filteredSortedRows}
             columns={columns}
-            paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            rowCount={filteredSortedRows.length}
-            paginationMode="server"
-            sortingMode="server"
-            sortModel={sortModel}
-            onSortModelChange={setSortModel}
-            onRowClick={(params) => setSelectedRowId(params.id as number)}
-            getRowClassName={(params) =>
-              params.id === selectedRowId ? 'selected-row' : ''
-            }
-            autoHeight
-            disableRowSelectionOnClick
-            pageSizeOptions={[5, 10, 25, 50]}
-            sx={{
-              height: 500,
-              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
-              '& .selected-row': { backgroundColor: '#d1eaff !important' },
-              '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
-            }}
+            getRowId={(row) => row.id.toString()}
+            searchTerm={search}
+            page={paginationModel.page}
+            rowsPerPage={paginationModel.pageSize}
+            onPageChange={(event, newPage) => setPaginationModel(prev => ({ ...prev, page: newPage }))}
+            onRowsPerPageChange={(event) => setPaginationModel(prev => ({ ...prev, pageSize: Number(event.target.value), page: 0 }))}
+            showPagination={true}
+            onRowClick={(id) => setSelectedRowId(Number(id))}
           />
+          
+          {filteredSortedRows.length > 0 && (
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              component="div"
+              count={filteredSortedRows.length}
+              rowsPerPage={paginationModel.pageSize}
+              page={paginationModel.page}
+              onPageChange={(event, newPage) => setPaginationModel(prev => ({ ...prev, page: newPage }))}
+              onRowsPerPageChange={(event) => setPaginationModel(prev => ({ ...prev, pageSize: Number(event.target.value), page: 0 }))}
+            />
+          )}
         </Paper>
       </Box>
     </>

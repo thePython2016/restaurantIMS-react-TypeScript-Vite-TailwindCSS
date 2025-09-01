@@ -34,7 +34,7 @@ export default function BulkSMSPage() {
   const sendBulkSMS = async (smsData: { sender_id: string; message: string; mobile: string }) => {
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
-
+    
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/v1/sms/bulk-send/`,

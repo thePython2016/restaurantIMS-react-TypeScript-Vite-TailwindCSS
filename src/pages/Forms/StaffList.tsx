@@ -17,6 +17,7 @@ import {
   IconButton,
   Tooltip,
   InputAdornment,
+  Checkbox,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -57,6 +58,8 @@ const StaffList: React.FC = () => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [clickedRows, setClickedRows] = useState<number[]>([]);
   const [search, setSearch] = useState('');
   const [salaryFilter, setSalaryFilter] = useState({ operator: '', amount: '' });
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 5 });
@@ -85,6 +88,28 @@ const StaffList: React.FC = () => {
   }, []);
 
   const columns: GridColDef[] = [
+    {
+      field: 'checkbox',
+      headerName: '',
+      width: 50,
+      sortable: false,
+      filterable: false,
+      renderHeader: () => (
+        <Checkbox
+          color="primary"
+          indeterminate={selectedRows.length > 0 && selectedRows.length < filteredRows.length}
+          checked={filteredRows.length > 0 && selectedRows.length === filteredRows.length}
+          onChange={handleSelectAll}
+        />
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          color="primary"
+          checked={isSelected(params.row.id)}
+          onChange={() => handleSelectRow(params.row.id)}
+        />
+      ),
+    },
     { field: 'name', headerName: 'Name', flex: 1 },
     { field: 'position', headerName: 'Position', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
@@ -110,6 +135,47 @@ const StaffList: React.FC = () => {
   });
 
   const selectedRow = filteredRows.find(row => row.id === selectedRowId) || null;
+
+  const handleRowClick = (id: number) => {
+    setClickedRows(prev => {
+      if (prev.includes(id)) {
+        return prev.filter(rowId => rowId !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  const handleSelectAll = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = filteredRows.map(row => row.id);
+      setSelectedRows(newSelected);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleSelectRow = (id: number) => {
+    const selectedIndex = selectedRows.indexOf(id);
+    let newSelected: number[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selectedRows, id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelected = newSelected.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelectedRows(newSelected);
+  };
+
+  const isSelected = (id: number) => selectedRows.indexOf(id) !== -1;
 
   const handleDelete = () => {
     if (deleteId !== null) {
@@ -315,14 +381,25 @@ const StaffList: React.FC = () => {
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
-            onRowClick={(params) => setSelectedRowId(params.id as number)}
-            getRowClassName={(params) => (params.id === selectedRowId ? 'selected-row' : '')}
+            onRowClick={(params) => {
+              setSelectedRowId(params.id as number);
+              handleRowClick(params.id as number);
+            }}
+            getRowClassName={(params) => {
+              if (params.id === selectedRowId) return 'selected-row';
+              if (selectedRows.includes(params.id as number)) return 'clicked-row';
+              return '';
+            }}
             autoHeight
             disableRowSelectionOnClick
             sx={{
               '& .MuiDataGrid-columnHeaders': { backgroundColor: '#bdbdbd' },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
               '& .selected-row': { backgroundColor: '#d1eaff !important' },
+              '& .clicked-row': { 
+                backgroundColor: '#d1eaff !important',
+                border: '2px solid #1976d2 !important'
+              },
               border: 'none',
             }}
           />

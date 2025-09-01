@@ -248,3 +248,4 @@ const UpdateCustomer: React.FC = () => {
 };
 
 export default UpdateCustomer;
+

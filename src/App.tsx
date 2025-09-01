@@ -27,12 +27,14 @@ import SignupForm from "./pages/AuthPages/SignupPage";
 import { StaffContacts } from './pages/Forms/StaffContacts';
 import { CustomerContacts } from './pages/Forms/CustomerContacts';
 
+
 import ViewSMS from "./pages/Forms/ViewSMS";
 
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
 import Update from './pages/Forms/UpdateStaff';
 import MenuItems from './pages/Forms/menu';
+import Chatbot from './pages/Forms/Chatbot';
 import MenuItemList from './pages/Forms/MenuItemList';
 import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
 import OrderForm from './pages/Forms/Order';
@@ -105,7 +107,9 @@ export default function App() {
         <Route path="/signup-page" element={<SignupForm/>} />
         <Route path="/password-reset" element={<PasswordResetPage/>} />
         <Route path="/password/reset/confirm" element={<PasswordConfirmPage />} />
-        <Route path="/all-sms" element={<ViewSMS />} />
+        {/* <Route path="/chatbot" element={<Chatbot />} /> */}
+        <Route path="/chatbot" element={<Chatbot roomName="general" />} />
+        
         
         <Route path="/welcome" element={<Welcome />} />
         
@@ -120,7 +124,7 @@ export default function App() {
           <Route path="/form-elements" element={<FormElements />} />
           <Route path="/bulk-sms" element={<MamboBulkSMSUserForm />} />
           <Route path="/airtime-form" element={<AirtimeForm />} />
-
+          <Route path="/all-sms" element={<ViewSMS />} />
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
@@ -156,6 +160,7 @@ export default function App() {
 
           <Route path="/staff-contacts" element={<StaffContacts />} />
           <Route path="/customers-contacts" element={<CustomerContacts />} />
+
 
 
 

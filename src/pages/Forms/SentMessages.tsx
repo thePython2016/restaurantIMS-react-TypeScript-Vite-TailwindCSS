@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
+  Card, 
+  CardContent, 
   Typography, 
   Box, 
   Button, 
@@ -39,6 +41,7 @@ interface SentMessage {
 export default function SentMessages() {
   const [rows, setRows] = useState<SentMessage[]>([]);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [clickedRows, setClickedRows] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,6 +51,19 @@ export default function SentMessages() {
     localStorage.removeItem('sentMessages');
     setRows([]);
     setSelectedRows([]);
+    setClickedRows([]);
+  };
+
+  const handleRowClick = (id: string) => {
+    setClickedRows(prev => {
+      if (prev.includes(id)) {
+        // If already clicked, remove it
+        return prev.filter(rowId => rowId !== id);
+      } else {
+        // If not clicked, add it
+        return [...prev, id];
+      }
+    });
   };
 
   const handleDeleteSelected = () => {
@@ -55,10 +71,11 @@ export default function SentMessages() {
   };
 
   const confirmDelete = () => {
-    const updatedRows = rows.filter(row => !selectedRows.includes(row.id));
+    const updatedRows = rows.filter(row => !clickedRows.includes(row.id));
     setRows(updatedRows);
     localStorage.setItem('sentMessages', JSON.stringify(updatedRows));
     setSelectedRows([]);
+    setClickedRows([]);
     setDeleteDialogOpen(false);
   };
 
@@ -135,19 +152,14 @@ export default function SentMessages() {
           const messages = JSON.parse(savedMessages);
           setRows(messages);
         } else {
-          // Add sample data for testing if no messages exist
-          const sampleMessages = [
-            { id: "1", recipient: "0713000000", message: "Hello John! Your order has been confirmed.", status: "Sent", date: "2025-01-27 18:00", senderId: "SMS001" },
-            { id: "2", recipient: "0722000000", message: "Meeting reminder: 3 PM today at the office.", status: "Delivered", date: "2025-01-27 19:10", senderId: "SMS002" },
-            { id: "3", recipient: "0733000000", message: "Payment received. Thank you for your business!", status: "Sent", date: "2025-01-27 20:30", senderId: "SMS003" },
-            { id: "4", recipient: "0744000000", message: "Your delivery is scheduled for tomorrow between 9 AM - 12 PM.", status: "Delivered", date: "2025-01-27 21:15", senderId: "SMS004" },
-            { id: "5", recipient: "0755000000", message: "Account verification code: 123456. Valid for 10 minutes.", status: "Sent", date: "2025-01-27 22:00", senderId: "SMS005" }
-          ];
-          setRows(sampleMessages);
-          localStorage.setItem('sentMessages', JSON.stringify(sampleMessages));
+          // No messages exist - start with empty array
+          setRows([]);
         }
       } catch (error) {
         console.error('Error loading sent messages:', error);
+        // If there's an error parsing, clear the data and start fresh
+        localStorage.removeItem('sentMessages');
+        setRows([]);
       }
     };
 
@@ -177,27 +189,26 @@ export default function SentMessages() {
   const isSomeSelected = currentPageRows.some(row => isSelected(row.id));
 
   return (
-    <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
-      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
+    <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6, minHeight: 'auto' }}>
+        <CardContent sx={{ height: 'auto', overflow: 'visible' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h5">
             Sent Messages
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {selectedRows.length > 0 && (
+            {clickedRows.length > 0 && (
               <Button 
-                variant="contained" 
+                variant="outlined" 
                 color="error" 
                 size="small"
                 onClick={handleDeleteSelected}
                 sx={{ 
                   minWidth: 'auto',
                   px: 2,
-                  fontWeight: 'bold',
-                  boxShadow: 2
+                  fontWeight: 'bold'
                 }}
               >
-                🗑️ Delete Selected ({selectedRows.length})
+                🗑️ Delete Selected ({clickedRows.length})
               </Button>
             )}
             {rows.length > 0 && (
@@ -244,8 +255,8 @@ export default function SentMessages() {
           />
         </Box>
 
-        <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-          <Table stickyHeader>
+        <TableContainer component={Paper} sx={{ height: 'auto', overflow: 'visible' }}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
@@ -273,18 +284,15 @@ export default function SentMessages() {
                       hover
                       key={row.id}
                       selected={isItemSelected}
+                      onClick={() => handleRowClick(row.id)}
                       sx={{
-                        '&.Mui-selected': {
-                          backgroundColor: '#1976d2 !important',
-                          color: 'white !important',
+                        cursor: 'pointer',
+                        // Highlight only selected rows with same color as StaffList
+                        backgroundColor: isItemSelected ? '#d1eaff !important' : 'inherit',
+                        '&:hover': {
+                          backgroundColor: isItemSelected ? '#b3d9ff !important' : 'rgba(0, 0, 0, 0.04) !important',
                         },
-                        '&.Mui-selected:hover': {
-                          backgroundColor: '#1565c0 !important',
-                          color: 'white !important',
-                        },
-                        '&.Mui-selected .MuiTableCell-root': {
-                          color: 'white !important',
-                        },
+                        border: isItemSelected ? '2px solid #1976d2 !important' : '1px solid transparent',
                       }}
                     >
                       <TableCell padding="checkbox">
@@ -336,33 +344,77 @@ export default function SentMessages() {
           onClose={cancelDelete}
           aria-labelledby="delete-dialog-title"
           aria-describedby="delete-dialog-description"
-          maxWidth="sm"
+          maxWidth="md"
           fullWidth
         >
-          <DialogTitle id="delete-dialog-title" sx={{ color: 'error.main', fontWeight: 'bold' }}>
-            ⚠️ Confirm Deletion
+          <DialogTitle id="delete-dialog-title" sx={{ color: 'error.main', fontWeight: 'bold', fontSize: '1.2rem' }}>
+            ⚠️ Confirm Message Deletion
           </DialogTitle>
           <DialogContent>
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              <strong>Warning:</strong> This action cannot be undone!
+            <Alert severity="error" sx={{ mb: 3, fontSize: '1rem' }}>
+              <strong>⚠️ WARNING:</strong> This action cannot be undone!
             </Alert>
-            <Typography variant="body1" sx={{ mb: 1 }}>
-              Are you sure you want to delete <strong>{selectedRows.length}</strong> selected message{selectedRows.length > 1 ? 's' : ''}?
+            
+            <Typography variant="h6" sx={{ mb: 2, color: 'error.main' }}>
+              You are about to delete {clickedRows.length} message{clickedRows.length > 1 ? 's' : ''}:
+            </Typography>
+            
+            {/* Show selected messages for confirmation */}
+            <Box sx={{ mb: 3, maxHeight: 200, overflow: 'auto', border: '1px solid #e0e0e0', borderRadius: 1, p: 2 }}>
+              {clickedRows.map((rowId, index) => {
+                const message = rows.find(r => r.id === rowId);
+                return message ? (
+                  <Box key={rowId} sx={{ mb: 1, p: 1, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {index + 1}. To: {message.recipient}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9rem' }}>
+                      Message: {message.message.length > 50 ? message.message.substring(0, 50) + '...' : message.message}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Sent: {message.date}
+                    </Typography>
+                  </Box>
+                ) : null;
+              })}
+            </Box>
+            
+            <Typography variant="body1" sx={{ mb: 1, fontWeight: 'bold' }}>
+              Are you absolutely sure you want to permanently delete these message{clickedRows.length > 1 ? 's' : ''}?
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              This will permanently remove the selected message{selectedRows.length > 1 ? 's' : ''} from your sent messages list.
+              This action will permanently remove the selected message{clickedRows.length > 1 ? 's' : ''} from your sent messages list and cannot be undone.
             </Typography>
           </DialogContent>
-          <DialogActions sx={{ p: 2 }}>
-            <Button onClick={cancelDelete} color="primary" variant="outlined">
+          <DialogActions sx={{ p: 3, gap: 2 }}>
+            <Button 
+              onClick={cancelDelete} 
+              color="primary" 
+              variant="outlined"
+              size="large"
+              sx={{ minWidth: 100 }}
+            >
               Cancel
             </Button>
-            <Button onClick={confirmDelete} color="error" variant="contained" sx={{ fontWeight: 'bold' }}>
-              🗑️ Delete
+            <Button 
+              onClick={confirmDelete} 
+              color="error" 
+              variant="contained" 
+              size="large"
+              sx={{ 
+                fontWeight: 'bold', 
+                minWidth: 120,
+                backgroundColor: 'error.main',
+                '&:hover': {
+                  backgroundColor: 'error.dark'
+                }
+              }}
+            >
+              🗑️ Delete Forever
             </Button>
           </DialogActions>
         </Dialog>
-      </Paper>
-    </Box>
+      </CardContent>
+    </Card>
   );
 }

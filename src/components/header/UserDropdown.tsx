@@ -2,12 +2,10 @@ import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 
 export default function UserDropdown() {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
 
   function toggleDropdown() {
     setIsOpen(!isOpen);
@@ -77,7 +75,7 @@ export default function UserDropdown() {
             {user?.username || "Musharof Chowdhury"}
           </span>
           <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {/* {user?.email || "randomuser@pimjo.com"} */}
+            {user?.email || "No email available"}
           </span>
         </div>
 
