@@ -408,24 +408,36 @@ const AppSidebar: React.FC = () => {
               </h2>
               <ul className="flex flex-col gap-4">
                 <li>
-                                     <Link
-                     to="/dashboard"
-                     onClick={() => !isExpanded && toggleSidebar()}
-                     className={`menu-item group ${
-                       location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
-                     }`}
-                   >
+                  <Link
+                    to="/dashboard"
+                    onClick={() => !isExpanded && toggleSidebar()}
+                    className={`menu-item group ${
+                      location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
+                    }`}
+                    style={location.pathname === "/dashboard" ? {
+                      background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                      boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(37, 99, 235, 0.2)',
+                      color: 'white'
+                    } : {}}
+                  >
                     <span
                       className={`menu-item-icon-size ${
                         location.pathname === "/dashboard"
                           ? "menu-item-icon-active"
                           : "menu-item-icon-inactive"
                       }`}
+                      style={location.pathname === "/dashboard" ? { color: 'white' } : {}}
                     >
                       <GridIcon />
                     </span>
                     {(isExpanded || isMobileOpen) && (
-                      <span className="menu-item-text">Dashboard</span>
+                      <span 
+                        className="menu-item-text"
+                        style={location.pathname === "/dashboard" ? { color: 'white' } : {}}
+                      >
+                        Dashboard
+                      </span>
                     )}
                   </Link>
                 </li>

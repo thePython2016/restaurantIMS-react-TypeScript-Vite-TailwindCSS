@@ -7,6 +7,8 @@ import { useTranslation } from "react-i18next";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { Email as EmailIcon } from "@mui/icons-material";
+import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 
 export function SignupForm() {
   const navigate = useNavigate();
@@ -381,6 +383,21 @@ export function SignupForm() {
                     onChange={(e) => handleFieldChange('firstName', e.target.value, setFirstName)}
                     disabled={isSubmitting}
                     error={!!fieldErrors.firstName}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        '& fieldset': {
+                          borderColor: '#D1D5DB',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#9CA3AF',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#3B82F6',
+                        },
+                      },
+                    }}
                     {...inputPropsWithRedAsterisk}
                   />
                   {fieldErrors.firstName && <ErrorMessage message={fieldErrors.firstName} />}
@@ -396,6 +413,21 @@ export function SignupForm() {
                     onChange={(e) => handleFieldChange('lastName', e.target.value, setLastName)}
                     disabled={isSubmitting}
                     error={!!fieldErrors.lastName}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        '& fieldset': {
+                          borderColor: '#D1D5DB',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#9CA3AF',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: '#3B82F6',
+                        },
+                      },
+                    }}
                     {...inputPropsWithRedAsterisk}
                   />
                   {fieldErrors.lastName && <ErrorMessage message={fieldErrors.lastName} />}
@@ -414,6 +446,29 @@ export function SignupForm() {
                   onChange={(e) => handleFieldChange('email', e.target.value, setEmail)}
                   disabled={isSubmitting}
                   error={!!fieldErrors.email}
+                  placeholder="youremail@example.com"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#D1D5DB',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9CA3AF',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3B82F6',
+                      },
+                    },
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <EmailIcon sx={{ color: '#9CA3AF', fontSize: '18px' }} />
+                      </InputAdornment>
+                    ),
+                  }}
                   {...inputPropsWithRedAsterisk}
                 />
                 {fieldErrors.email && <ErrorMessage message={fieldErrors.email} />}
@@ -431,6 +486,21 @@ export function SignupForm() {
                   onChange={(e) => handleFieldChange('phone', e.target.value, setPhone)}
                   disabled={isSubmitting}
                   error={!!fieldErrors.phone}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#D1D5DB',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9CA3AF',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3B82F6',
+                      },
+                    },
+                  }}
                   {...inputPropsWithRedAsterisk}
                 />
                 {fieldErrors.phone && <ErrorMessage message={fieldErrors.phone} />}
@@ -448,11 +518,26 @@ export function SignupForm() {
                   onChange={(e) => handleFieldChange('password', e.target.value, setPassword)}
                   disabled={isSubmitting}
                   error={!!fieldErrors.password}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#D1D5DB',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9CA3AF',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3B82F6',
+                      },
+                    },
+                  }}
                   {...inputPropsWithRedAsterisk}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
                           {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
@@ -474,11 +559,26 @@ export function SignupForm() {
                   onChange={(e) => handleFieldChange('confirmPassword', e.target.value, setConfirmPassword)}
                   disabled={isSubmitting}
                   error={!!fieldErrors.confirmPassword}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'white',
+                      borderRadius: '8px',
+                      '& fieldset': {
+                        borderColor: '#D1D5DB',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#9CA3AF',
+                      },
+                      '&.Mui-focused fieldset': {
+                        borderColor: '#3B82F6',
+                      },
+                    },
+                  }}
                   {...inputPropsWithRedAsterisk}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" size="small">
+                        <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
                           {showConfirmPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
@@ -550,6 +650,9 @@ export function SignupForm() {
           </div>
         </div>
       </div>
+
+      {/* WhatsApp Button at bottom right */}
+      <WhatsAppButtonOut />
     </div>
   );
 }

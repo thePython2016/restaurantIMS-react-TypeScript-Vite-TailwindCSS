@@ -15,6 +15,7 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
+import { Email as EmailIcon } from "@mui/icons-material";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -108,7 +109,30 @@ function SignIn() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                placeholder="youremail@example.com"
                 InputLabelProps={{ sx: { "& .MuiFormLabel-asterisk": { color: "red" } } }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      borderColor: '#D1D5DB',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#9CA3AF',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#3B82F6',
+                    },
+                  },
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <EmailIcon sx={{ color: '#9CA3AF', fontSize: '18px' }} />
+                    </InputAdornment>
+                  ),
+                }}
               />
 
               <TextField
@@ -122,10 +146,25 @@ function SignIn() {
                 required
                 disabled={loading}
                 InputLabelProps={{ sx: { "& .MuiFormLabel-asterisk": { color: "red" } } }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'white',
+                    borderRadius: '8px',
+                    '& fieldset': {
+                      borderColor: '#D1D5DB',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#9CA3AF',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#3B82F6',
+                    },
+                  },
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={togglePasswordVisibility} edge="end">
+                      <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: '#9CA3AF' }}>
                         {showPassword ? "🙈" : "👁"}
                       </IconButton>
                     </InputAdornment>

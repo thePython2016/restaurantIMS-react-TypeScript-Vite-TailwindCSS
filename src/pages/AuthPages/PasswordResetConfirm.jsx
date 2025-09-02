@@ -373,6 +373,25 @@ const PasswordResetConfirm = () => {
                   <p>• Make sure to keep your password secure</p>
                 </div>
               </div>
+
+              {/* Dashboard Button */}
+              <div className="pt-6">
+                <button
+                  type="button"
+                  onClick={() => navigate("/welcome")}
+                  className="inline-flex items-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm transition-colors duration-200"
+                  style={{
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                    boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(37, 99, 235, 0.2)'
+                  }}
+                >
+                  <svg className="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+                  </svg>
+                  Dashboard
+                </button>
+              </div>
             </div>
           ) : (
             /* Form */
