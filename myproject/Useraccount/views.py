@@ -304,10 +304,10 @@ def custom_password_reset(request):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # Don't reveal if user exists or not for security
+            # Return specific error when email doesn't exist
             return Response({
-                'message': 'If an account with this email exists, a password reset link has been sent.'
-            }, status=status.HTTP_200_OK)
+                'error': 'No account found with this email address. Please check your email or create a new account.'
+            }, status=status.HTTP_404_NOT_FOUND)
         
         # Generate token
         token = default_token_generator.make_token(user)

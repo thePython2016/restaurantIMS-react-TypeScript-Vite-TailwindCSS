@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Channels
+    'channels',
     # Your apps
     'Customers',
     'Items',
@@ -76,7 +78,18 @@ INSTALLED_APPS = [
     'mambosmssingle',
     'whatsapplinkin',
     'mambosmsbalance',
+    'chatbot',
 ]
+# redis config
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         }
+#     }
+# }
 
 # -------------------------
 # Middleware
@@ -95,10 +108,11 @@ MIDDLEWARE = [
 ]
 
 # -------------------------
-# URL / WSGI
+# URL / WSGI / ASGI
 # -------------------------
 ROOT_URLCONF = 'myproject.urls'
 WSGI_APPLICATION = 'myproject.wsgi.application'
+ASGI_APPLICATION = 'myproject.asgi.application'
 
 # -------------------------
 # Templates
@@ -341,3 +355,20 @@ warnings.filterwarnings(
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# -------------------------
+# Channels Configuration
+# -------------------------
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+# OPEN_AI KEY
+from dotenv import load_dotenv
+load_dotenv()  # loads .env
+
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")

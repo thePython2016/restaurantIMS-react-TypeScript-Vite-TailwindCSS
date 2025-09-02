@@ -62,8 +62,10 @@ urlpatterns += [
     path("api/", include("mambosmssingle.urls")),
     path("api/", include("mambosmsbulk.urls")),
 
-     path("", include("whatsapplinkin.urls")),  # include the app URLs
-     path("api/v1/sms/", include("mambosmsbalance.urls")),
+    path("", include("whatsapplinkin.urls")),  # include the app URLs
+    path("api/v1/sms/", include("mambosmsbalance.urls")),
+    path("api/", include("chatbot.urls")),
+    # path("", include("chatbot.urls")),  # include for REDIS
 ]
 
 

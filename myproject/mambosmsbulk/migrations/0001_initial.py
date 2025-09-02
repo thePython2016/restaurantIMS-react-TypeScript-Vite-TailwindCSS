@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('message_id', models.CharField(blank=True, max_length=100)),
                 ('cost', models.CharField(blank=True, max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('campaign', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='logs', to='bulkSMS.smscampaign')),
+                # Removed the problematic foreign key reference to 'bulkSMS.smscampaign'
             ],
         ),
     ]
