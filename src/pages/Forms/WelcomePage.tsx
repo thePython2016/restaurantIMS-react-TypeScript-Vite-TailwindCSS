@@ -1,6 +1,7 @@
 import React from "react";
 import SignIn from "../AuthPages/SignIn";
 import PublicOrderForm from "./PublicOrderForm";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 const Welcome = () => {
   return (
@@ -24,6 +25,9 @@ const Welcome = () => {
           <SignIn />
         </div>
       </div>
+
+      {/* Chatbot Icon */}
+      <ChatBotIcon />
     </div>
   );
 };

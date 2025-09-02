@@ -15,6 +15,10 @@ export default defineConfig({
       },
     }),
   ],
+  define: {
+    // Define process.env for compatibility
+    'process.env': 'import.meta.env',
+  },
   server: {
     proxy: {
       // Proxy API requests to Django backend

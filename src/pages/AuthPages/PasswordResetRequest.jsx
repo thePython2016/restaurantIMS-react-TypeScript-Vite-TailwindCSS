@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { Email as EmailIcon } from "@mui/icons-material";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 // Using relative URLs for better deployment flexibility
 
@@ -325,6 +326,9 @@ const PasswordResetRequest = () => {
 
       {/* WhatsApp Button at bottom right */}
       <WhatsAppButtonOut />
+      
+      {/* Chatbot Icon at bottom left */}
+      <ChatBotIcon />
     </div>
   );
 };

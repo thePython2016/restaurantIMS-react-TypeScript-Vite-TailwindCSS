@@ -6,6 +6,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import Multilingual from "../Forms/multilingual.jsx";
 import { useTranslation } from "react-i18next";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 import {
   TextField,
@@ -243,8 +244,11 @@ function SignIn() {
         </div>
       </div>
 
-      {/* WhatsApp Button at bottom left */}
+      {/* WhatsApp Button at bottom right */}
       <WhatsAppButtonOut />
+      
+      {/* Chatbot Icon at bottom left */}
+      <ChatBotIcon />
     </div>
   );
 }

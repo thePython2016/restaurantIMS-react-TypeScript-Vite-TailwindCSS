@@ -2,6 +2,7 @@ import React from "react";
 import SignIn from "../AuthPages/SignIn";
 import PublicOrderForm from "../Forms/PublicOrderForm";
 import PasswordResetRequest from "./PasswordResetRequest.jsx";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 const PasswordResetPage = () => {
   return (
@@ -25,6 +26,9 @@ const PasswordResetPage = () => {
           <PasswordResetRequest/>
         </div>
       </div>
+
+      {/* Chatbot Icon */}
+      <ChatBotIcon />
     </div>
   );
 };

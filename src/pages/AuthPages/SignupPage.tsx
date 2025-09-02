@@ -1,6 +1,7 @@
 import React from "react";
 import PublicOrderForm from "../Forms/PublicOrderForm";
 import { SignupForm } from "./SignUp";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 const SignupFormPage = () => {
   return (
@@ -24,6 +25,9 @@ const SignupFormPage = () => {
           <SignupForm />
         </div>
       </div>
+
+      {/* Chatbot Icon */}
+      <ChatBotIcon />
     </div>
   );
 };

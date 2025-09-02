@@ -9,6 +9,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { Email as EmailIcon } from "@mui/icons-material";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
+import ChatBotIcon from "../../components/ChatBotIcon";
 
 export function SignupForm() {
   const navigate = useNavigate();
@@ -653,6 +654,9 @@ export function SignupForm() {
 
       {/* WhatsApp Button at bottom right */}
       <WhatsAppButtonOut />
+      
+      {/* Chatbot Icon at bottom left */}
+      <ChatBotIcon />
     </div>
   );
 }
