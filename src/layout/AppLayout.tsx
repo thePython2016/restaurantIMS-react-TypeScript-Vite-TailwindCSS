@@ -20,7 +20,7 @@ const LayoutContent: React.FC = () => {
       <Box
         sx={{
           flex: 1,
-          transition: 'all 0.3s ease-in-out',
+          transition: 'margin-left 0.1s ease-out',
           ml: {
             lg: isExpanded || isHovered ? '290px' : '90px',
             xs: isMobileOpen ? 0 : 'auto'

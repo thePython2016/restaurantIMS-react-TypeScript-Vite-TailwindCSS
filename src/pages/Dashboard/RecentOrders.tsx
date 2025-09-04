@@ -97,12 +97,27 @@ const RecentOrders: React.FC = () => {
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+    <Paper 
+      elevation={1}
+      sx={{ 
+        borderRadius: 2, 
+        p: 2,
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider'
+      }}
+    >
         <Box>
-        <Typography variant="h5" mb={1} align="left" fontWeight={700} className="text-gray-800">
+        <Typography 
+          variant="h5" 
+          mb={1} 
+          align="left" 
+          fontWeight={700}
+          sx={{ color: 'text.primary' }}
+        >
             Recent Orders
           </Typography>
-        <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
+        <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', mb: 2 }} />
         </Box>
 
         <Box display="flex" flexWrap="wrap" gap={2} alignItems="center" justifyContent="center" mb={3}>
@@ -238,14 +253,29 @@ const RecentOrders: React.FC = () => {
           autoHeight
           disableRowSelectionOnClick
           sx={{
-          '& .MuiDataGrid-row:hover': { backgroundColor: 'var(--color-gray-100)' },
-          '& .selected-row': { backgroundColor: 'var(--color-brand-50) !important' },
-          '& .MuiDataGrid-footerContainer': { borderTop: '1px solid var(--color-gray-200)' },
-          '& .MuiDataGrid-columnHeaders': { backgroundColor: 'var(--color-gray-50)' },
+            '& .MuiDataGrid-row:hover': { 
+              backgroundColor: 'action.hover' 
+            },
+            '& .selected-row': { 
+              backgroundColor: 'action.selected !important' 
+            },
+            '& .MuiDataGrid-footerContainer': { 
+              borderTop: '1px solid',
+              borderColor: 'divider'
+            },
+            '& .MuiDataGrid-columnHeaders': { 
+              backgroundColor: 'action.hover'
+            },
+            '& .MuiDataGrid-cell': {
+              borderColor: 'divider'
+            },
+            '& .MuiDataGrid-columnHeaders': {
+              borderColor: 'divider'
+            },
             mt: 2,
           }}
         />
-    </div>
+    </Paper>
   );
 };
 

@@ -112,7 +112,7 @@ const CustomerContacts = () => {
         </Box>
 
         {/* Table - matching SentMessages exactly */}
-        <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
+        <TableContainer component={Paper}>
           <Table stickyHeader>
             <TableHead>
               <TableRow>

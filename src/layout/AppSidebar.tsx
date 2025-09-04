@@ -241,7 +241,7 @@ const AppSidebar: React.FC = () => {
                  handleSubmenuToggle(index, menuType);
                }}
                className={`menu-item group ${
-                openSubmenu?.type === menuType && openSubmenu?.index === index
+                openSubmenu?.type === menuType && openSubmenu?.index === index && (isExpanded || isMobileOpen)
                   ? "menu-item-active"
                   : "menu-item-inactive"
                              } cursor-pointer ${
@@ -252,7 +252,7 @@ const AppSidebar: React.FC = () => {
             >
               <span
                 className={`menu-item-icon-size  ${
-                  openSubmenu?.type === menuType && openSubmenu?.index === index
+                  openSubmenu?.type === menuType && openSubmenu?.index === index && (isExpanded || isMobileOpen)
                     ? "menu-item-icon-active"
                     : "menu-item-icon-inactive"
                 }`}
@@ -264,7 +264,7 @@ const AppSidebar: React.FC = () => {
                )}
                {(isExpanded || isMobileOpen) && (
                  <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${
+                  className={`ml-auto w-5 h-5 transition-transform duration-100 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
                       ? "rotate-180 text-brand-500"
@@ -279,12 +279,12 @@ const AppSidebar: React.FC = () => {
                  to={nav.path}
                  onClick={() => !isExpanded && toggleSidebar()}
                  className={`menu-item group ${
-                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                   isActive(nav.path) && (isExpanded || isMobileOpen) ? "menu-item-active" : "menu-item-inactive"
                  }`}
                >
                 <span
                   className={`menu-item-icon-size ${
-                    isActive(nav.path)
+                    isActive(nav.path) && (isExpanded || isMobileOpen)
                       ? "menu-item-icon-active"
                       : "menu-item-icon-inactive"
                   }`}
@@ -302,7 +302,7 @@ const AppSidebar: React.FC = () => {
               ref={(el) => {
                 subMenuRefs.current[`${menuType}-${index}`] = el;
               }}
-              className="overflow-hidden transition-all duration-300"
+              className="overflow-hidden transition-all duration-150"
               style={{
                 height:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -342,7 +342,7 @@ const AppSidebar: React.FC = () => {
     <>
       <style>{scrollbarStyles}</style>
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-100 ease-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -350,12 +350,39 @@ const AppSidebar: React.FC = () => {
         }
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
+      style={{
+        transition: 'width 0.1s ease-out, transform 0.1s ease-out'
+      }}
     >
       <div
-        className={`py-8 flex ${
+        className={`py-8 flex items-center ${
           !isExpanded ? "lg:justify-center" : "justify-start"
-        }`}
+        } gap-2`}
       >
+        <button
+          className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-75 active:scale-95"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleSidebar();
+          }}
+          aria-label="Toggle Sidebar"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M3 6C3 5.44772 3.44772 5 4 5H20C20.5523 5 21 5.44772 21 6C21 6.55228 20.5523 7 20 7H4C3.44772 7 3 6.55228 3 6ZM3 12C3 11.4477 3.44772 11 4 11H20C20.5523 11 21 11.4477 21 12C21 12.5523 20.5523 13 20 13H4C3.44772 13 3 12.5523 3 12ZM4 17C3.44772 17 3 17.4477 3 18C3 18.5523 3.44772 19 4 19H20C20.5523 19 21 18.5523 21 18C21 17.4477 20.5523 17 20 17H4Z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+
         <Link to="/">
           {isExpanded || isMobileOpen ? (
             <>
@@ -412,9 +439,9 @@ const AppSidebar: React.FC = () => {
                     to="/dashboard"
                     onClick={() => !isExpanded && toggleSidebar()}
                     className={`menu-item group ${
-                      location.pathname === "/dashboard" ? "menu-item-active" : "menu-item-inactive"
+                      location.pathname === "/dashboard" && (isExpanded || isMobileOpen) ? "menu-item-active" : "menu-item-inactive"
                     }`}
-                    style={location.pathname === "/dashboard" ? {
+                    style={location.pathname === "/dashboard" && (isExpanded || isMobileOpen) ? {
                       background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                       boxShadow: '0 2px 4px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                       border: '1px solid rgba(37, 99, 235, 0.2)',
@@ -423,18 +450,18 @@ const AppSidebar: React.FC = () => {
                   >
                     <span
                       className={`menu-item-icon-size ${
-                        location.pathname === "/dashboard"
+                        location.pathname === "/dashboard" && (isExpanded || isMobileOpen)
                           ? "menu-item-icon-active"
                           : "menu-item-icon-inactive"
                       }`}
-                      style={location.pathname === "/dashboard" ? { color: 'white' } : {}}
+                      style={location.pathname === "/dashboard" && (isExpanded || isMobileOpen) ? { color: 'white' } : {}}
                     >
                       <GridIcon />
                     </span>
                     {(isExpanded || isMobileOpen) && (
                       <span 
                         className="menu-item-text"
-                        style={location.pathname === "/dashboard" ? { color: 'white' } : {}}
+                        style={location.pathname === "/dashboard" && (isExpanded || isMobileOpen) ? { color: 'white' } : {}}
                       >
                         Dashboard
                       </span>

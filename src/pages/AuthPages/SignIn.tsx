@@ -16,7 +16,7 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import { Email as EmailIcon } from "@mui/icons-material";
+import { Email as EmailIcon, Visibility, VisibilityOff } from "@mui/icons-material";
 
 function SignIn() {
   const navigate = useNavigate();
@@ -166,7 +166,7 @@ function SignIn() {
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={togglePasswordVisibility} edge="end" sx={{ color: '#9CA3AF' }}>
-                        {showPassword ? "🙈" : "👁"}
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     </InputAdornment>
                   ),
