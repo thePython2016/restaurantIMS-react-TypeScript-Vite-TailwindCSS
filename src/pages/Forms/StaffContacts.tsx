@@ -73,12 +73,14 @@ const StaffContacts = () => {
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
       <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-          <Typography variant="h5">
-            Staff Contact Details
-          </Typography>
+        <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+            <Typography variant="h5" sx={{ color: 'white' }}>
+              Staff Contact Details
+            </Typography>
+          </Box>
+          <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>
-        <Divider sx={{ mb: 3 }} />
 
         {/* Search and Rows per page controls - matching SentMessages style exactly */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

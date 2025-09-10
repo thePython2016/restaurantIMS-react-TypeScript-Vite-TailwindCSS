@@ -26,40 +26,36 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import UserCircleIcon from '../../icons/user-circle.svg';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+
+// Interface for staff data
+interface StaffData {
+  id: string;
+  name: string;
+  position: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  salary: number;
+}
 
 const StaffList: React.FC = () => {
-  const [rows, setRows] = useState([
-    {
-      id: 1,
-      name: 'John Doe',
-      position: 'Manager',
-      email: 'john@example.com',
-      phone: '+255123456789',
-      address: 'Mikocheni Street',
-      city: 'Dar es Salaam',
-      salary: 5000,
-    },
-    {
-      id: 2,
-      name: 'Jane Smith',
-      position: 'Supervisor',
-      email: 'jane@example.com',
-      phone: '+255987654321',
-      address: 'Arusha Town',
-      city: 'Arusha',
-      salary: 4000,
-    },
-  ]);
+  const { accessToken } = useAuth();
+  const [rows, setRows] = useState<StaffData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [clickedRows, setClickedRows] = useState<number[]>([]);
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [clickedRows, setClickedRows] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [salaryFilter, setSalaryFilter] = useState({ operator: '', amount: '' });
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 5 });
@@ -76,6 +72,49 @@ const StaffList: React.FC = () => {
 
   const gridRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  // ✅ Fetch data from Django DRF API
+  const fetchStaffData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (!accessToken) {
+        setError('Authentication required. Please log in again.');
+        return;
+      }
+      
+      const response = await fetch("http://127.0.0.1:8000/api/stafflist/", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data: StaffData[] = await response.json();
+      
+      console.log('Fetched staff data:', data); // Debug log
+      
+      setRows(data);
+      
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      console.error("Error fetching staff:", err);
+      setError(`Failed to fetch staff data: ${errorMessage}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchStaffData();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,7 +155,12 @@ const StaffList: React.FC = () => {
     { field: 'phone', headerName: 'Phone', flex: 1 },
     { field: 'address', headerName: 'Address', flex: 1 },
     { field: 'city', headerName: 'Region', flex: 1 },
-    { field: 'salary', headerName: 'Salary', flex: 1 },
+    { 
+      field: 'salary', 
+      headerName: 'Salary', 
+      flex: 1,
+      renderCell: (params) => `$${params.value.toLocaleString()}`
+    },
   ];
 
   const filteredRows = rows.filter(row => {
@@ -136,7 +180,7 @@ const StaffList: React.FC = () => {
 
   const selectedRow = filteredRows.find(row => row.id === selectedRowId) || null;
 
-  const handleRowClick = (id: number) => {
+  const handleRowClick = (id: string) => {
     setClickedRows(prev => {
       if (prev.includes(id)) {
         return prev.filter(rowId => rowId !== id);
@@ -155,9 +199,9 @@ const StaffList: React.FC = () => {
     }
   };
 
-  const handleSelectRow = (id: number) => {
+  const handleSelectRow = (id: string) => {
     const selectedIndex = selectedRows.indexOf(id);
-    let newSelected: number[] = [];
+    let newSelected: string[] = [];
 
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selectedRows, id);
@@ -175,14 +219,37 @@ const StaffList: React.FC = () => {
     setSelectedRows(newSelected);
   };
 
-  const isSelected = (id: number) => selectedRows.indexOf(id) !== -1;
+  const isSelected = (id: string) => selectedRows.indexOf(id) !== -1;
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (deleteId !== null) {
-      setRows(prev => prev.filter(row => row.id !== deleteId));
-      setDeleteId(null);
-      setSelectedRowId(null);
-      setOpenDeleteDialog(false);
+      try {
+        if (!accessToken) {
+          setError('Authentication required. Please log in again.');
+          return;
+        }
+
+        const response = await fetch(`http://127.0.0.1:8000/api/stafflist/${deleteId}/`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Update local state only after successful API call
+        setRows(prev => prev.filter(row => row.id !== deleteId));
+        setDeleteId(null);
+        setSelectedRowId(null);
+        setOpenDeleteDialog(false);
+      } catch (err) {
+        console.error('Error deleting staff member:', err);
+        setError('Failed to delete staff member. Please try again.');
+      }
     }
   };
 
@@ -201,13 +268,49 @@ const StaffList: React.FC = () => {
     }));
   };
 
-  const handleUpdateSave = () => {
+  const handleUpdateSave = async () => {
     if (selectedRowId === null) return;
-    setRows(prev => prev.map(row =>
-      row.id === selectedRowId ? { ...row, ...updateForm } : row
-    ));
-    setOpenUpdateDialog(false);
-    setSelectedRowId(null);
+    
+    try {
+      if (!accessToken) {
+        setError('Authentication required. Please log in again.');
+        return;
+      }
+
+      // Prepare data for API (map city back to region for backend)
+      const updateData = {
+        ...updateForm,
+        region: updateForm.city, // Map city to region for backend
+        firstName: updateForm.name.split(' ')[0] || '',
+        lastName: updateForm.name.split(' ').slice(1).join(' ') || '',
+      };
+      
+      // Remove city field as backend expects region
+      delete updateData.city;
+
+      const response = await fetch(`http://127.0.0.1:8000/api/stafflist/${selectedRowId}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Update local state only after successful API call
+      setRows(prev => prev.map(row =>
+        row.id === selectedRowId ? { ...row, ...updateForm } : row
+      ));
+      setOpenUpdateDialog(false);
+      setSelectedRowId(null);
+    } catch (err) {
+      console.error('Error updating staff member:', err);
+      setError('Failed to update staff member. Please try again.');
+    }
   };
 
   const handlePDF = () => {
@@ -222,7 +325,7 @@ const StaffList: React.FC = () => {
         row.phone,
         row.address,
         row.city,
-        row.salary
+        `$${row.salary.toLocaleString()}`
       ]),
     });
     doc.save('staff_list.pdf');
@@ -245,7 +348,7 @@ const StaffList: React.FC = () => {
               <td>${row.phone}</td>
               <td>${row.address}</td>
               <td>${row.city}</td>
-              <td>${row.salary}</td>
+              <td>$${row.salary.toLocaleString()}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -271,14 +374,14 @@ const StaffList: React.FC = () => {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 6 }}>
       <Paper sx={{ p: 3 }}>
-        <Box>
+        <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
           <Box display="flex" alignItems="center" mb={1}>
             <img src={UserCircleIcon} alt="Staff Icon" style={{ width: 28, height: 28, marginRight: 10 }} />
-            <Typography variant="h5" align="left" fontWeight={700}>
-            Update Staff
-          </Typography>
+            <Typography variant="h5" align="left" fontWeight={700} sx={{ color: 'white' }}>
+              Update Staff
+            </Typography>
           </Box>
-          <Box sx={{ borderBottom: '1px solid #ededed', mb: 2 }} />
+          <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>
 
         <Box
@@ -346,6 +449,17 @@ const StaffList: React.FC = () => {
               sx={{ width: { xs: 150, sm: 200 } }}
             />
 
+            <Tooltip title="Refresh Data">
+              <IconButton 
+                color="primary" 
+                onClick={fetchStaffData} 
+                size="small"
+                disabled={loading}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+
             {selectedRow && (
               <>
                 <Tooltip title="Update Selected Record">
@@ -376,31 +490,78 @@ const StaffList: React.FC = () => {
 
         <Box sx={{ width: '100%' }} ref={gridRef}>
           <DataGrid
-            rows={filteredRows}
+            rows={loading ? [] : filteredRows}
             columns={columns}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
+            loading={loading}
             onRowClick={(params) => {
-              setSelectedRowId(params.id as number);
-              handleRowClick(params.id as number);
+              setSelectedRowId(params.id as string);
+              handleRowClick(params.id as string);
             }}
             getRowClassName={(params) => {
               if (params.id === selectedRowId) return 'selected-row';
-              if (selectedRows.includes(params.id as number)) return 'clicked-row';
+              if (selectedRows.includes(params.id as string)) return 'clicked-row';
               return '';
             }}
             autoHeight
             disableRowSelectionOnClick
             sx={{
-              '& .MuiDataGrid-columnHeaders': { backgroundColor: '#bdbdbd' },
+              '& .MuiDataGrid-columnHeaders': { 
+                backgroundColor: '#f5f5f5',
+                color: '#333',
+                fontWeight: 'bold',
+                minHeight: '56px',
+                '& .MuiDataGrid-columnHeader': {
+                  minHeight: '56px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  backgroundColor: '#f5f5f5',
+                  color: '#333',
+                  fontWeight: 'bold'
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: '#333',
+                  fontWeight: 'bold',
+                  fontSize: '0.875rem'
+                },
+                '& .MuiDataGrid-columnHeaderTitleContainer': {
+                  color: '#333'
+                },
+                '& .MuiDataGrid-iconButtonContainer': {
+                  color: '#333'
+                },
+                '& .MuiDataGrid-menuIcon': {
+                  color: '#333'
+                }
+              },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
               '& .selected-row': { backgroundColor: '#d1eaff !important' },
               '& .clicked-row': { 
                 backgroundColor: '#d1eaff !important',
                 border: '2px solid #1976d2 !important'
               },
-              border: 'none',
+              border: '1px solid #e0e0e0',
+              '& .MuiDataGrid-overlay': {
+                backgroundColor: 'transparent',
+              }
+            }}
+            slots={{
+              noRowsOverlay: () => (
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '100%',
+                    color: 'text.secondary',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {loading ? 'Loading...' : (error ? 'Error loading data' : 'No records')}
+                </Box>
+              ),
             }}
           />
         </Box>
@@ -420,7 +581,15 @@ const StaffList: React.FC = () => {
         )}
 
         <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)} maxWidth="sm" fullWidth>
-          <DialogTitle>Update Staff Member</DialogTitle>
+          <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px 8px 0 0' }}>
+            <DialogTitle sx={{
+              color: 'white',
+              padding: 0,
+              margin: 0
+            }}>
+              Update Staff Member
+            </DialogTitle>
+          </Box>
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               {Object.entries(updateForm).map(([key, value]) => (
@@ -443,7 +612,15 @@ const StaffList: React.FC = () => {
         </Dialog>
 
         <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-          <DialogTitle>Confirm Delete</DialogTitle>
+          <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px 8px 0 0' }}>
+            <DialogTitle sx={{
+              color: 'white',
+              padding: 0,
+              margin: 0
+            }}>
+              Confirm Delete
+            </DialogTitle>
+          </Box>
           <DialogContent>
             <DialogContentText>
               Are you sure you want to delete this staff member?
@@ -454,6 +631,18 @@ const StaffList: React.FC = () => {
             <Button onClick={handleDelete} color="error" variant="contained">Delete</Button>
           </DialogActions>
         </Dialog>
+
+        {/* Error message at bottom if needed */}
+        {error && (
+          <Box sx={{ mt: 2, textAlign: 'center' }}>
+            <Typography color="error" variant="body2">
+              {error}
+            </Typography>
+            <Button size="small" onClick={fetchStaffData} sx={{ mt: 1 }}>
+              Retry
+            </Button>
+          </Box>
+        )}
       </Paper>
     </Box>
   );

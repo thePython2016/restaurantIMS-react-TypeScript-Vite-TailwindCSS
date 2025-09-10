@@ -169,10 +169,31 @@ const AppSidebar: React.FC = () => {
     type: "main" | "others";
     index: number;
   } | null>(null);
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>(
     {}
   );
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Handle scroll detection
+  const handleScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const scrollTop = scrollContainerRef.current.scrollTop;
+      setIsScrolled(scrollTop > 0);
+    }
+  }, []);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+      return () => {
+        scrollContainer.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [handleScroll]);
 
   const isActive = useCallback(
     (path: string) => location.pathname === path,
@@ -413,9 +434,12 @@ const AppSidebar: React.FC = () => {
       </div>
 
 
-
       {user && accessToken && (
-        <div className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
+        <div ref={scrollContainerRef} className="flex flex-col overflow-y-auto duration-300 ease-linear custom-scrollbar">
+        {/* Conditional divider - only shows when scrolling */}
+        {isScrolled && (
+          <div className="border-t border-gray-200 dark:border-gray-700 mx-3 my-2"></div>
+        )}
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             {/* Dashboard Section */}

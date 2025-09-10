@@ -11,6 +11,24 @@ import { Email as EmailIcon } from "@mui/icons-material";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 import ChatBotIcon from "../../components/ChatBotIcon";
 
+// Format phone number function
+const formatPhoneNumber = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+  let formatted = '';
+
+  if (digits.length <= 3) {
+    formatted = digits;
+  } else if (digits.length <= 6) {
+    formatted = digits.slice(0, 3) + ' ' + digits.slice(3);
+  } else if (digits.length <= 9) {
+    formatted = digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6);
+  } else {
+    formatted = digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6, 9);
+  }
+
+  return formatted;
+};
+
 export function SignupForm() {
   const navigate = useNavigate();
   const { googleLogin } = useAuth();
@@ -113,12 +131,11 @@ export function SignupForm() {
       newFieldErrors.email = t("Please enter a valid email address");
     }
 
-    // Phone number format validation (basic validation for digits and common formats)
+    // Phone number format validation (Tanzania format: 123 456 789)
     if (phone.trim()) {
-      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/; // International format allowing + and 1-16 digits
-      const cleanPhone = phone.replace(/[\s\-\(\)]/g, ''); // Remove common separators
-      if (!phoneRegex.test(cleanPhone) || cleanPhone.length < 10) {
-        newFieldErrors.phone = t("Please enter a valid phone number");
+      const phoneRegex = /^\d{3}\s\d{3}\s\d{3}$/; // Format: 123 456 789
+      if (!phoneRegex.test(phone)) {
+        newFieldErrors.phone = t("Phone must be 9 digits (format: 123 456 789)");
       }
     }
 
@@ -484,9 +501,22 @@ export function SignupForm() {
                   required
                   size="small"
                   value={phone}
-                  onChange={(e) => handleFieldChange('phone', e.target.value, setPhone)}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (val.startsWith('+255')) {
+                      val = val.slice(4);
+                    }
+                    val = formatPhoneNumber(val);
+                    handleFieldChange('phone', val, setPhone);
+                  }}
                   disabled={isSubmitting}
                   error={!!fieldErrors.phone}
+                  placeholder="123 456 789"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">+255</InputAdornment>
+                    ),
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: 'white',
