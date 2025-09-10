@@ -1,12 +1,11 @@
 from django.db import models
-
 class Item(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    is_available = models.BooleanField(default=True)
+    itemID = models.AutoField(primary_key=True)
+    itemName = models.CharField(max_length=100)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return self.itemName
     class Meta:
-        db_table = "item"  # custom table name
+        db_table = "Item"  # custom table name

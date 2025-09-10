@@ -26,7 +26,7 @@ from custom_password_reset import custom_password_reset
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('Customers.urls'), name='customers'),
+    path('', include('Customer.urls'), name='customers'),
     path('', include('Useraccount.urls'), name='user'),
     
     # Custom and Djoser Authentication URLs
@@ -66,6 +66,28 @@ urlpatterns += [
     path("api/v1/sms/", include("mambosmsbalance.urls")),
     path("api/", include("chatbot.urls")),
     # path("", include("chatbot.urls")),  # include for REDIS
+]
+
+
+from Items import views as items_views
+from OrderItem import views as orderitem_views
+from Payment import views as payment_views
+from Order import views as order_views
+from Staff import views as staff_views
+from Customer import views as customer_views
+
+router = DefaultRouter()
+router.register(r'staff', staff_views.StaffViewSet)
+router.register(r'customer', customer_views.CustomerViewSet)
+router.register(r'item', items_views.ItemViewSet)
+router.register(r'order', order_views.OrderViewSet)
+router.register(r'order-item', orderitem_views.OrderItemViewSet)
+router.register(r'payment', payment_views.PaymentViewSet)
+# router.register(r'staff-list', staff_views.StaffViewSet, basename="staff-list")
+router.register(r'stafflist', staff_views.StaffListViewSet, basename="stafflist")
+
+urlpatterns += [
+    path('api/', include(router.urls)),
 ]
 
 

@@ -2,8 +2,12 @@ from django.shortcuts import render
 
 # Create your views here.
 
+from rest_framework import viewsets
+from .models import Item
+from .serializers import (
+    ItemSerializer
+)
 
-from django.utils.translation import gettext as _
-
-def welcome_message():
-    return _("Welcome to my site")
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = Item.objects.all()
+    serializer_class = ItemSerializer
