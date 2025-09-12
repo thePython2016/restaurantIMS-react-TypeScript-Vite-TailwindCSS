@@ -1,13 +1,11 @@
-from django.shortcuts import render
-
-# Create your views here.
-
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from .models import Item
-from .serializers import (
-    ItemSerializer
-)
+from .serializers import ItemSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
-    queryset = Item.objects.all()
+    queryset = Item.objects.all().order_by('-itemID')
+    serializer_class = ItemSerializer
+
+class ItemListCreateView(generics.ListCreateAPIView):
+    queryset = Item.objects.all().order_by('-itemID')
     serializer_class = ItemSerializer
