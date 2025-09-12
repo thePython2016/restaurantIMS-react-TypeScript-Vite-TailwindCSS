@@ -39,10 +39,10 @@ const generateCustomerData = (count: number) => {
 };
 
 const columns: GridColDef[] = [
-  { field: 'name', headerName: 'Full Name', flex: 1 },
-  { field: 'phone', headerName: 'Phone', flex: 1 },
-  { field: 'address', headerName: 'Address', flex: 1 },
-  { field: 'city', headerName: 'Region', flex: 1 },
+  { field: 'name', headerName: 'Full Name', flex: 1, sortable: true, filterable: true },
+  { field: 'phone', headerName: 'Phone', flex: 1, sortable: true, filterable: true },
+  { field: 'address', headerName: 'Address', flex: 1, sortable: true, filterable: true },
+  { field: 'city', headerName: 'Region', flex: 1, sortable: true, filterable: true },
 ];
 
 const CustomerList: React.FC = () => {
@@ -216,6 +216,9 @@ const CustomerList: React.FC = () => {
           }
           autoHeight
           disableRowSelectionOnClick
+          disableColumnMenu={false}
+          disableColumnFilter={false}
+          disableColumnSelector={false}
           pageSizeOptions={[5, 10, 25, 50]}
           sx={{
             height: 500,
@@ -223,17 +226,40 @@ const CustomerList: React.FC = () => {
             '& .selected-row': { backgroundColor: '#d1eaff !important' },
             '& .MuiDataGrid-footerContainer': { borderTop: '1px solid #ccc' },
             '& .MuiDataGrid-columnHeaders': { 
+              backgroundColor: '#f5f5f5 !important',
+              color: '#1976d2 !important',
+              fontWeight: 'bold !important',
+              minHeight: '56px !important',
               borderBottom: '2px solid #e0e0e0',
-              backgroundColor: '#f8f9fa'
-            },
-            '& .MuiDataGrid-columnHeader': {
-              borderRight: '1px solid #e0e0e0',
-              '&:last-child': {
-                borderRight: 'none'
+              '& .MuiDataGrid-columnHeader': {
+                minHeight: '56px !important',
+                display: 'flex !important',
+                alignItems: 'center !important',
+                backgroundColor: '#f5f5f5 !important',
+                color: '#1976d2 !important',
+                fontWeight: 'bold !important',
+                borderRight: '1px dotted #ccc !important',
+                '&:last-child': {
+                  borderRight: 'none !important'
+                }
+              },
+              '& .MuiDataGrid-columnHeaderTitle': {
+                color: '#1976d2 !important',
+                fontWeight: 'bold !important',
+                fontSize: '0.875rem !important'
+              },
+              '& .MuiDataGrid-columnHeaderTitleContainer': {
+                color: '#1976d2 !important'
+              },
+              '& .MuiDataGrid-iconButtonContainer': {
+                color: '#1976d2 !important'
+              },
+              '& .MuiDataGrid-menuIcon': {
+                color: '#1976d2 !important'
               }
             },
             '& .MuiDataGrid-cell': {
-              borderRight: '1px solid #f0f0f0',
+              borderRight: '1px dotted #ccc',
               '&:last-child': {
                 borderRight: 'none'
               }

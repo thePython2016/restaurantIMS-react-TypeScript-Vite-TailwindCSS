@@ -12,15 +12,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TablePagination,
+  Checkbox,
 } from '@mui/material';
-import TableWithCheckboxes from '../../components/TableWithCheckboxes';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
 import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useNavigate } from 'react-router-dom';
@@ -41,13 +42,6 @@ const generateCustomerData = (count: number) => {
   }));
 };
 
-const columns = [
-  { field: 'name', headerName: 'Full Name', flex: 1 },
-  { field: 'phone', headerName: 'Phone', flex: 1 },
-  { field: 'address', headerName: 'Address', flex: 1 },
-  { field: 'city', headerName: 'Region', flex: 1 },
-];
-
 const CustomerList: React.FC = () => {
   // Initial data
   const initialData = useMemo(() => generateCustomerData(50), []);
@@ -58,38 +52,64 @@ const CustomerList: React.FC = () => {
     page: 0,
     pageSize: 10,
   });
-  const [sortModel, setSortModel] = useState<GridSortModel>([]);
   const [search, setSearch] = useState('');
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-  // Filter and sort rows based on search and sort model
-  const filteredSortedRows = useMemo(() => {
-    let filtered = rows;
-    if (search.trim()) {
-      filtered = filtered.filter((row) =>
-        Object.values(row)
-          .slice(0, 4) // exclude functions and isRowSelected property
-          .some((val) =>
-            String(val).toLowerCase().includes(search.toLowerCase())
-          )
-      );
-    }
-    if (sortModel.length > 0) {
-      const { field, sort } = sortModel[0];
-      filtered = [...filtered].sort((a, b) => {
-        if (a[field] > b[field]) return sort === 'asc' ? 1 : -1;
-        if (a[field] < b[field]) return sort === 'asc' ? -1 : 1;
-        return 0;
-      });
-    }
-    return filtered;
-  }, [rows, search, sortModel]);
+  // Filter rows based on search
+  const filteredRows = useMemo(() => {
+    if (!search.trim()) return rows;
+    return rows.filter((row) =>
+      Object.values(row)
+        .slice(0, 4) // exclude functions and isRowSelected property
+        .some((val) =>
+          String(val).toLowerCase().includes(search.toLowerCase())
+        )
+    );
+  }, [rows, search]);
 
-  // Pagination slice
-  const pagedRows = useMemo(() => {
-    const start = paginationModel.page * paginationModel.pageSize;
-    return filteredSortedRows.slice(start, start + paginationModel.pageSize);
-  }, [filteredSortedRows, paginationModel]);
+  const columns: GridColDef[] = [
+    { 
+      field: 'checkbox', 
+      headerName: '', 
+      width: 50, 
+      sortable: false, 
+      filterable: false,
+      disableColumnMenu: true,
+      renderHeader: () => (
+        <Checkbox
+          color="primary"
+          indeterminate={selectedRows.length > 0 && selectedRows.length < filteredRows.length}
+          checked={filteredRows.length > 0 && selectedRows.length === filteredRows.length}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedRows(filteredRows.map(row => row.id));
+            } else {
+              setSelectedRows([]);
+            }
+          }}
+        />
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          color="primary"
+          checked={selectedRows.includes(params.row.id)}
+          onChange={(e) => {
+            const rowId = params.row.id;
+            if (e.target.checked) {
+              setSelectedRows(prev => [...prev, rowId]);
+            } else {
+              setSelectedRows(prev => prev.filter(id => id !== rowId));
+            }
+          }}
+        />
+      ),
+    },
+    { field: 'name', headerName: 'Full Name', flex: 1, sortable: true, filterable: true },
+    { field: 'phone', headerName: 'Phone', flex: 1, sortable: true, filterable: true },
+    { field: 'address', headerName: 'Address', flex: 1, sortable: true, filterable: true },
+    { field: 'city', headerName: 'Region', flex: 1, sortable: true, filterable: true },
+  ];
 
   // PDF export
   const handlePDF = () => {
@@ -97,7 +117,7 @@ const CustomerList: React.FC = () => {
     doc.text('Customer List', 14, 10);
     autoTable(doc, {
       head: [['Full Name', 'Phone', 'Address', 'Region']],
-      body: filteredSortedRows.map((row) => [row.name, row.phone, row.address, row.city]),
+      body: filteredRows.map((row) => [row.name, row.phone, row.address, row.city]),
     });
     doc.save('customer_list.pdf');
   };
@@ -112,7 +132,7 @@ const CustomerList: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          ${filteredSortedRows
+          ${filteredRows
             .map(
               (row) => `
             <tr>
@@ -205,6 +225,14 @@ const CustomerList: React.FC = () => {
                 sx={{ width: 250 }}
               />
               <Button
+                variant="outlined"
+                startIcon={<PrintIcon />}
+                onClick={handlePrint}
+                sx={{ mr: 1 }}
+              >
+                Print
+              </Button>
+              <Button
                 variant="contained"
                 startIcon={<PictureAsPdfIcon />}
                 onClick={handlePDF}
@@ -215,30 +243,117 @@ const CustomerList: React.FC = () => {
             </Box>
           </Box>
 
-          <TableWithCheckboxes
-            rows={filteredSortedRows}
-            columns={columns}
-            getRowId={(row) => row.id.toString()}
-            searchTerm={search}
-            page={paginationModel.page}
-            rowsPerPage={paginationModel.pageSize}
-            onPageChange={(event, newPage) => setPaginationModel(prev => ({ ...prev, page: newPage }))}
-            onRowsPerPageChange={(event) => setPaginationModel(prev => ({ ...prev, pageSize: Number(event.target.value), page: 0 }))}
-            showPagination={true}
-            onRowClick={(id) => setSelectedRowId(Number(id))}
-          />
-          
-          {filteredSortedRows.length > 0 && (
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 50]}
-              component="div"
-              count={filteredSortedRows.length}
-              rowsPerPage={paginationModel.pageSize}
-              page={paginationModel.page}
-              onPageChange={(event, newPage) => setPaginationModel(prev => ({ ...prev, page: newPage }))}
-              onRowsPerPageChange={(event) => setPaginationModel(prev => ({ ...prev, pageSize: Number(event.target.value), page: 0 }))}
+          <Box sx={{ width: '100%', height: '500px' }}>
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              paginationModel={paginationModel}
+              onPaginationModelChange={setPaginationModel}
+              pageSizeOptions={[5, 10, 25, 50]}
+              onRowClick={(params) => setSelectedRowId(params.id as number)}
+              getRowClassName={(params) => {
+                if (params.id === selectedRowId) return 'selected-row';
+                if (selectedRows.includes(params.id as number)) return 'clicked-row';
+                return '';
+              }}
+              disableRowSelectionOnClick
+              hideFooter={false}
+              disableColumnMenu={false}
+              disableColumnFilter={false}
+              disableColumnSelector={false}
+              sortingMode="client"
+              filterMode="client"
+              sx={{
+                '& .MuiDataGrid-root': {
+                  border: '1px solid #e0e0e0',
+                  '& .MuiDataGrid-columnHeaders': {
+                    display: 'flex !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important'
+                  }
+                },
+                '& .MuiDataGrid-columnHeaders': { 
+                  backgroundColor: '#f5f5f5 !important',
+                  color: '#1976d2 !important',
+                  fontWeight: 'bold !important',
+                  minHeight: '56px !important',
+                  display: 'flex !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important',
+                  '& .MuiDataGrid-columnHeader': {
+                    minHeight: '56px !important',
+                    display: 'flex !important',
+                    alignItems: 'center !important',
+                    backgroundColor: '#f5f5f5 !important',
+                    color: '#1976d2 !important',
+                    fontWeight: 'bold !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important',
+                    borderRight: '1px dotted #ccc !important',
+                    '&:last-child': {
+                      borderRight: 'none !important'
+                    }
+                  },
+                  '& .MuiDataGrid-columnHeaderTitle': {
+                    color: '#1976d2 !important',
+                    fontWeight: 'bold !important',
+                    fontSize: '0.875rem !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important'
+                  },
+                  '& .MuiDataGrid-columnHeaderTitleContainer': {
+                    color: '#1976d2 !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important'
+                  },
+                  '& .MuiDataGrid-iconButtonContainer': {
+                    color: '#1976d2 !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important'
+                  },
+                  '& .MuiDataGrid-menuIcon': {
+                    color: '#1976d2 !important',
+                    visibility: 'visible !important',
+                    opacity: '1 !important'
+                  }
+                },
+                '& .MuiDataGrid-cell': {
+                  borderRight: '1px dotted #ccc',
+                  '&:last-child': {
+                    borderRight: 'none'
+                  }
+                },
+                '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+                '& .selected-row': { backgroundColor: '#d1eaff !important' },
+                '& .clicked-row': { 
+                  backgroundColor: '#d1eaff !important',
+                  border: '2px solid #1976d2 !important'
+                },
+                '& .MuiDataGrid-overlay': {
+                  backgroundColor: 'transparent',
+                },
+                '& .MuiDataGrid-main': {
+                  minHeight: '200px'
+                }
+              }}
+              slots={{
+                noRowsOverlay: () => (
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      height: '100%',
+                      color: 'text.secondary',
+                      fontSize: '1.1rem'
+                    }}
+                  >
+                    No customers found
+                  </Box>
+                ),
+              }}
             />
-          )}
+          </Box>
         </Paper>
       </Box>
     </>

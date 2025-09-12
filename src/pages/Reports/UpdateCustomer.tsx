@@ -43,10 +43,10 @@ const generateCustomerData = (count: number) => {
 };
 
 const columns: GridColDef[] = [
-  { field: 'name', headerName: 'Full Name', flex: 1 },
-  { field: 'phone', headerName: 'Phone', flex: 1 },
-  { field: 'address', headerName: 'Address', flex: 1 },
-  { field: 'city', headerName: 'Region', flex: 1 },
+  { field: 'name', headerName: 'Full Name', flex: 1, sortable: true, filterable: true },
+  { field: 'phone', headerName: 'Phone', flex: 1, sortable: true, filterable: true },
+  { field: 'address', headerName: 'Address', flex: 1, sortable: true, filterable: true },
+  { field: 'city', headerName: 'Region', flex: 1, sortable: true, filterable: true },
 ];
 
 const UpdateCustomer: React.FC = () => {
@@ -250,9 +250,71 @@ const UpdateCustomer: React.FC = () => {
             }
             autoHeight
             disableRowSelectionOnClick
+            disableColumnMenu={false}
+            disableColumnFilter={false}
+            disableColumnSelector={false}
             pageSizeOptions={[5, 10, 25, 50]}
             sx={{
               height: 500,
+              '& .MuiDataGrid-root': {
+                border: '1px solid #e0e0e0',
+                '& .MuiDataGrid-columnHeaders': {
+                  display: 'flex !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-columnHeaders': { 
+                backgroundColor: '#f5f5f5 !important',
+                color: '#1976d2 !important',
+                fontWeight: 'bold !important',
+                minHeight: '56px !important',
+                display: 'flex !important',
+                visibility: 'visible !important',
+                opacity: '1 !important',
+                '& .MuiDataGrid-columnHeader': {
+                  minHeight: '56px !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  backgroundColor: '#f5f5f5 !important',
+                  color: '#1976d2 !important',
+                  fontWeight: 'bold !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important',
+                  borderRight: '1px dotted #ccc !important',
+                  '&:last-child': {
+                    borderRight: 'none !important'
+                  }
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: '#1976d2 !important',
+                  fontWeight: 'bold !important',
+                  fontSize: '0.875rem !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-columnHeaderTitleContainer': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-iconButtonContainer': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-menuIcon': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-cell': {
+                borderRight: '1px dotted #ccc',
+                '&:last-child': {
+                  borderRight: 'none'
+                }
+              },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
               '& .selected-row': { backgroundColor: '#d1eaff !important' },
               '& .MuiDataGrid-footerContainer': {
@@ -260,6 +322,12 @@ const UpdateCustomer: React.FC = () => {
                 backgroundColor: '#f5f5f5',
                 justifyContent: 'flex-end',
               },
+              '& .MuiDataGrid-overlay': {
+                backgroundColor: 'transparent',
+              },
+              '& .MuiDataGrid-main': {
+                minHeight: '200px'
+              }
             }}
           />
         </div>

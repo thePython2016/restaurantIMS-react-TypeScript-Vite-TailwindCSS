@@ -507,6 +507,11 @@ const StaffList: React.FC = () => {
             }}
             autoHeight
             disableRowSelectionOnClick
+            disableColumnMenu={false}
+            disableColumnFilter={false}
+            disableColumnSelector={false}
+            sortingMode="client"
+            filterMode="client"
             sx={{
               '& .MuiDataGrid-columnHeaders': { 
                 backgroundColor: '#f5f5f5',
@@ -518,22 +523,32 @@ const StaffList: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   backgroundColor: '#f5f5f5',
-                  color: '#333',
-                  fontWeight: 'bold'
+                  color: '#1976d2',
+                  fontWeight: 'bold',
+                  borderRight: '1px dotted #ccc',
+                  '&:last-child': {
+                    borderRight: 'none'
+                  }
                 },
                 '& .MuiDataGrid-columnHeaderTitle': {
-                  color: '#333',
+                  color: '#1976d2',
                   fontWeight: 'bold',
                   fontSize: '0.875rem'
                 },
                 '& .MuiDataGrid-columnHeaderTitleContainer': {
-                  color: '#333'
+                  color: '#1976d2'
                 },
                 '& .MuiDataGrid-iconButtonContainer': {
-                  color: '#333'
+                  color: '#1976d2'
                 },
                 '& .MuiDataGrid-menuIcon': {
-                  color: '#333'
+                  color: '#1976d2'
+                }
+              },
+              '& .MuiDataGrid-cell': {
+                borderRight: '1px dotted #ccc',
+                '&:last-child': {
+                  borderRight: 'none'
                 }
               },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },

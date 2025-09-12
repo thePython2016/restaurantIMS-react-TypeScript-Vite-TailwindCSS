@@ -143,13 +143,21 @@ const Update: React.FC = () => {
         />
       ),
     },
-    { field: 'name', headerName: 'Name', flex: 1, minWidth: 120 },
-    { field: 'position', headerName: 'Position', flex: 1, minWidth: 120 },
-    { field: 'email', headerName: 'Email', flex: 1, minWidth: 150 },
-    { field: 'phone', headerName: 'Phone', flex: 1, minWidth: 120 },
-    { field: 'address', headerName: 'Address', flex: 1, minWidth: 150 },
-    { field: 'city', headerName: 'Region', flex: 1, minWidth: 120 },
-    { field: 'salary', headerName: 'Salary', flex: 1, minWidth: 100 },
+    { field: 'name', headerName: 'Name', flex: 1, minWidth: 120, sortable: true, filterable: true },
+    { field: 'position', headerName: 'Position', flex: 1, minWidth: 120, sortable: true, filterable: true },
+    { field: 'email', headerName: 'Email', flex: 1, minWidth: 150, sortable: true, filterable: true },
+    { field: 'phone', headerName: 'Phone', flex: 1, minWidth: 120, sortable: true, filterable: true },
+    { field: 'address', headerName: 'Address', flex: 1, minWidth: 150, sortable: true, filterable: true },
+    { field: 'city', headerName: 'Region', flex: 1, minWidth: 120, sortable: true, filterable: true },
+    { 
+      field: 'salary', 
+      headerName: 'Salary', 
+      flex: 1, 
+      minWidth: 100, 
+      sortable: true, 
+      filterable: true,
+      renderCell: (params) => `$${params.value.toLocaleString()}`
+    },
   ];
 
   const filteredRows = rows.filter(row => {
@@ -476,6 +484,8 @@ const Update: React.FC = () => {
             disableColumnMenu={false}
             disableColumnFilter={false}
             disableColumnSelector={false}
+            sortingMode="client"
+            filterMode="client"
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
@@ -503,32 +513,42 @@ const Update: React.FC = () => {
                   display: 'flex !important',
                   alignItems: 'center !important',
                   backgroundColor: '#f5f5f5 !important',
-                  color: '#333 !important',
+                  color: '#1976d2 !important',
                   fontWeight: 'bold !important',
                   visibility: 'visible !important',
-                  opacity: '1 !important'
+                  opacity: '1 !important',
+                  borderRight: '1px dotted #ccc !important',
+                  '&:last-child': {
+                    borderRight: 'none !important'
+                  }
                 },
                 '& .MuiDataGrid-columnHeaderTitle': {
-                  color: '#333 !important',
+                  color: '#1976d2 !important',
                   fontWeight: 'bold !important',
                   fontSize: '0.875rem !important',
                   visibility: 'visible !important',
                   opacity: '1 !important'
                 },
                 '& .MuiDataGrid-columnHeaderTitleContainer': {
-                  color: '#333 !important',
+                  color: '#1976d2 !important',
                   visibility: 'visible !important',
                   opacity: '1 !important'
                 },
                 '& .MuiDataGrid-iconButtonContainer': {
-                  color: '#333 !important',
+                  color: '#1976d2 !important',
                   visibility: 'visible !important',
                   opacity: '1 !important'
                 },
                 '& .MuiDataGrid-menuIcon': {
-                  color: '#333 !important',
+                  color: '#1976d2 !important',
                   visibility: 'visible !important',
                   opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-cell': {
+                borderRight: '1px dotted #ccc',
+                '&:last-child': {
+                  borderRight: 'none'
                 }
               },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },

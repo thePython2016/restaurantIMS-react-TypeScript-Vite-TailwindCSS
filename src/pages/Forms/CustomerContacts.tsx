@@ -10,18 +10,18 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Checkbox,
-  TablePagination
+  Button,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import SearchIcon from '@mui/icons-material/Search';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import PrintIcon from '@mui/icons-material/Print';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 // Sample customer data
 const customers = [
@@ -38,8 +38,11 @@ const customers = [
 
 const CustomerContacts = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 10,
+  });
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   // Filter customers based on search query
   const filteredCustomers = useMemo(() => {
@@ -54,22 +57,118 @@ const CustomerContacts = () => {
     );
   }, [searchQuery]);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
-    setPage(0); // Reset to first page when searching
+    setPaginationModel(prev => ({ ...prev, page: 0 })); // Reset to first page when searching
   };
 
-  // Get current page rows
-  const currentPageRows = filteredCustomers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const handleRefresh = () => {
+    setSearchQuery("");
+    setPaginationModel({ page: 0, pageSize: 10 });
+    setSelectedRows([]);
+  };
+
+  const columns: GridColDef[] = [
+    { 
+      field: 'checkbox', 
+      headerName: '', 
+      width: 50, 
+      sortable: false, 
+      filterable: false,
+      disableColumnMenu: true,
+      renderHeader: () => (
+        <Checkbox
+          color="primary"
+          indeterminate={selectedRows.length > 0 && selectedRows.length < filteredCustomers.length}
+          checked={filteredCustomers.length > 0 && selectedRows.length === filteredCustomers.length}
+          onChange={(e) => {
+            if (e.target.checked) {
+              setSelectedRows(filteredCustomers.map(customer => customer.id));
+            } else {
+              setSelectedRows([]);
+            }
+          }}
+        />
+      ),
+      renderCell: (params) => (
+        <Checkbox
+          color="primary"
+          checked={selectedRows.includes(params.row.id)}
+          onChange={(e) => {
+            const rowId = params.row.id;
+            if (e.target.checked) {
+              setSelectedRows(prev => [...prev, rowId]);
+            } else {
+              setSelectedRows(prev => prev.filter(id => id !== rowId));
+            }
+          }}
+        />
+      ),
+    },
+    { field: 'id', headerName: 'ID', flex: 0.5, sortable: true, filterable: true },
+    { field: 'name', headerName: 'Name', flex: 1, sortable: true, filterable: true },
+    { field: 'phone', headerName: 'Phone', flex: 1, sortable: true, filterable: true },
+    { field: 'email', headerName: 'Email', flex: 1.5, sortable: true, filterable: true },
+    { field: 'city', headerName: 'City', flex: 1, sortable: true, filterable: true },
+  ];
+
+  const handlePDF = () => {
+    const doc = new jsPDF();
+    doc.text('Customer Contact Details', 14, 10);
+    autoTable(doc, {
+      head: [['ID', 'Name', 'Phone', 'Email', 'City']],
+      body: filteredCustomers.map(customer => [
+        customer.id,
+        customer.name,
+        customer.phone,
+        customer.email,
+        customer.city
+      ]),
+    });
+    doc.save('customer_contacts.pdf');
+  };
+
+  const handlePrint = () => {
+    const tableHTML = `
+      <table border="1" cellspacing="0" cellpadding="8" style="width:100%; border-collapse:collapse;">
+        <thead style="background-color:#e0e0e0;">
+          <tr>
+            <th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>City</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredCustomers
+            .map(
+              (customer) => `
+            <tr>
+              <td>${customer.id}</td>
+              <td>${customer.name}</td>
+              <td>${customer.phone}</td>
+              <td>${customer.email}</td>
+              <td>${customer.city}</td>
+            </tr>
+          `
+            )
+            .join('')}
+        </tbody>
+      </table>
+    `;
+    const printWin = window.open('', '', 'width=900,height=700');
+    if (!printWin) return;
+    printWin.document.write(`
+      <html>
+        <head><title>Print Customer Contacts</title></head>
+        <body>
+          <h2 style="text-align:left;">Customer Contact Details</h2>
+          ${tableHTML}
+        </body>
+      </html>
+    `);
+    printWin.document.close();
+    printWin.focus();
+    printWin.print();
+    printWin.close();
+  };
 
   return (
     <Card sx={{ p: 2, boxShadow: 3, borderRadius: 3, mt: 6 }}>
@@ -83,88 +182,167 @@ const CustomerContacts = () => {
           <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>
 
-        {/* Search and Rows per page controls - matching SentMessages style exactly */}
+        {/* Search and Rows per page controls */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Rows per page</InputLabel>
             <Select
-              value={rowsPerPage}
+              value={paginationModel.pageSize}
               label="Rows per page"
-              onChange={handleChangeRowsPerPage}
+              onChange={(e) => setPaginationModel(prev => ({ ...prev, pageSize: Number(e.target.value), page: 0 }))}
             >
               {[5, 10, 25, 50].map(size => (
                 <MenuItem key={size} value={size}>{size}</MenuItem>
               ))}
             </Select>
           </FormControl>
-          <TextField
-            size="small"
-            placeholder="Search customers..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            sx={{ minWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
+          
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              size="small"
+              placeholder="Search customers..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              sx={{ minWidth: 300 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              variant="outlined"
+              startIcon={<PrintIcon />}
+              onClick={handlePrint}
+              sx={{ mr: 1 }}
+            >
+              Print
+            </Button>
+            <Tooltip title="Refresh Data">
+              <IconButton 
+                color="primary" 
+                onClick={handleRefresh} 
+                size="small"
+                sx={{ mr: 1 }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
+            <Button
+              variant="contained"
+              startIcon={<PictureAsPdfIcon />}
+              onClick={handlePDF}
+              color="primary"
+            >
+              PDF
+            </Button>
+          </Box>
+        </Box>
+
+        {/* DataGrid */}
+        <Box sx={{ width: '100%' }}>
+          <DataGrid
+            rows={filteredCustomers}
+            columns={columns}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[5, 10, 25, 50]}
+            disableRowSelectionOnClick
+            hideFooter={false}
+            disableColumnMenu={false}
+            disableColumnFilter={false}
+            disableColumnSelector={false}
+            sortingMode="client"
+            filterMode="client"
+            autoHeight
+            sx={{
+              '& .MuiDataGrid-root': {
+                border: '1px solid #e0e0e0',
+                '& .MuiDataGrid-columnHeaders': {
+                  display: 'flex !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-columnHeaders': { 
+                backgroundColor: '#f5f5f5 !important',
+                color: '#1976d2 !important',
+                fontWeight: 'bold !important',
+                minHeight: '56px !important',
+                display: 'flex !important',
+                visibility: 'visible !important',
+                opacity: '1 !important',
+                '& .MuiDataGrid-columnHeader': {
+                  minHeight: '56px !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  backgroundColor: '#f5f5f5 !important',
+                  color: '#1976d2 !important',
+                  fontWeight: 'bold !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important',
+                  borderRight: '1px dotted #ccc !important',
+                  '&:last-child': {
+                    borderRight: 'none !important'
+                  }
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: '#1976d2 !important',
+                  fontWeight: 'bold !important',
+                  fontSize: '0.875rem !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-columnHeaderTitleContainer': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-iconButtonContainer': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-menuIcon': {
+                  color: '#1976d2 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-cell': {
+                borderRight: '1px dotted #ccc',
+                '&:last-child': {
+                  borderRight: 'none'
+                }
+              },
+              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+              '& .MuiDataGrid-overlay': {
+                backgroundColor: 'transparent',
+              },
+              '& .MuiDataGrid-main': {
+                minHeight: '200px'
+              }
+            }}
+            slots={{
+              noRowsOverlay: () => (
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '100%',
+                    color: 'text.secondary',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  No customer contacts found
+                </Box>
               ),
             }}
           />
         </Box>
-
-        {/* Table - matching SentMessages exactly */}
-        <TableContainer component={Paper}>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>City</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentPageRows.length > 0 ? (
-                currentPageRows.map((row) => (
-                  <TableRow
-                    hover
-                    key={row.id}
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                      },
-                    }}
-                  >
-                    <TableCell>{row.id}</TableCell>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.phone}</TableCell>
-                    <TableCell>{row.email}</TableCell>
-                    <TableCell>{row.city}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    No customers found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Table Pagination - matching SentMessages exactly */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          component="div"
-          count={filteredCustomers.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </CardContent>
     </Card>
   );

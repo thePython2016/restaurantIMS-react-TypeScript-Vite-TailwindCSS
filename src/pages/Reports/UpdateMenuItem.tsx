@@ -132,9 +132,31 @@ export function UpdateMenuItem() {
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" fontWeight={700} mb={2}>Update Menu</Typography>
+        <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
+          <Typography 
+            variant="h5" 
+            mb={1} 
+            align="left" 
+            fontWeight={700}
+            sx={{
+              color: 'white'
+            }}
+          >
+            Update Menu
+          </Typography>
+          <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
+        </Box>
 
-        <Box display="flex" gap={2} flexWrap="wrap" alignItems="center" mb={2}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 2,
+            alignItems: 'center',
+            mb: 2,
+            justifyContent: 'space-between',
+          }}
+        >
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Rows per page</InputLabel>
             <Select
@@ -146,55 +168,75 @@ export function UpdateMenuItem() {
             </Select>
           </FormControl>
 
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Price</InputLabel>
-            <Select
-              value={priceFilter.operator}
-              label="Price"
-              onChange={(e) => setPriceFilter(prev => ({ ...prev, operator: e.target.value }))}
-            >
-              <MenuItem value="">No Filter</MenuItem>
-              <MenuItem value="gt">Greater Than</MenuItem>
-              <MenuItem value="lt">Less Than</MenuItem>
-              <MenuItem value="gte">Greater or Equal</MenuItem>
-              <MenuItem value="lte">Less or Equal</MenuItem>
-            </Select>
-          </FormControl>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
+            <FormControl size="small" sx={{ minWidth: 130 }}>
+              <InputLabel>Price</InputLabel>
+              <Select
+                label="Price"
+                value={priceFilter.operator}
+                onChange={(e) => setPriceFilter(prev => ({ ...prev, operator: e.target.value }))}
+              >
+                <MenuItem value="">No Filter</MenuItem>
+                <MenuItem value="gt">Greater Than</MenuItem>
+                <MenuItem value="lt">Less Than</MenuItem>
+                <MenuItem value="gte">Greater or Equal</MenuItem>
+                <MenuItem value="lte">Less or Equal</MenuItem>
+              </Select>
+            </FormControl>
 
-          <TextField
-            size="small"
-            label="Amount"
-            type="number"
-            value={priceFilter.amount}
-            onChange={(e) => setPriceFilter(prev => ({ ...prev, amount: e.target.value }))}
-            sx={{ width: 100 }}
-          />
+            <TextField
+              size="small"
+              label="Amount"
+              type="number"
+              value={priceFilter.amount}
+              onChange={(e) => setPriceFilter(prev => ({ ...prev, amount: e.target.value }))}
+              sx={{ width: 100 }}
+            />
 
-          <TextField
-            size="small"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{ startAdornment: (<InputAdornment position="start"><SearchIcon /></InputAdornment>) }}
-            sx={{ width: 200 }}
-          />
+            <TextField
+              size="small"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                )
+              }}
+              sx={{ width: { xs: 150, sm: 200 } }}
+            />
 
-          {selectedRow && (
-            <>
-              <Tooltip title="Update">
-                <IconButton onClick={() => setOpenUpdateDialog(true)}><EditIcon /></IconButton>
-              </Tooltip>
-              <Tooltip title="Delete">
-                <IconButton onClick={() => setOpenDeleteDialog(true)} color="error"><DeleteIcon /></IconButton>
-              </Tooltip>
-            </>
-          )}
+            {selectedRow && (
+              <>
+                <Tooltip title="Update Selected Record">
+                  <IconButton color="primary" onClick={() => setOpenUpdateDialog(true)} size="small">
+                    <EditIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Selected Record">
+                  <IconButton
+                    color="error"
+                    onClick={() => setOpenDeleteDialog(true)}
+                    size="small"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
 
-          <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>Print</Button>
-          <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF}>PDF</Button>
+            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint} size="small">
+              Print
+            </Button>
+            <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF} color="primary" size="small">
+              PDF
+            </Button>
+          </Box>
         </Box>
 
-        <Box ref={gridRef}>
+        <Box sx={{ width: '100%', height: '500px' }} ref={gridRef}>
           <DataGrid
             rows={filteredRows}
             columns={columns}
@@ -202,17 +244,121 @@ export function UpdateMenuItem() {
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
             onRowClick={(params) => setSelectedId(params.id as number)}
-            getRowClassName={(params) => params.id === selectedId ? 'selected-row' : ''}
-            autoHeight
+            getRowClassName={(params) => {
+              if (params.id === selectedId) return 'selected-row';
+              return '';
+            }}
             disableRowSelectionOnClick
-            sx={{ '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' }, '& .selected-row': { backgroundColor: '#d1eaff !important' } }}
+            hideFooter={false}
+            disableColumnMenu={false}
+            disableColumnFilter={false}
+            disableColumnSelector={false}
+            initialState={{
+              pagination: {
+                paginationModel: { page: 0, pageSize: 5 },
+              },
+            }}
+            sx={{
+              '& .MuiDataGrid-root': {
+                border: '1px solid #e0e0e0',
+                '& .MuiDataGrid-columnHeaders': {
+                  display: 'flex !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-columnHeaders': { 
+                backgroundColor: '#f5f5f5 !important',
+                color: '#333 !important',
+                fontWeight: 'bold !important',
+                minHeight: '56px !important',
+                display: 'flex !important',
+                visibility: 'visible !important',
+                opacity: '1 !important',
+                '& .MuiDataGrid-columnHeader': {
+                  minHeight: '56px !important',
+                  display: 'flex !important',
+                  alignItems: 'center !important',
+                  backgroundColor: '#f5f5f5 !important',
+                  color: '#333 !important',
+                  fontWeight: 'bold !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  color: '#333 !important',
+                  fontWeight: 'bold !important',
+                  fontSize: '0.875rem !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-columnHeaderTitleContainer': {
+                  color: '#333 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-iconButtonContainer': {
+                  color: '#333 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                },
+                '& .MuiDataGrid-menuIcon': {
+                  color: '#333 !important',
+                  visibility: 'visible !important',
+                  opacity: '1 !important'
+                }
+              },
+              '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
+              '& .selected-row': { backgroundColor: '#d1eaff !important' },
+              '& .MuiDataGrid-overlay': {
+                backgroundColor: 'transparent',
+              },
+              '& .MuiDataGrid-main': {
+                minHeight: '200px'
+              }
+            }}
+            slots={{
+              noRowsOverlay: () => (
+                <Box 
+                  sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    height: '100%',
+                    color: 'text.secondary',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  No records
+                </Box>
+              ),
+            }}
           />
         </Box>
 
-        <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)}>
-          <DialogTitle>Update Menu Item</DialogTitle>
+        {selectedRow && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2 }}>
+            <Button variant="outlined" color="primary" startIcon={<EditIcon />} onClick={() => setOpenUpdateDialog(true)}>
+              Update Selected Record
+            </Button>
+            <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={() => setOpenDeleteDialog(true)}>
+              Delete Selected Record
+            </Button>
+          </Box>
+        )}
+
+        <Dialog open={openUpdateDialog} onClose={() => setOpenUpdateDialog(false)} maxWidth="sm" fullWidth>
+          <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px 8px 0 0' }}>
+            <DialogTitle sx={{
+              color: 'white',
+              padding: 0,
+              margin: 0
+            }}>
+              Update Menu Item
+            </DialogTitle>
+          </Box>
           <DialogContent>
-            <Box display="flex" flexDirection="column" gap={2} mt={1}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               {Object.entries(updateForm).map(([key, value]) => (
                 <TextField
                   key={key}
@@ -228,14 +374,24 @@ export function UpdateMenuItem() {
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenUpdateDialog(false)}>Cancel</Button>
-            <Button variant="contained" onClick={handleUpdateSave}>Save</Button>
+            <Button variant="contained" onClick={handleUpdateSave} color="primary">Save</Button>
           </DialogActions>
         </Dialog>
 
         <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-          <DialogTitle>Confirm Delete</DialogTitle>
+          <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px 8px 0 0' }}>
+            <DialogTitle sx={{
+              color: 'white',
+              padding: 0,
+              margin: 0
+            }}>
+              Confirm Delete
+            </DialogTitle>
+          </Box>
           <DialogContent>
-            <DialogContentText>Are you sure you want to delete this menu item?</DialogContentText>
+            <DialogContentText>
+              Are you sure you want to delete this menu item?
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
