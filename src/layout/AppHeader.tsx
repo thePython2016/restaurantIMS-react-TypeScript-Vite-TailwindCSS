@@ -42,16 +42,16 @@ const AppHeader: React.FC = () => {
 
   return (
     <header className="sticky top-0 flex w-full bg-white border-gray-200 z-99999 dark:border-gray-800 dark:bg-gray-900 lg:border-b">
-      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
+      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6 overflow-visible">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
-          <Link to="/" className="lg:hidden">
+          <Link to="/" className="lg:hidden shrink-0">
             <img
-              className="dark:hidden"
+              className="header-logo dark:hidden"
               src="./images/logo/logo.svg"
               alt="Logo"
             />
             <img
-              className="hidden dark:block"
+              className="header-logo hidden dark:block"
               src="./images/logo/logo-dark.svg"
               alt="Logo"
             />
@@ -77,8 +77,8 @@ const AppHeader: React.FC = () => {
             </svg>
           </button>
 
-          <div className="hidden lg:flex lg:justify-center lg:flex-1">
-            <form className="w-full max-w-2xl">
+          <div className="flex flex-1 justify-center overflow-visible max-w-full">
+            <form className="w-full max-w-2xl lg:ml-8">
               <div className="relative">
                 <span className="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
                   <svg

@@ -12,6 +12,7 @@ import {
   InputLabel,
   FormControl,
   Select,
+  CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
@@ -31,8 +32,16 @@ const schema = yup.object().shape({
   notes: yup.string().notRequired(),
 });
 
+const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
+  <>
+    {label}
+    <span style={{ color: 'red', marginLeft: 2 }}>*</span>
+  </>
+);
+
 const OrderForm = () => {
   const [amount, setAmount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -54,82 +63,116 @@ const OrderForm = () => {
   const quantity = watch('quantity');
 
   useEffect(() => {
-    const price = menuPrices[menuItem] || 0;
-    setAmount(price * quantity);
+    const price = (menuPrices as Record<string, number>)[menuItem as keyof typeof menuPrices] || 0;
+    const qty = Number(quantity) || 0;
+    setAmount(price * qty);
   }, [menuItem, quantity]);
 
-  const onSubmit = (data) => {
-    const orderData = { ...data, amount };
-    console.log('Order submitted:', orderData);
-    // Submission logic here
+  const onSubmit = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      const orderData = { ...data, amount };
+      console.log('Order submitted:', orderData);
+      // Submission logic here
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
-      <Paper elevation={3} className="w-full max-w-6xl p-8 mx-auto">
-        <Typography variant="h5" sx={{ mb: 4, pb: 2, borderBottom: '1px solid #e0e0e0', textAlign: 'left', fontWeight: 700 }}>
-          Order Form
-        </Typography>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div className="flex gap-6">
-            <TextField
-              label={<><span>Customer Name</span><span style={{color: 'red'}}>*</span></>}
-              fullWidth
-              {...register('customerName')}
-              error={!!errors.customerName}
-              helperText={errors.customerName?.message}
-            />
-            <FormControl fullWidth error={!!errors.menuItem}>
-              <InputLabel>
-                <span>Menu Item</span><span style={{color: 'red'}}>*</span>
-              </InputLabel>
-              <Select
-                label={<><span>Menu Item</span><span style={{color: 'red'}}>*</span></>}
-                {...register('menuItem')}
-                defaultValue=""
+      <Paper elevation={3} className="w-full max-w-6xl p-4 mx-auto">
+        <Box
+          sx={{
+            backgroundColor: '#1976d2',
+            padding: '16px',
+            borderRadius: '8px',
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+            Order Form
+          </Typography>
+          <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
+        </Box>
+
+        <div className="mt-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Row 1 */}
+            <div className="flex gap-4">
+              <TextField
+                size="small"
+                label={<RequiredLabel label="Customer Name" />}
+                fullWidth
+                {...register('customerName')}
+                error={!!errors.customerName}
+                helperText={errors.customerName?.message as string}
+              />
+              <FormControl fullWidth error={!!errors.menuItem} size="small">
+                <InputLabel>
+                  <RequiredLabel label="Menu Item" />
+                </InputLabel>
+                <Select
+                  label={<RequiredLabel label="Menu Item" /> as unknown as string}
+                  native={false}
+                  defaultValue=""
+                  {...register('menuItem')}
+                >
+                  {Object.keys(menuPrices).map((item) => (
+                    <MenuItem key={item} value={item}>{item}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+
+            {/* Row 2 */}
+            <div className="flex gap-4">
+              <TextField
+                size="small"
+                label={<RequiredLabel label="Quantity" />}
+                type="number"
+                fullWidth
+                {...register('quantity')}
+                error={!!errors.quantity}
+                helperText={errors.quantity?.message as string}
+                inputProps={{ min: 1 }}
+              />
+              <TextField
+                size="small"
+                label="Amount (TSh)"
+                fullWidth
+                value={amount}
+                InputProps={{ readOnly: true }}
+              />
+            </div>
+
+            {/* Row 3 */}
+            <div className="flex gap-4">
+              <TextField
+                size="small"
+                label="Notes (optional)"
+                fullWidth
+                {...register('notes')}
+                multiline
+                rows={3}
+              />
+              <div className="w-full" />
+            </div>
+
+            <Box display="flex" justifyContent="flex-end" mt={3}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="small"
+                startIcon={isSubmitting ? <CircularProgress size={20} /> : undefined}
+                disabled={isSubmitting}
               >
-                {Object.keys(menuPrices).map((item) => (
-                  <MenuItem key={item} value={item}>{item}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-
-          <div className="flex gap-6">
-            <TextField
-              label={<><span>Quantity</span><span style={{color: 'red'}}>*</span></>}
-              type="number"
-              fullWidth
-              {...register('quantity')}
-              error={!!errors.quantity}
-              helperText={errors.quantity?.message}
-              inputProps={{ min: 1 }}
-            />
-            <TextField
-              label="Amount (Tsh)"
-              fullWidth
-              value={amount}
-              InputProps={{ readOnly: true }}
-            />
-          </div>
-
-          <div className="flex gap-6">
-            <TextField
-              label="Notes (optional)"
-              fullWidth
-              {...register('notes')}
-              multiline
-              rows={3}
-            />
-            <div className="w-full" /> {/* empty space for alignment */}
-          </div>
-
-          <Box display="flex" justifyContent="flex-end" mt={2}>
-            <Button type="submit" variant="contained" color="primary">
-              Submit Order
-            </Button>
-          </Box>
-        </form>
+                {isSubmitting ? 'Submitting...' : 'Submit Order'}
+              </Button>
+            </Box>
+          </form>
+        </div>
       </Paper>
     </Box>
   );
