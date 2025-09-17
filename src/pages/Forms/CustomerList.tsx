@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Paper,
@@ -14,6 +14,9 @@ import {
   MenuItem,
   Checkbox,
 } from '@mui/material';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import PrintIcon from '@mui/icons-material/Print';
@@ -25,29 +28,22 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-// Sample customer data generator
-const generateCustomerData = (count: number) => {
-  const names = ['John Doe', 'Jane Smith', 'Michael Johnson', 'Emily Davis', 'David Brown'];
-  const phones = ['0712345678', '0765432109', '0789123456', '0654321879', '0743210987'];
-  const addresses = ['123 Street', '456 Avenue', '789 Road', '321 Blvd', '654 Lane'];
-  const cities = ['Dar es Salaam', 'Arusha', 'Dodoma', 'Mwanza', 'Mbeya'];
-
-  return Array.from({ length: count }).map((_, i) => ({
-    id: i + 1,
-    name: names[i % names.length],
-    phone: phones[i % phones.length],
-    address: addresses[i % addresses.length],
-    city: cities[i % cities.length],
-  }));
+type CustomerRow = {
+  id: number;
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  createdAt?: string;
 };
 
 const CustomerList: React.FC = () => {
-  // Initial data
-  const initialData = useMemo(() => generateCustomerData(50), []);
   const navigate = useNavigate();
+  const { accessToken } = useAuth();
 
-  const [rows, setRows] = useState(initialData);
+  const [rows, setRows] = useState<CustomerRow[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 10,
@@ -55,18 +51,76 @@ const CustomerList: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedRowId, setSelectedRowId] = useState<number | null>(null);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCustomers = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setSelectedRowId(null);
+
+      if (!accessToken) {
+        setError('Authentication required. Please log in.');
+        setRows([]);
+        return;
+      }
+
+      const response = await fetch('http://127.0.0.1:8000/api/customer/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        let message = `Failed to load customers (${response.status})`;
+        try {
+          const data = await response.json();
+          if (typeof data.detail === 'string') message = data.detail;
+        } catch {}
+        throw new Error(message);
+      }
+
+      const data = await response.json();
+      const mapped: CustomerRow[] = (Array.isArray(data) ? data : data.results || []).map((c: any) => ({
+        id: c.customerID ?? c.id,
+        name: c.fullname,
+        phone: c.phoneNumber,
+        address: c.physicalAddress,
+        city: c.region,
+        createdAt: c.createdAt || null,
+      }));
+      setRows(mapped);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load customers');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   // Filter rows based on search
   const filteredRows = useMemo(() => {
-    if (!search.trim()) return rows;
-    return rows.filter((row) =>
-      Object.values(row)
-        .slice(0, 4) // exclude functions and isRowSelected property
-        .some((val) =>
-          String(val).toLowerCase().includes(search.toLowerCase())
-        )
-    );
-  }, [rows, search]);
+    const q = search.trim().toLowerCase();
+    return rows.filter((row) => {
+      const matchesSearch = !q
+        ? true
+        : [row.name, row.phone, row.address, row.city]
+            .some((val) => String(val).toLowerCase().includes(q));
+      const rowDate = row.createdAt ? dayjs(row.createdAt) : null;
+      const matchesStart = startDate && rowDate ? rowDate.isAfter(startDate.startOf('day')) || rowDate.isSame(startDate.startOf('day')) : true;
+      const matchesEnd = endDate && rowDate ? rowDate.isBefore(endDate.endOf('day')) || rowDate.isSame(endDate.endOf('day')) : true;
+      return matchesSearch && matchesStart && matchesEnd;
+    });
+  }, [rows, search, startDate, endDate]);
 
   const columns: GridColDef[] = [
     { 
@@ -110,6 +164,11 @@ const CustomerList: React.FC = () => {
     { field: 'address', headerName: 'Address', flex: 1, sortable: true, filterable: true },
     { field: 'city', headerName: 'Region', flex: 1, sortable: true, filterable: true },
   ];
+
+  const handleRefresh = () => {
+    setSelectedRows([]);
+    fetchCustomers();
+  };
 
   // PDF export
   const handlePDF = () => {
@@ -166,25 +225,19 @@ const CustomerList: React.FC = () => {
 
   return (
     <>
-      <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
+      <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6, maxWidth: 1200, mx: 'auto' }}>
         <Paper elevation={3} sx={{
           backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : '#fff',
           border: (theme) => `1px solid ${theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[200]}`,
           borderRadius: 3,
-          p: 6,
-          mx: 'auto'
+          p: 3,
+          width: '100%'
         }}>
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-            borderBottom="1px solid #ccc"
-            pb={1}
-          >
-            <Typography variant="h5" fontWeight="bold">
+          <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
+            <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
               Customer List
             </Typography>
+            <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
           </Box>
 
           {/* Controls Row: Rows per page left, search/print/pdf right */}
@@ -213,28 +266,49 @@ const CustomerList: React.FC = () => {
             </FormControl>
 
             {/* Right: Search, Print, PDF */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="From"
+                  value={startDate}
+                  onChange={(v) => setStartDate(v)}
+                  slotProps={{ textField: { size: 'small', sx: { width: 140 } } }}
+                />
+                <DatePicker
+                  label="To"
+                  value={endDate}
+                  onChange={(v) => setEndDate(v)}
+                  slotProps={{ textField: { size: 'small', sx: { width: 140 } } }}
+                />
+              </LocalizationProvider>
               <TextField
                 size="small"
                 placeholder="Search customers..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 InputProps={{
-                  startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+                  startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
                 }}
-                sx={{ width: 250 }}
+                sx={{ width: 200 }}
               />
               <Button
+                size="small"
                 variant="outlined"
-                startIcon={<PrintIcon />}
+                startIcon={<PrintIcon sx={{ fontSize: 18 }} />}
                 onClick={handlePrint}
                 sx={{ mr: 1 }}
               >
                 Print
               </Button>
+              <Tooltip title="Refresh Data">
+                <IconButton color="primary" onClick={handleRefresh} size="small">
+                  <RefreshIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
               <Button
+                size="small"
                 variant="contained"
-                startIcon={<PictureAsPdfIcon />}
+                startIcon={<PictureAsPdfIcon sx={{ fontSize: 18 }} />}
                 onClick={handlePDF}
                 color="primary"
               >
@@ -243,7 +317,10 @@ const CustomerList: React.FC = () => {
             </Box>
           </Box>
 
-          <Box sx={{ width: '100%', height: '500px' }}>
+          <Box sx={{ width: '100%' }}>
+            {error && (
+              <Box sx={{ mb: 2, color: 'error.main', fontSize: 14 }}>{error}</Box>
+            )}
             <DataGrid
               rows={filteredRows}
               columns={columns}
@@ -256,6 +333,8 @@ const CustomerList: React.FC = () => {
                 if (selectedRows.includes(params.id as number)) return 'clicked-row';
                 return '';
               }}
+              autoHeight
+              loading={loading}
               disableRowSelectionOnClick
               hideFooter={false}
               disableColumnMenu={false}

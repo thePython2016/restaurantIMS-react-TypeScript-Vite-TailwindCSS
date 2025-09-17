@@ -32,6 +32,9 @@ import autoTable from 'jspdf-autotable';
 import UserCircleIcon from '../../icons/user-circle.svg';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 // Interface for staff data
 interface StaffData {
@@ -58,6 +61,8 @@ const StaffList: React.FC = () => {
   const [clickedRows, setClickedRows] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [salaryFilter, setSalaryFilter] = useState({ operator: '', amount: '' });
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 5 });
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
   const [updateForm, setUpdateForm] = useState({
@@ -175,7 +180,13 @@ const StaffList: React.FC = () => {
       salaryFilter.operator === 'lte' ? row.salary <= amount :
       true;
 
-    return matchesSearch && matchesSalary;
+    // Optional date filtering: expect optional createdAt/created_at field
+    const createdAt = (row as any).createdAt || (row as any).created_at || null;
+    const rowDate = createdAt ? dayjs(createdAt) : null;
+    const matchesStart = startDate && rowDate ? rowDate.isAfter(startDate.startOf('day')) || rowDate.isSame(startDate.startOf('day')) : true;
+    const matchesEnd = endDate && rowDate ? rowDate.isBefore(endDate.endOf('day')) || rowDate.isSame(endDate.endOf('day')) : true;
+
+    return matchesSearch && matchesSalary && matchesStart && matchesEnd;
   });
 
   const selectedRow = filteredRows.find(row => row.id === selectedRowId) || null;
@@ -410,6 +421,20 @@ const StaffList: React.FC = () => {
           </FormControl>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap', ml: 'auto' }}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                label="From"
+                value={startDate}
+                onChange={(v) => setStartDate(v)}
+                slotProps={{ textField: { size: 'small', sx: { width: 140 } } }}
+              />
+              <DatePicker
+                label="To"
+                value={endDate}
+                onChange={(v) => setEndDate(v)}
+                slotProps={{ textField: { size: 'small', sx: { width: 140 } } }}
+              />
+            </LocalizationProvider>
             <FormControl size="small" sx={{ minWidth: 130 }}>
               <InputLabel>Salary</InputLabel>
               <Select

@@ -7,6 +7,15 @@ import PasswordConfirmPage from "./pages/AuthPages/PasswordResetConfirmPage";
 import SignIn from "./pages/AuthPages/SignIn";
 import { SignupForm as SignUp } from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
+import Inventory from './pages/Forms/ReceiveInventory.tsx';
+import InventoryList from './pages/Forms/InventoryList';
+import UpdateInventory from './pages/Forms/UpdateInventory';
+import InventoryItem from './pages/Forms/InventoryItem';
+import ReceiveInventory from './pages/Forms/ReceiveInventory';
+
+
+
+
 
 import UserProfiles from "./pages/UserProfiles";
 import Videos from "./pages/UiElements/Videos";
@@ -50,6 +59,13 @@ import MamboBulkSMSUserForm from './pages/Forms/MamboBulkSMSForm.jsx';
 import MamboSMSUserForm from './pages/Forms/MamboSingleSMSForm';
 import WhatsAppButtonIn from './pages/Forms/WhatsAppButtonIn.jsx';
 import WhatsAppButtonOut from './pages/Forms/WhatsAppButtonOut.tsx';
+
+import ItemListUpdate from './pages/Forms/ItemListUpdate.tsx';
+import ItemList from './pages/Forms/ItemList.tsx';
+import InventoryEvaluation from './pages/Forms/InventoryEvaluation.tsx';
+
+
+
 
 
 
@@ -128,11 +144,26 @@ export default function App() {
           <Route path="/menu" element={<MenuItems />} />
           <Route path="/item-list" element={<MenuItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory-list" element={<InventoryList />} />
+          <Route path="/update-inventory" element={<UpdateInventory />} />
           <Route path="/single-sms" element={<MamboSMSUserForm />} />
           <Route path="/sent-sms" element={<SentMessages />} />
           <Route path="/whatsapp" element={<WhatsAppButtonIn />} />
           <Route path="/whatsapp-out" element={<WhatsAppButtonOut />} />
           <Route path="/message-balance" element={<MessageBalanceDetails />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory-list" element={<InventoryList />} />
+          <Route path="/update-inventory" element={<UpdateInventory />} />  
+          <Route path="/new-item" element={<InventoryItem />} />
+          <Route path="/receive-inventory-items" element={<ReceiveInventory />} />
+          <Route path="/receive-item" element={<ReceiveInventory />} />
+          <Route path="/update-item" element={<ItemListUpdate />} />
+          <Route path="/item-list" element={<ItemList />} />
+          <Route path="/menu-item-list" element={<MenuItemList />} />
+          <Route path="/inventory-evaluation-details" element={<InventoryEvaluation />} />
+
+
 
 
 
@@ -160,6 +191,10 @@ export default function App() {
 
           <Route path="/staff-contacts" element={<StaffContacts />} />
           <Route path="/customers-contacts" element={<CustomerContacts />} />
+          <Route path="/inventory-item" element={<InventoryItem />} />
+          <Route path="/receive-inventory-items" element={<Inventory />} />
+
+
 
 
 

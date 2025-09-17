@@ -163,7 +163,42 @@ const navItems: NavItem[] = [
     ],
 
   },
+  {
 
+    name: "Active Customer",
+
+    icon: <UserCircleIcon />,
+
+    subItems: [
+
+      { name: "Add New", path: "/customer", pro: false, icon: <PlusIcon /> },
+
+      { name: "Customers List", path: "/customer-list", pro: false, icon: <ListIcon /> },
+
+      { name: "Update", path: "/update-customer", pro: false, icon: <PencilIcon /> },
+
+    ],
+
+  },
+  {
+
+    name: "Inventory",
+
+    icon: <BoxIconLine />,
+
+    subItems: [
+
+      { name: "Add New Item", path: "/new-item", pro: false, icon: <PlusIcon /> },
+       { name: "Item List", path: "/item-list", pro: false, icon: <PlusIcon /> },
+       { name: "Update Item", path: "/update-item", pro: false, icon: <PlusIcon /> },
+       { name: "Receive Item", path: "/receive-item", pro: false, icon: <PlusIcon /> },
+      { name: "Inventory Valuation details", path: "/inventory-evaluation-details", pro: false, icon: <ListIcon /> },
+
+      // { name: "Update Inventory", path: "/update-inventory", pro: false, icon: <PencilIcon /> }
+
+    ],
+
+  },
   {
 
     name: "Menu Items",
@@ -174,7 +209,8 @@ const navItems: NavItem[] = [
 
       { name: "Add New", path: "/menu", pro: false, icon: <PlusIcon /> },
 
-      { name: "View Item", path: "/item-list", pro: false, icon: <ListIcon /> },
+      { name: "View Item", path: "/menu-item-list", pro: false, icon: <ListIcon /> },
+      
 
       { name: "Update Item", path: "/update-menu", pro: false, icon: <PencilIcon /> }
 
@@ -194,29 +230,14 @@ const navItems: NavItem[] = [
 
       { name: "Orders List", path: "/order-list", pro: false, icon: <ListIcon /> },
 
+
       { name: "Update Order", path: "/update-order", pro: false, icon: <PencilIcon /> },
 
     ],
 
   },
 
-  {
-
-    name: "Active Customer",
-
-    icon: <UserCircleIcon />,
-
-    subItems: [
-
-      { name: "Add New", path: "/customer", pro: false, icon: <PlusIcon /> },
-
-      { name: "Customers List", path: "/customer-list", pro: false, icon: <ListIcon /> },
-
-      { name: "Update", path: "/update-customer", pro: false, icon: <PencilIcon /> },
-
-    ],
-
-  },
+ 
 
   {
 
@@ -389,7 +410,13 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback(
 
-    (path: string) => location.pathname === path,
+    (path: string) => {
+
+      const normalized = path?.startsWith('/') ? path : `/${path}`;
+
+      return location.pathname === normalized;
+
+    },
 
     [location.pathname]
 
