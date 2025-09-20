@@ -1,60 +1,73 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
+import { 
+  Box, 
+  Paper, 
+  Typography, 
+  Alert,
   Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
   IconButton,
-  Tooltip,
   InputAdornment,
-  Alert,
-  Checkbox,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip
 } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import SearchIcon from '@mui/icons-material/Search';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 import axios from 'axios';
 
 interface MenuItem {
-  itemID?: number;
-  id?: number;
+  itemID?: number | string;
+  id?: number | string;
   name: string;
+  item_name: string;
   category: string;
   description: string;
-  price: number;
-  availability: string;
+  quantity: number;
+  date: string;
+  unitOfMeasure: string;
+  price?: number;
+  availability?: string;
+  isTotal?: boolean;
+  isSubtotal?: boolean;
+  isGrandTotal?: boolean;
 }
 
 const InventoryEvaluation = () => {
+  const gridRef = useRef<HTMLDivElement>(null);
   const [rows, setRows] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [selectedRows, setSelectedRows] = useState<number[]>([]);
-
-  const [search, setSearch] = useState('');
-  const [priceFilter, setPriceFilter] = useState({ operator: '', amount: '' });
-  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 5 });
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedRow, setSelectedRow] = useState<MenuItem | null>(null);
+  const [selectedRows, setSelectedRows] = useState<MenuItem[]>([]);
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 5,
+  });
+  const [priceFilter, setPriceFilter] = useState({
+    operator: '',
+    amount: '',
+  });
+  const [search, setSearch] = useState('');
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [updateForm, setUpdateForm] = useState({ name: '', category: '', description: '', price: 0, availability: 'Available' });
-  const gridRef = useRef<HTMLDivElement>(null);
+  const [updateForm, setUpdateForm] = useState<Partial<MenuItem>>({});
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -62,15 +75,46 @@ const InventoryEvaluation = () => {
     try {
       // Get authentication token
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-      
-      const response = await axios.get('http://127.0.0.1:8000/api/item/', {
+      const response = await axios.get('http://127.0.0.1:8000/api/inventory-items/', {
         headers: {
           'Content-Type': 'application/json',
           ...(token && { 'Authorization': `Bearer ${token}` })
         }
       });
       
-      setRows(response.data);
+      console.log('API Response:', response.data); // Debug log
+      console.log('Response type:', typeof response.data);
+      console.log('Is array?', Array.isArray(response.data));
+      
+      // Ensure we have an array of items
+      const items = Array.isArray(response.data) ? response.data : [];
+      console.log('Processed items:', items);
+      
+      // Map and normalize the data
+      console.log('About to map rows. First item sample:', items[0]);
+      const mappedRows = items.map((row: any, idx: number) => {
+        // Always assign a unique string id
+        const id = String(row.id ?? row.itemID ?? row.item_name ?? idx);
+        return {
+          id: id,
+          itemID: String(row.itemID ?? row.id ?? id),
+          date: row.date || new Date().toISOString().split('T')[0],
+          item_name: row.item_name || row.name || '',
+          name: row.item_name || row.name || '',
+          category: row.category || '',
+          description: row.description || '',
+          quantity: Number(row.quantity) || 0,
+          onhand: Number(row.onhand) || 0,
+          unitOfMeasure: row.unit_of_measure || row.unitOfMeasure || '',
+          isTransaction: Boolean(row.isTransaction),
+          isSubtotal: Boolean(row.isSubtotal),
+          isTotal: Boolean(row.isTotal),
+          isGrandTotal: Boolean(row.isGrandTotal)
+        };
+      });
+      
+      console.log('Mapped Rows:', mappedRows); // Debug log
+      setRows(mappedRows);
     } catch (err: any) {
       if (err.response?.status === 401) {
         setError('Authentication required. Please login first.');
@@ -87,159 +131,340 @@ const InventoryEvaluation = () => {
     fetchMenuItems();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (gridRef.current && !gridRef.current.contains(event.target as Node)) {
-        setSelectedId(null);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const filteredRows = rows.filter(row => {
-    const matchesSearch = Object.values(row).join(' ').toLowerCase().includes(search.toLowerCase());
-    const amount = parseFloat(priceFilter.amount);
-    const matchesPrice =
-      !priceFilter.operator || isNaN(amount) ? true :
-      priceFilter.operator === 'gt' ? row.price > amount :
-      priceFilter.operator === 'lt' ? row.price < amount :
-      priceFilter.operator === 'gte' ? row.price >= amount :
-      priceFilter.operator === 'lte' ? row.price <= amount :
-      true;
-    return matchesSearch && matchesPrice;
+    // Apply search filter if any
+    if (search) {
+      const searchLower = search.toLowerCase();
+      const rowValues = Object.values(row).join(' ').toLowerCase();
+      if (!rowValues.includes(searchLower)) return false;
+    }
+    return true;
   });
 
-  const selectedRow = filteredRows.find(row => row.id === selectedId) || null;
+  // Calculate totals per item
+  interface TotalItem extends MenuItem {
+    isTotal: boolean;
+    isSubtotal: boolean;
+  }
+
+  interface Totals {
+    [key: string]: TotalItem;
+  }
+
+  console.log('Initial rows:', rows); // Debug log
+
+  const totals = filteredRows.reduce<Totals>((acc, row) => {
+    if (!row.item_name) return acc; // Skip if item_name is missing
+    const itemKey = row.item_name;
+    if (!acc[itemKey]) {
+      acc[itemKey] = {
+        id: String(`subtotal_${itemKey}`),
+        itemID: String(`subtotal_${itemKey}`),
+        item_name: row.item_name,
+        name: row.item_name,
+        category: row.category || '',
+        unitOfMeasure: row.unitOfMeasure || '',
+        quantity: 0,
+        onhand: 0,
+        date: 'Subtotal',
+        description: '',
+        isTotal: true,
+        isSubtotal: true
+      };
+    }
+    acc[itemKey].quantity += Number(row.quantity) || 0;
+    acc[itemKey].onhand = Number(row.onhand) || 0;
+    return acc;
+  }, {});
+
+  // Calculate grand total
+  const grandTotal = {
+    id: String('grand_total'),
+    itemID: String('grand_total'),
+    item_name: 'GRAND TOTAL',
+    name: 'GRAND TOTAL',
+    category: '',
+    unitOfMeasure: '',
+    quantity: Object.values(totals).reduce((sum: number, item: any) => sum + item.quantity, 0),
+    onhand: 0,
+    date: 'TOTAL',
+    description: '',
+    isTotal: true,
+    isGrandTotal: true
+  };
+
+  // Group transactions by item name
+  const groupedItems = filteredRows.reduce((groups: { [key: string]: any[] }, row) => {
+    if (!groups[row.item_name]) {
+      groups[row.item_name] = [];
+    }
+    groups[row.item_name].push(row);
+    return groups;
+  }, {});
+
+  // Create rows with totals for each group
+  const rowsWithTotals = Object.entries(groupedItems).reduce((acc: any[], [itemName, items]) => {
+    // Add all transactions for this item
+    acc.push(...items);
+    // Add subtotal for this item
+    if (totals[itemName]) {
+      acc.push(totals[itemName]);
+    }
+    return acc;
+  }, []);
+  
+  // Add grand total row at the bottom
+  rowsWithTotals.push(grandTotal);
+  console.log('rowsWithTotals:', rowsWithTotals);
+  rowsWithTotals.forEach((row, idx) => {
+    console.log(`Row ${idx}: id=${row.id}, isTotal=${row.isTotal}, isSubtotal=${row.isSubtotal}, isGrandTotal=${row.isGrandTotal}`);
+  });
+
+
 
   const handleRefresh = () => {
     fetchMenuItems();
-    // Reset filters and search
-    setSearch('');
-    setPriceFilter({ operator: '', amount: '' });
-    setSelectedId(null);
   };
 
   const handleUpdateFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUpdateForm(prev => ({ ...prev, [name]: name === 'price' ? Number(value) : value }));
+    setUpdateForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  const handleUpdateSave = () => {
-    if (selectedId === null) return;
-    setRows(prev => prev.map(row => row.id === selectedId ? { ...row, ...updateForm } : row));
-    setOpenUpdateDialog(false);
-    setSelectedId(null);
-  };
-
-  const handleDelete = () => {
-    if (selectedId !== null) {
-      setRows(prev => prev.filter(row => row.id !== selectedId));
-      setSelectedId(null);
-      setOpenDeleteDialog(false);
-    }
-  };
-
-  const handleBulkDelete = async () => {
+  const handleUpdateSave = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      
-      // Get authentication token
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-      
-      // Delete all selected items
-      const deletePromises = selectedRows.map(id => 
-        axios.delete(`http://127.0.0.1:8000/api/item/${id}/`, {
+      await axios.patch(
+        `http://127.0.0.1:8000/api/inventory-items/${selectedRow?.id}/`,
+        updateForm,
+        {
           headers: {
             'Content-Type': 'application/json',
             ...(token && { 'Authorization': `Bearer ${token}` })
           }
-        })
+        }
       );
-      
-      await Promise.all(deletePromises);
-      
-      setSuccessMessage(`${selectedRows.length} menu items deleted successfully!`);
-      setSelectedRows([]);
-      await fetchMenuItems(); // Refresh the data
-    } catch (err: any) {
-      if (err.response?.status === 401) {
-        setError('Authentication required. Please login first.');
-      } else {
-        setError('Failed to delete selected menu items');
-      }
-      console.error('Error deleting selected menu items:', err);
+      setSuccessMessage('Item updated successfully');
+      setOpenUpdateDialog(false);
+      fetchMenuItems();
+    } catch (err) {
+      console.error('Error updating item:', err);
+      setError('Failed to update item');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePDF = () => {
-    const doc = new jsPDF();
-    doc.text('Menu List', 14, 10);
-    autoTable(doc, {
-      head: [['Name', 'Category', 'Description', 'Price', 'Availability']],
-      body: filteredRows.map(r => [r.name, r.category, r.description, r.price, r.availability]),
-    });
-    doc.save('menu_list.pdf');
+  const handleDelete = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      await axios.delete(
+        `http://127.0.0.1:8000/api/inventory-items/${selectedRow?.id}/`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+          }
+        }
+      );
+      setSuccessMessage('Item deleted successfully');
+      setOpenDeleteDialog(false);
+      setSelectedRow(null);
+      fetchMenuItems();
+    } catch (err) {
+      console.error('Error deleting item:', err);
+      setError('Failed to delete item');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      await Promise.all(
+        selectedRows.map(row => 
+          axios.delete(
+            `http://127.0.0.1:8000/api/inventory-items/${row.id}/`,
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                ...(token && { 'Authorization': `Bearer ${token}` })
+              }
+            }
+          )
+        )
+      );
+      setSuccessMessage(`${selectedRows.length} items deleted successfully`);
+      setSelectedRows([]);
+      fetchMenuItems();
+    } catch (err) {
+      console.error('Error deleting items:', err);
+      setError('Failed to delete items');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePDF = (): void => {
+    const document = new jsPDF();
+    
+    try {
+      // Add title with styling
+      document.setFont('helvetica', 'bold');
+      document.setFontSize(16);
+      document.setTextColor(25, 118, 210); // #1976d2
+      document.text('Inventory Valuation Report', 14, 15);
+      
+      // Add date
+      document.setFont('helvetica', 'normal');
+      document.setFontSize(10);
+      document.setTextColor(100, 100, 100);
+      document.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
+      
+      autoTable(document, {
+        startY: 30,
+        head: [['Date', 'Item Name', 'Category', 'Unit of Measure', 'Quantity']],
+        body: rowsWithTotals.map(r => [
+          r.date,
+          r.item_name,
+          r.category,
+          r.unitOfMeasure,
+          r.quantity?.toString() || '0'
+        ]),
+        headStyles: {
+          fillColor: [25, 118, 210],
+          textColor: 255,
+          fontSize: 11,
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        styles: {
+          cellPadding: 3,
+          fontSize: 10,
+          lineColor: [200, 200, 200],
+          lineWidth: 0.1,
+          valign: 'middle'
+        },
+        columnStyles: {
+          0: { halign: 'center' },
+          4: { halign: 'right' }
+        },
+        didDrawCell: (data) => {
+          const row = rowsWithTotals[data.row.index];
+          if (row?.isGrandTotal) {
+            document.setFont('helvetica', 'bold');
+            document.setFontSize(11);
+            document.setTextColor(255, 255, 255);
+          } else if (row?.isSubtotal) {
+            document.setFont('helvetica', 'bold');
+            document.setFontSize(10);
+            document.setTextColor(0, 0, 0);
+          } else {
+            document.setFont('helvetica', 'normal');
+            document.setFontSize(10);
+            document.setTextColor(0, 0, 0);
+          }
+        },
+        willDrawCell: (data) => {
+          const row = rowsWithTotals[data.row.index];
+          if (row?.isGrandTotal) {
+            document.setFillColor(25, 118, 210);
+            return true;
+          } else if (row?.isSubtotal) {
+            document.setFillColor(240, 240, 240);
+            return true;
+          }
+          return false;
+        },
+        alternateRowStyles: {
+          fillColor: [252, 252, 252]
+        },
+        theme: 'grid'
+      });
+      
+      document.save('inventory_valuation.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      setError('Failed to generate PDF report');
+    }
   };
 
   const columns: GridColDef[] = [
     { 
-      field: 'checkbox', 
-      headerName: '', 
-      width: 50, 
-      sortable: false, 
-      filterable: false,
-      disableColumnMenu: true,
-      renderHeader: () => (
-        <Checkbox
-          color="primary"
-          indeterminate={selectedRows.length > 0 && selectedRows.length < filteredRows.length}
-          checked={selectedRows.length === filteredRows.length && filteredRows.length > 0}
-          onChange={(e) => {
-            if (e.target.checked) {
-              setSelectedRows(filteredRows.map(row => row.itemID || row.id || 0));
-            } else {
-              setSelectedRows([]);
-            }
-          }}
-        />
-      ),
-      renderCell: (params) => (
-        <Checkbox
-          color="primary"
-          checked={selectedRows.includes(params.row.itemID || params.row.id || 0)}
-          onChange={(e) => {
-            const rowId = params.row.itemID || params.row.id || 0;
-            if (e.target.checked) {
-              setSelectedRows(prev => [...prev, rowId]);
-            } else {
-              setSelectedRows(prev => prev.filter(id => id !== rowId));
-            }
-          }}
-        />
-      ),
-    },
-    { field: 'name', headerName: 'Item Name', flex: 1, sortable: true, filterable: true },
-    { field: 'category', headerName: 'Category', flex: 1, sortable: true, filterable: true },
-    { field: 'description', headerName: 'Description', flex: 2, sortable: true, filterable: true },
-    { 
-      field: 'price', 
-      headerName: 'Price (Tsh)', 
+      field: 'date', 
+      headerName: 'Date', 
       flex: 1, 
-      sortable: true,
+      sortable: true, 
       filterable: true,
-      renderCell: (params) => {
-        return new Intl.NumberFormat('en-TZ', {
-          style: 'currency',
-          currency: 'TZS',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(params.value).replace('TZS', 'TSh');
+      valueFormatter: (params) => params.value || ''
+    },
+    { 
+      field: 'item_name', 
+      headerName: 'Item Name', 
+      flex: 1, 
+      sortable: true, 
+      filterable: true,
+      valueFormatter: (params) => params.value || ''
+    },
+    { 
+      field: 'category', 
+      headerName: 'Category', 
+      flex: 1, 
+      sortable: true, 
+      filterable: true,
+      valueFormatter: (params) => params.value || ''
+    },
+    { 
+      field: 'unitOfMeasure',  // This matches the mapped field name
+      headerName: 'Unit of Measure', 
+      flex: 1, 
+      sortable: true, 
+      filterable: true,
+      valueFormatter: (params) => params.value || '-'  // Show dash for empty values
+    },
+    { 
+      field: 'quantity', 
+      headerName: 'Quantity', 
+      flex: 1, 
+      sortable: true, 
+      filterable: true,
+      valueFormatter: (params) => {
+        const value = params?.value;
+        if (value === null || value === undefined) return '';
+        return typeof value === 'number' ? value.toLocaleString() : value;
       }
     },
-    { field: 'availability', headerName: 'Availability', flex: 1, sortable: true, filterable: true },
+    { 
+      field: 'onhand', 
+      headerName: 'On Hand', 
+      flex: 1, 
+      sortable: true, 
+      filterable: true,
+      valueFormatter: (params) => {
+        const value = params?.value;
+        if (value === null || value === undefined) return '';
+        return typeof value === 'number' ? value.toLocaleString() : value;
+      },
+      cellClassName: (params) => {
+        const value = params?.value;
+        if (value === null || value === undefined) return '';
+        if (typeof value === 'number') {
+          if (value < 0) return 'negative-stock';
+          if (value < 10) return 'low-stock';
+        }
+        return '';
+      }
+    }
   ];
 
   return (
@@ -375,14 +600,16 @@ const InventoryEvaluation = () => {
             )}
 
             <Tooltip title="Refresh Data">
-              <IconButton 
-                color="primary" 
-                onClick={handleRefresh} 
-                size="small"
-                disabled={loading}
-              >
-                <RefreshIcon />
-              </IconButton>
+              <span>
+                <IconButton 
+                  color="primary" 
+                  onClick={handleRefresh} 
+                  size="small"
+                  disabled={loading}
+                >
+                  <RefreshIcon />
+                </IconButton>
+              </span>
             </Tooltip>
 
             <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF} color="primary">
@@ -391,20 +618,38 @@ const InventoryEvaluation = () => {
           </Box>
         </Box>
 
-        <Box sx={{ width: '100%', height: '500px' }} ref={gridRef}>
+        <Box sx={{ 
+            width: '100%', 
+            height: 'auto',
+            '& .MuiDataGrid-root': {
+              height: 'auto',
+              minHeight: '200px',
+              maxHeight: 'none'
+            }
+          }} ref={gridRef}>
           <DataGrid
-            rows={filteredRows}
+            rows={rowsWithTotals}
             columns={columns}
-            getRowId={(row) => row.itemID || row.id}
+            getRowId={(row) => String(row.id)}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
             pageSizeOptions={[5, 10, 25, 50]}
-            onRowClick={(params) => setSelectedId(params.id as number)}
-            getRowClassName={(params) => {
-              if (params.id === selectedId) return 'selected-row';
-              return '';
+            autoHeight
+            checkboxSelection
+            onRowSelectionModelChange={(newSelectionModel) => {
+              if (!Array.isArray(newSelectionModel)) return;
+              const selectedItems = rowsWithTotals.filter(
+                row => newSelectionModel.includes(String(row.id)) && !row.isTotal && !row.isSubtotal && !row.isGrandTotal
+              );
+              setSelectedRows(selectedItems);
             }}
-            disableRowSelectionOnClick
+            // isRowSelectable removed for debugging
+            onRowClick={(params) => {
+              if (!params.row.isTotal && !params.row.isSubtotal && !params.row.isGrandTotal) {
+                setSelectedId(typeof params.id === 'string' ? parseInt(params.id) : params.id as number);
+                setSelectedRow(params.row);
+              }
+            }}
             hideFooter={false}
             disableColumnMenu={false}
             disableColumnFilter={false}
@@ -475,15 +720,49 @@ const InventoryEvaluation = () => {
                 borderRight: '1px dotted #ccc',
                 '&:last-child': {
                   borderRight: 'none'
+                },
+                '&.negative-stock': {
+                  color: '#d32f2f',
+                  fontWeight: 'bold',
+                  backgroundColor: 'rgba(211, 47, 47, 0.1)'
+                },
+                '&.low-stock': {
+                  color: '#ed6c02',
+                  fontWeight: 'bold',
+                  backgroundColor: 'rgba(237, 108, 2, 0.1)'
                 }
               },
               '& .MuiDataGrid-row:hover': { backgroundColor: '#f5f5f5' },
               '& .selected-row': { backgroundColor: '#d1eaff !important' },
+              '& .total-row': { 
+                backgroundColor: '#f5f5f5 !important',
+                fontWeight: 'bold !important',
+                borderTop: '2px solid #1976d2 !important',
+              },
+              '& .subtotal-row': {
+                backgroundColor: '#f5f5f5 !important',
+                fontWeight: 'bold !important',
+                fontStyle: 'italic !important',
+                borderTop: '1px solid #1976d2 !important',
+                borderBottom: '1px solid #1976d2 !important',
+              },
+              '& .grand-total-row': {
+                backgroundColor: '#1976d2 !important',
+                color: 'white !important',
+                fontSize: '1.1rem !important',
+                fontWeight: 'bold !important',
+                borderTop: '3px solid #000 !important',
+                borderBottom: '3px solid #000 !important',
+                '& .MuiDataGrid-cell': {
+                  color: 'white !important'
+                }
+              },
               '& .MuiDataGrid-overlay': {
                 backgroundColor: 'transparent',
               },
               '& .MuiDataGrid-main': {
-                minHeight: '200px'
+                height: 'auto',
+                overflow: 'hidden'
               }
             }}
             slots={{
@@ -573,3 +852,10 @@ const InventoryEvaluation = () => {
 }
 
 export default InventoryEvaluation;
+
+// For any Tooltip wrapping a disabled Button, use:
+// <Tooltip title="...">
+//   <span>
+//     <Button disabled>...</Button>
+//   </span>
+// </Tooltip>

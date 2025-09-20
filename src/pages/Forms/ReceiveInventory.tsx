@@ -23,28 +23,18 @@ import dayjs, { Dayjs } from 'dayjs';
 import axios from 'axios';
 
 interface InventoryData {
-  itemName: string;
+  itemID: number | '';  // Used for selection in form
   description: string;
   quantity: number;
   dateAdded: Dayjs | null;
 }
 
-
-const schema = yup.object({
-  itemName: yup.string().required('Item name is required'),
-  description: yup.string().required('Description is required'),
-  quantity: yup
-    .number()
-    .typeError('Quantity must be a number')
-    .min(0, 'Quantity cannot be negative')
-    .integer('Quantity must be a whole number')
-    .required('Quantity is required'),
-  dateAdded: yup.mixed<Dayjs | null>().required('Date is required').test(
-    'is-valid-date',
-    'Date is required',
-    (value) => value !== null && dayjs.isDayjs(value)
-  ),
-});
+interface Item {
+  itemID?: number;
+  id?: number;
+  itemName?: string;
+  name?: string;
+}
 
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
@@ -53,18 +43,30 @@ const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   </>
 );
 
+const schema = yup.object().shape({
+  itemID: yup.number().typeError('Item is required').required('Item is required'),
+  description: yup.string().required('Description is required'),
+  quantity: yup
+    .number()
+    .typeError('Quantity must be a number')
+    .min(0, 'Quantity cannot be negative')
+    .integer('Quantity must be a whole number')
+    .required('Quantity is required'),
+  dateAdded: yup.mixed().required('Date is required').test(
+    'is-valid-date',
+    'Date is required',
+    (value) => value !== null && dayjs.isDayjs(value)
+  )
+});
+
 const Inventory: React.FC = () => {
   const [apiErrors, setApiErrors] = useState<{ [key: string]: string[] }>({});
   const [notification, setNotification] = useState<{
     open: boolean;
     message: string;
     severity: 'success' | 'error';
-  }>({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
-  const [inventoryItems, setInventoryItems] = useState<string[]>([]);
+  }>({ open: false, message: '', severity: 'success' });
+  const [allItems, setAllItems] = useState<any[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [newItemName, setNewItemName] = useState('');
 
@@ -77,95 +79,92 @@ const Inventory: React.FC = () => {
   } = useForm<InventoryData>({
     resolver: yupResolver(schema) as any,
     defaultValues: {
-      itemName: '',
+      itemID: '',
       description: '',
       quantity: undefined,
-      dateAdded: dayjs() // Today's date as dayjs object
-    }
+      dateAdded: dayjs(),
+    },
   });
 
-  // Fetch inventory items for autocomplete
   useEffect(() => {
-    const fetchInventoryItems = async () => {
+    const fetchAllItems = async () => {
       try {
         const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
         if (!token) return;
         
-        const response = await axios.get('http://127.0.0.1:8000/api/inventory/', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        const response = await axios.get('http://127.0.0.1:8000/api/item/', {
+          headers: { Authorization: `Bearer ${token}` },
         });
         
         if (response.data && Array.isArray(response.data)) {
-          // Extract unique item names
-          const uniqueItems = [...new Set(response.data.map((item: any) => item.item_name || item.itemName))];
-          setInventoryItems(uniqueItems.filter(Boolean));
+          setAllItems(response.data);
         }
-      } catch (error) {
-        console.error('Error fetching inventory items:', error);
+      } catch (err) {
+        console.error('Error fetching items:', err);
       }
     };
-    
-    fetchInventoryItems();
+    fetchAllItems();
   }, []);
 
   const showNotification = (message: string, severity: 'success' | 'error') => {
     setNotification({ open: true, message, severity });
-    
-    // Auto-hide success messages after 5 seconds
-    if (severity === 'success') {
-      setTimeout(() => {
-        setNotification(prev => ({ ...prev, open: false }));
-      }, 5000);
-    }
+    if (severity === 'success') setTimeout(() => setNotification((s) => ({ ...s, open: false })), 5000);
   };
 
   const onSubmit = async (data: InventoryData) => {
     try {
-      setApiErrors({}); // Clear previous API errors
-      
-      // Get authentication token
+      setApiErrors({});
       const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-      
       if (!token) {
         showNotification('No authentication token found. Please log in again.', 'error');
         return;
       }
-      
-      // Convert dayjs date to string format for API
-      const formattedData = {
-        ...data,
-        dateAdded: data.dateAdded ? data.dateAdded.format('YYYY-MM-DD') : ''
+
+      const itemIDValue = data.itemID === '' ? null : Number(data.itemID);
+      if (!itemIDValue) {
+        setApiErrors({ itemID: ['Invalid item selected'] });
+        return;
+      }
+
+      // Find the selected item from allItems array
+      const selectedItem = allItems.find(item => (item.itemID || item.id) === itemIDValue);
+      if (!selectedItem) {
+        setApiErrors({ itemID: ['Selected item not found'] });
+        return;
+      }
+
+      const payload = {
+        itemID: itemIDValue,
+        item_name: selectedItem.itemName || selectedItem.name,
+        quantity: data.quantity,
+        date: data.dateAdded ? data.dateAdded.format('YYYY-MM-DD') : '',
+        description: data.description,
       };
-      
-      // Make API call with authentication
-      await axios.post('http://127.0.0.1:8000/api/inventory/', formattedData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
+
+      await axios.post('http://127.0.0.1:8000/api/inventory-items/', payload, {
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       });
-      
+
       showNotification('Inventory item saved successfully!', 'success');
-      handleReset(); // Clear all fields including select fields
+      handleReset();
     } catch (err: any) {
       console.error('Error saving inventory item:', err);
-      
       if (err.response?.status === 401) {
         showNotification('Authentication required. Please login first.', 'error');
       } else if (err.response?.data?.errors) {
-        // Handle validation errors from API
         setApiErrors(err.response.data.errors);
+      } else if (err.response?.data?.message) {
+        showNotification(err.response.data.message, 'error');
+      } else if (err.message) {
+        showNotification(`Error: ${err.message}`, 'error');
       } else {
-        showNotification('Failed to save inventory item', 'error');
+        showNotification('Failed to save inventory item. Please try again.', 'error');
       }
     }
   };
 
   const handleAddNewItem = () => {
     setOpenDialog(false);
-    // Navigate to InventoryItem form
     window.location.href = 'http://localhost:5173/inventory-item';
   };
 
@@ -175,203 +174,79 @@ const Inventory: React.FC = () => {
   };
 
   const handleReset = () => {
-    // Reset all form fields to default values and clear all form state
-    reset({
-      itemName: '',
-      description: '',
-      quantity: undefined,
-      dateAdded: dayjs() // Keep today's date as default
-    });
+    reset({ itemID: '', description: '', quantity: undefined, dateAdded: dayjs() });
     setApiErrors({});
   };
 
   return (
     <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
       <Paper elevation={3} className="w-full max-w-6xl p-4 mx-auto">
-        <Box
-          sx={{
-            backgroundColor: '#1976d2',
-            padding: '16px',
-            borderRadius: '8px',
-            mb: 2,
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}
-          >
+        <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
             Inventory Registration Form
           </Typography>
           <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>
 
-        {/* Display Success Message */}
         {notification.open && notification.severity === 'success' && (
-          <Box 
-            sx={{ 
-              mb: 2,
-              p: 2,
-              backgroundColor: '#f0f8f0',
-              border: '1px solid #4caf50',
-              borderRadius: '4px',
-              color: '#2e7d32',
-              fontSize: '14px',
-              textAlign: 'center'
-            }}
-          >
+          <Box sx={{ mb: 2, p: 2, backgroundColor: '#f0f8f0', border: '1px solid #4caf50', borderRadius: '4px', color: '#2e7d32', fontSize: '14px', textAlign: 'center' }}>
             {notification.message}
           </Box>
         )}
 
-        {/* Display API errors */}
         {Object.keys(apiErrors).length > 0 && (
           <Alert severity="error" sx={{ mb: 2 }}>
             <Typography variant="body2" fontWeight="bold">Please fix the following errors:</Typography>
             <ul>
-              {Object.entries(apiErrors).map(([field, messages]) => (
-                messages.map((message, index) => (
-                  <li key={`${field}-${index}`}>
-                    <strong>{field}:</strong> {message}
-                  </li>
-                ))
-              ))}
+              {Object.entries(apiErrors).map(([field, messages]) => messages.map((message, i) => <li key={`${field}-${i}`}><strong>{field}:</strong> {message}</li>))}
             </ul>
           </Alert>
         )}
 
-        {/* Display Error Message */}
-        {notification.open && notification.severity === 'error' && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {notification.message}
-          </Alert>
-        )}
+        {notification.open && notification.severity === 'error' && <Alert severity="error" sx={{ mb: 2 }}>{notification.message}</Alert>}
 
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <div className="mt-4">
             <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-5">
-              {/* Row 1 - Date First */}
               <div className="flex gap-4">
-                <Controller
-                  name="dateAdded"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      label={<RequiredLabel label="Date" />}
-                      value={field.value}
-                      onChange={(newValue) => field.onChange(newValue)}
-                      disableFuture
-                      slotProps={{
-                        textField: {
-                          size: 'small',
-                          variant: 'outlined',
-                          fullWidth: true,
-                          error: !!errors.dateAdded || !!apiErrors.dateAdded,
-                          helperText: errors.dateAdded?.message || (apiErrors.dateAdded && apiErrors.dateAdded[0])
-                        }
-                      }}
-                    />
-                  )}
-                />
-              <TextField
-                size="small"
-                variant="outlined"
-                label={<RequiredLabel label="Item Name" />}
-                fullWidth
-                select
-                {...register('itemName')}
-                error={!!errors.itemName || !!apiErrors.itemName}
-                helperText={errors.itemName?.message || (apiErrors.itemName && apiErrors.itemName[0]) || 'Select item from inventory'}
-              >
-                <MenuItem value="">
-                  <em>Select an item</em>
-                </MenuItem>
-                {inventoryItems.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </div>
+                <Controller name="dateAdded" control={control} render={({ field }) => (
+                  <DatePicker label={<RequiredLabel label="Date" />} value={field.value} onChange={(newValue) => field.onChange(newValue)} disableFuture slotProps={{ textField: { size: 'small', variant: 'outlined', fullWidth: true, error: !!errors.dateAdded || !!apiErrors.dateAdded, helperText: errors.dateAdded?.message || (apiErrors.dateAdded && apiErrors.dateAdded[0]) } }} />
+                )} />
 
-            {/* Row 2 */}
-            <div className="flex gap-4">
-              <TextField
-                size="small"
-                variant="outlined"
-                label={<RequiredLabel label="Quantity" />}
-                type="number"
-                fullWidth
-                {...register('quantity')}
-                error={!!errors.quantity || !!apiErrors.quantity}
-                helperText={errors.quantity?.message || (apiErrors.quantity && apiErrors.quantity[0]) || 'Enter current quantity in stock'}
-                InputProps={{
-                  inputProps: {
-                    min: 0,
-                    max: 1000000,
-                    step: 1,
-                  },
-                }}
-              />
-              <TextField
-                size="small"
-                variant="outlined"
-                label="Description"
-                fullWidth
-                multiline
-                rows={3}
-                {...register('description')}
-                error={!!errors.description || !!apiErrors.description}
-                helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])}
-              />
-            </div>
+                <TextField size="small" variant="outlined" label={<RequiredLabel label="Item Name" />} fullWidth select {...register('itemID')} error={!!errors.itemID || !!apiErrors.itemID} helperText={errors.itemID?.message || (apiErrors.itemID && apiErrors.itemID[0]) || 'Select item from inventory'}>
+                  <MenuItem value=""><em>Select an item</em></MenuItem>
+                  {allItems.map((item) => (
+                    <MenuItem key={item.itemID || item.id} value={item.itemID || item.id}>{item.itemName || item.name}</MenuItem>
+                  ))}
+                </TextField>
+              </div>
 
-            <Box display="flex" justifyContent="space-between" mt={3}>
-              <Button
-                type="button"
-                variant="outlined"
-                color="secondary"
-                size="small"
-                onClick={handleReset}
-                disabled={isSubmitting}
-              >
-                Reset
-              </Button>
+              <div className="flex gap-4">
+                <TextField size="small" variant="outlined" label={<RequiredLabel label="Quantity" />} type="number" fullWidth {...register('quantity')} error={!!errors.quantity || !!apiErrors.quantity} helperText={errors.quantity?.message || (apiErrors.quantity && apiErrors.quantity[0]) || 'Enter current quantity in stock'} InputProps={{ inputProps: { min: 0, max: 1000000, step: 1 } }} />
+                <TextField size="small" variant="outlined" label="Description" fullWidth multiline rows={3} {...register('description')} error={!!errors.description || !!apiErrors.description} helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])} />
+              </div>
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="small"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Inventory Item'}
-              </Button>
-            </Box>
-          </form>
-        </div>
+              <Box display="flex" justifyContent="space-between" mt={3}>
+                <Button type="button" variant="outlined" color="secondary" size="small" onClick={handleReset} disabled={isSubmitting}>Reset</Button>
+                <Button type="submit" variant="contained" color="primary" size="small" disabled={isSubmitting}>{isSubmitting ? 'Saving...' : 'Save Inventory Item'}</Button>
+              </Box>
+            </form>
+          </div>
         </LocalizationProvider>
 
-        {/* Dialog for adding new item */}
         <Dialog open={openDialog} onClose={handleDialogClose}>
           <DialogTitle>Item Not Found</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              The item "{newItemName}" is not in the inventory list. Would you like to add it as a new inventory item?
-            </DialogContentText>
+            <DialogContentText>The item "{newItemName}" is not in the inventory list. Would you like to add it as a new inventory item?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleDialogClose} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={handleAddNewItem} color="primary" variant="contained">
-              Add New Item
-            </Button>
+            <Button onClick={handleDialogClose} color="secondary">Cancel</Button>
+            <Button onClick={handleAddNewItem} color="primary" variant="contained">Add New Item</Button>
           </DialogActions>
         </Dialog>
-
       </Paper>
     </Box>
   );
 };
 
-export default Inventory
+export default Inventory;

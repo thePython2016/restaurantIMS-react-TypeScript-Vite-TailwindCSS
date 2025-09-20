@@ -33,11 +33,10 @@ import axios from 'axios';
 interface MenuItem {
   itemID?: number;
   id?: number;
-  name: string;
+  itemName: string;
   category: string;
-  description: string;
-  price: number;
-  availability: string;
+  unitOfMeasure: string;
+  dateAdded: string;
 }
 
 const ItemListUpdate = () => {
@@ -70,7 +69,16 @@ const ItemListUpdate = () => {
         }
       });
       
-      setRows(response.data);
+      // Map backend data to expected fields for the table
+      const mappedRows = response.data.map((item: any) => ({
+        itemID: item.itemID || item.id,
+        id: item.itemID || item.id,
+        itemName: item.itemName || item.name || '',
+        category: item.category || '',
+        unitOfMeasure: item.unitOfMeasure || item.unit_of_measure || '',
+        dateAdded: item.dateAdded || item.date_added || '',
+      }));
+      setRows(mappedRows);
     } catch (err: any) {
       if (err.response?.status === 401) {
         setError('Authentication required. Please login first.');
@@ -185,11 +193,11 @@ const ItemListUpdate = () => {
   };
 
   const columns: GridColDef[] = [
-    { 
-      field: 'checkbox', 
-      headerName: '', 
-      width: 50, 
-      sortable: false, 
+    {
+      field: 'checkbox',
+      headerName: '',
+      width: 50,
+      sortable: false,
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
@@ -221,25 +229,10 @@ const ItemListUpdate = () => {
         />
       ),
     },
-    { field: 'name', headerName: 'Item Name', flex: 1, sortable: true, filterable: true },
+    { field: 'dateAdded', headerName: 'Date', flex: 1, sortable: true, filterable: true },
+    { field: 'itemName', headerName: 'Item Name', flex: 1, sortable: true, filterable: true },
     { field: 'category', headerName: 'Category', flex: 1, sortable: true, filterable: true },
-    { field: 'description', headerName: 'Description', flex: 2, sortable: true, filterable: true },
-    { 
-      field: 'price', 
-      headerName: 'Price (Tsh)', 
-      flex: 1, 
-      sortable: true,
-      filterable: true,
-      renderCell: (params) => {
-        return new Intl.NumberFormat('en-TZ', {
-          style: 'currency',
-          currency: 'TZS',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(params.value).replace('TZS', 'TSh');
-      }
-    },
-    { field: 'availability', headerName: 'Availability', flex: 1, sortable: true, filterable: true },
+    { field: 'unitOfMeasure', headerName: 'Unit of Measure', flex: 1, sortable: true, filterable: true },
   ];
 
   return (

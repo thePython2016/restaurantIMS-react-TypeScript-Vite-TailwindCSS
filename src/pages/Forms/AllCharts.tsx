@@ -9,7 +9,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { PieChartIcon } from '../../icons';
-import MenuItemReport from './MenuItemList';
+import MenuItemReport from './ItemList';
 import OrderReport from './OrderList';
 import CustomerReport from './CustomerList';
 import SalesItemReport from './SalesItem';

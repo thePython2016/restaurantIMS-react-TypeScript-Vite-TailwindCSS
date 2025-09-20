@@ -33,11 +33,10 @@ import axios from 'axios';
 interface MenuItem {
   itemID?: number;
   id?: number;
-  name: string;
+  itemName: string;
   category: string;
-  description: string;
-  price: number;
-  availability: string;
+  unitOfMeasure: string;
+  dateAdded: string;
 }
 
 const ItemList = () => {
@@ -70,7 +69,16 @@ const ItemList = () => {
         }
       });
       
-      setRows(response.data);
+      // Map backend data to expected fields for the table
+      const mappedRows = response.data.map((item: any) => ({
+        itemID: item.itemID || item.id,
+        id: item.itemID || item.id,
+        itemName: item.itemName || item.name || '',
+        category: item.category || '',
+        unitOfMeasure: item.unitOfMeasure || item.unit_of_measure || '',
+        dateAdded: item.dateAdded || item.date_added || '',
+      }));
+      setRows(mappedRows);
     } catch (err: any) {
       if (err.response?.status === 401) {
         setError('Authentication required. Please login first.');
@@ -185,11 +193,11 @@ const ItemList = () => {
   };
 
   const columns: GridColDef[] = [
-    { 
-      field: 'checkbox', 
-      headerName: '', 
-      width: 50, 
-      sortable: false, 
+    {
+      field: 'checkbox',
+      headerName: '',
+      width: 50,
+      sortable: false,
       filterable: false,
       disableColumnMenu: true,
       renderHeader: () => (
@@ -221,32 +229,16 @@ const ItemList = () => {
         />
       ),
     },
-    { field: 'name', headerName: 'Item Name', flex: 1, sortable: true, filterable: true },
-    { field: 'category', headerName: 'Category', flex: 1, sortable: true, filterable: true },
-    { field: 'description', headerName: 'Description', flex: 2, sortable: true, filterable: true },
-    { 
-      field: 'price', 
-      headerName: 'Price (Tsh)', 
-      flex: 1, 
-      sortable: true,
-      filterable: true,
-      renderCell: (params) => {
-        return new Intl.NumberFormat('en-TZ', {
-          style: 'currency',
-          currency: 'TZS',
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 0,
-        }).format(params.value).replace('TZS', 'TSh');
-      }
-    },
-    { field: 'availability', headerName: 'Availability', flex: 1, sortable: true, filterable: true },
+    { field: 'dateAdded', headerName: 'Date', flex: 1, sortable: true, filterable: true },
+    { field: 'itemName', headerName: 'Item Name', flex: 1, sortable: true, filterable: true },
+    { field: 'category', headerName: 'Item Category', flex: 1, sortable: true, filterable: true },
+    { field: 'unitOfMeasure', headerName: 'Unit of Measure', flex: 1, sortable: true, filterable: true },
   ];
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', mt: 4 }}>
       <Paper sx={{ p: 3 }}>
         <Box sx={{ backgroundColor: '#1976d2', padding: '16px', borderRadius: '8px', mb: 2 }}>
-;
           <Typography 
             variant="h5" 
             mb={1} 
@@ -256,7 +248,7 @@ const ItemList = () => {
               color: 'white'
             }}
           >
-            Update Inventory
+            Update Menu
           </Typography>
           <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>

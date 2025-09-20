@@ -22,6 +22,8 @@ interface InventoryData {
   itemName: string;
   unitOfMeasure: string;
   dateAdded: Dayjs | null;
+  category: string;
+  description?: string;
 }
 
 const unitOfMeasureOptions = ['kg', 'grams', 'liters', 'ml', 'pieces', 'boxes', 'bags', 'bottles', 'cans'];
@@ -34,6 +36,8 @@ const schema = yup.object({
     'Date is required',
     (value) => value !== null && dayjs.isDayjs(value)
   ),
+  category: yup.string().required('Category is required'),
+  description: yup.string().optional(),
 });
 
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
@@ -43,7 +47,7 @@ const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   </>
 );
 
-const InventoryItem: React.FC = () => {
+const Items: React.FC = () => {
   const location = useLocation();
   const [apiErrors, setApiErrors] = useState<{ [key: string]: string[] }>({});
   const [notification, setNotification] = useState<{
@@ -68,7 +72,8 @@ const InventoryItem: React.FC = () => {
     defaultValues: {
       itemName: '',
       unitOfMeasure: '',
-      dateAdded: dayjs() // Today's date as dayjs object
+      dateAdded: dayjs(), // Today's date as dayjs object
+      category: ''
     }
   });
 
@@ -105,22 +110,24 @@ const InventoryItem: React.FC = () => {
         showNotification('No authentication token found. Please log in again.', 'error');
         return;
       }
-      
-      // Convert dayjs date to string format for API
-      const formattedData = {
-        ...data,
-        dateAdded: data.dateAdded ? data.dateAdded.format('YYYY-MM-DD') : ''
+      // Build payload for Items endpoint (Item model expects itemName, category, description, unitOfMeasure, dateAdded)
+      const payload = {
+        itemName: data.itemName,
+        category: data.category,
+        description: data.description || '',
+        unitOfMeasure: data.unitOfMeasure,
+        dateAdded: data.dateAdded ? data.dateAdded.format('YYYY-MM-DD') : undefined
       };
-      
-      // Make API call with authentication
-      await axios.post('http://127.0.0.1:8000/api/inventory/', formattedData, {
+
+      // Make API call with authentication to /api/item/
+      await axios.post('http://127.0.0.1:8000/api/item/', payload, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
       
-      showNotification('Inventory item saved successfully!', 'success');
+      showNotification('Item saved successfully!', 'success');
       handleReset(); // Clear all fields including select fields
     } catch (err: any) {
       console.error('Error saving inventory item:', err);
@@ -141,7 +148,8 @@ const InventoryItem: React.FC = () => {
     reset({
       itemName: '',
       unitOfMeasure: '',
-      dateAdded: dayjs() // Keep today's date as default
+      dateAdded: dayjs(), // Keep today's date as default
+      category: ''
     });
     setApiErrors({});
   };
@@ -263,6 +271,33 @@ const InventoryItem: React.FC = () => {
                   </MenuItem>
                 ))}
               </TextField>
+
+              <TextField
+                size="small"
+                variant="outlined"
+                label={<RequiredLabel label="Category" />}
+                fullWidth
+                {...register('category')}
+                error={!!errors.category || !!apiErrors.category}
+                helperText={errors.category?.message || (apiErrors.category && apiErrors.category[0])}
+                autoComplete="off"
+              />
+            </div>
+
+            {/* Row 3 - Description (optional) */}
+            <div className="flex gap-4">
+              <TextField
+                size="small"
+                variant="outlined"
+                label={"Description (optional)"}
+                fullWidth
+                multiline
+                minRows={2}
+                {...register('description')}
+                error={!!errors.description || !!apiErrors.description}
+                helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])}
+                autoComplete="off"
+              />
             </div>
 
               <Box display="flex" justifyContent="space-between" mt={3}>
@@ -296,4 +331,4 @@ const InventoryItem: React.FC = () => {
   );
 };
 
-export default InventoryItem
+export default Items

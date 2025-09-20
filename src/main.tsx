@@ -11,6 +11,7 @@ import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import "@mui/x-data-grid/vanilla";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

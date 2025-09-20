@@ -10,7 +10,7 @@ import NotFound from "./pages/OtherPage/NotFound";
 import Inventory from './pages/Forms/ReceiveInventory.tsx';
 import InventoryList from './pages/Forms/InventoryList';
 import UpdateInventory from './pages/Forms/UpdateInventory';
-import InventoryItem from './pages/Forms/InventoryItem';
+import InventoryItem from './pages/Forms/Items';
 import ReceiveInventory from './pages/Forms/ReceiveInventory';
 
 
@@ -44,7 +44,7 @@ import StaffList from './pages/Forms/StaffList';
 import Update from './pages/Forms/UpdateStaff';
 import MenuItems from './pages/Forms/menu';
 import Chatbot from './pages/Forms/Chatbot';
-import MenuItemList from './pages/Forms/MenuItemList';
+// import MenuItemList from './pages/Forms/MenuItemList';
 import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
 import OrderForm from './pages/Forms/Order';
 import OrderList from './pages/Forms/OrderList';
@@ -142,7 +142,7 @@ export default function App() {
           <Route path="/airtime-form" element={<AirtimeForm />} />
           <Route path="/all-sms" element={<ViewSMS />} />
           <Route path="/menu" element={<MenuItems />} />
-          <Route path="/item-list" element={<MenuItemList />} />
+          <Route path="/item-list" element={<ItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/inventory-list" element={<InventoryList />} />
@@ -160,7 +160,7 @@ export default function App() {
           <Route path="/receive-item" element={<ReceiveInventory />} />
           <Route path="/update-item" element={<ItemListUpdate />} />
           <Route path="/item-list" element={<ItemList />} />
-          <Route path="/menu-item-list" element={<MenuItemList />} />
+          {/* <Route path="/menu-item-list" element={<MenuItemList />} /> */}
           <Route path="/inventory-evaluation-details" element={<InventoryEvaluation />} />
 
 
