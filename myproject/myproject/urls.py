@@ -70,7 +70,7 @@ urlpatterns += [
 
 
 from Items import views as items_views
-from Inventory import views as inventory_views
+# from Inventory import views as inventory_views
 from OrderItem import views as orderitem_views
 from Payment import views as payment_views
 from Order import views as order_views
@@ -82,7 +82,7 @@ router = DefaultRouter()
 router.register(r'staff', staff_views.StaffViewSet)
 router.register(r'customer', customer_views.CustomerViewSet)
 router.register(r'item', items_views.ItemViewSet)
-router.register(r'inventory', inventory_views.InventoryViewSet)
+# router.register(r'inventory', inventory_views.InventoryViewSet)
 router.register(r'order', order_views.OrderViewSet)
 router.register(r'order-item', orderitem_views.OrderItemViewSet)
 router.register(r'payment', payment_views.PaymentViewSet)

@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     # Your apps
     'Customer',
     'Items',
-    'Inventory',
+    # 'Inventory',
     'Menus',
     'OrderItem',
     'Staff',
