@@ -90,6 +90,11 @@ const InventoryEvaluation = () => {
       const items = Array.isArray(response.data) ? response.data : [];
       console.log('Processed items:', items);
       
+      if (items.length === 0) {
+        console.log('No inventory items found in the database');
+        setError('No inventory items found. Please add some inventory items first.');
+      }
+      
       // Map and normalize the data
       console.log('About to map rows. First item sample:', items[0]);
       const mappedRows = items.map((row: any, idx: number) => {
@@ -118,8 +123,12 @@ const InventoryEvaluation = () => {
     } catch (err: any) {
       if (err.response?.status === 401) {
         setError('Authentication required. Please login first.');
+      } else if (err.response?.status === 404) {
+        setError('Inventory API endpoint not found. Please check if the backend is running.');
+      } else if (err.code === 'NETWORK_ERROR' || err.message?.includes('Network Error')) {
+        setError('Cannot connect to the server. Please check if the backend is running on http://127.0.0.1:8000');
       } else {
-        setError('Failed to fetch menu items');
+        setError(`Failed to fetch inventory items: ${err.message || 'Unknown error'}`);
       }
       console.error('Error fetching menu items:', err);
     } finally {
