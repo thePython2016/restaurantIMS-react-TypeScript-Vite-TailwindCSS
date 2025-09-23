@@ -75,7 +75,7 @@ INSTALLED_APPS = [
     'djoser',
     'sms',
     'mambosmsbulk',
-    'airtime',
+    
     'mambosmssingle',
     'whatsapplinkin',
     'mambosmsbalance',

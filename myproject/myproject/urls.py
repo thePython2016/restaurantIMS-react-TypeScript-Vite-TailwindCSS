@@ -46,10 +46,7 @@ urlpatterns = [
 ]
 
 
-urlpatterns += [
-    # path('admin/', admin.site.urls),
-    path('', include('airtime.urls')),
-]
+
 # urlpatterns += [
 #     # path('admin/', admin.site.urls),
 #     path("api/", include("mambosms.urls")),
