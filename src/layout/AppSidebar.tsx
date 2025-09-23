@@ -192,6 +192,7 @@ const navItems: NavItem[] = [
        { name: "Item List", path: "/item-list", pro: false, icon: <PlusIcon /> },
        { name: "Update Item", path: "/update-item", pro: false, icon: <PlusIcon /> },
        { name: "Receive Item", path: "/receive-item", pro: false, icon: <PlusIcon /> },
+       { name: "Inventory Item details", path: "/inventory-item-details", pro: false, icon: <ListIcon /> },
       { name: "Inventory Valuation details", path: "/inventory-evaluation-details", pro: false, icon: <ListIcon /> },
 
       // { name: "Update Inventory", path: "/update-inventory", pro: false, icon: <PencilIcon /> }
@@ -207,7 +208,7 @@ const navItems: NavItem[] = [
 
     subItems: [
 
-      { name: "Add New", path: "/menu", pro: false, icon: <PlusIcon /> },
+      { name: "Add New", path: "/menu-item", pro: false, icon: <PlusIcon /> },
 
       { name: "View Item", path: "/menu-item-list", pro: false, icon: <ListIcon /> },
       

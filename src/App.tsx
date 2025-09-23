@@ -12,6 +12,7 @@ import InventoryList from './pages/Forms/InventoryList';
 import UpdateInventory from './pages/Forms/UpdateInventory';
 import InventoryItem from './pages/Forms/Items';
 import ReceiveInventory from './pages/Forms/ReceiveInventory';
+import InventoryItemSummary from './pages/Forms/InventoryItemSummary';
 
 
 
@@ -141,7 +142,7 @@ export default function App() {
           <Route path="/bulk-sms" element={<MamboBulkSMSUserForm />} />
           <Route path="/airtime-form" element={<AirtimeForm />} />
           <Route path="/all-sms" element={<ViewSMS />} />
-          <Route path="/menu" element={<MenuItems />} />
+          <Route path="/menu-item" element={<MenuItems />} />
           <Route path="/item-list" element={<ItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
           <Route path="/inventory" element={<Inventory />} />
@@ -162,6 +163,8 @@ export default function App() {
           <Route path="/item-list" element={<ItemList />} />
           {/* <Route path="/menu-item-list" element={<MenuItemList />} /> */}
           <Route path="/inventory-evaluation-details" element={<InventoryEvaluation />} />
+          <Route path="/inventory-item-details" element={<InventoryItemSummary />} />
+
 
 
 

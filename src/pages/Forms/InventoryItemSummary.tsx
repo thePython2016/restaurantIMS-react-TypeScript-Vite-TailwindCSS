@@ -48,7 +48,7 @@ interface MenuItem {
   isGrandTotal?: boolean;
 }
 
-const InventoryEvaluation = () => {
+const InventoryItemSummary = () => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [rows, setRows] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -931,7 +931,7 @@ const InventoryEvaluation = () => {
   );
 }
 
-export default InventoryEvaluation;
+export default InventoryItemSummary;
 
 // For any Tooltip wrapping a disabled Button, use:
 // <Tooltip title="...">

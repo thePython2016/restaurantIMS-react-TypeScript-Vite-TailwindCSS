@@ -264,12 +264,10 @@ const RecentOrders: React.FC = () => {
               borderColor: 'divider'
             },
             '& .MuiDataGrid-columnHeaders': { 
-              backgroundColor: 'action.hover'
-            },
-            '& .MuiDataGrid-cell': {
+              backgroundColor: 'action.hover',
               borderColor: 'divider'
             },
-            '& .MuiDataGrid-columnHeaders': {
+            '& .MuiDataGrid-cell': {
               borderColor: 'divider'
             },
             mt: 2,

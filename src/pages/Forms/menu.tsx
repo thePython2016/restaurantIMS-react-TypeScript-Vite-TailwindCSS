@@ -1,40 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {
+  Box,
+  Paper,
+  Typography,
   TextField,
   Button,
-  Typography,
-  Paper,
-  Box,
-  MenuItem,
   Alert,
+  MenuItem,
+  // Avatar,
+  // IconButton,
+  Stack
 } from '@mui/material';
-import axios from 'axios';
+// import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
-interface MenuItemData {
-  name: string;
-  category: string;
-  description: string;
-  price: number;
-  availability: string;
-}
-
-const categories = ['Appetizer', 'Main Course', 'Dessert', 'Beverage'];
-const availabilityOptions = ['Available', 'Out of Stock'];
-
-const schema = yup.object({
-  name: yup.string().required('Item name is required'),
-  category: yup.string().required('Category is required'),
-  description: yup.string().required('Description is required'),
-  price: yup
-    .number()
-    .typeError('Price must be a number')
-    .positive('Price must be positive')
-    .required('Price is required'),
-  availability: yup.string().required('Availability is required'),
-});
 
 const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   <>
@@ -43,96 +24,124 @@ const RequiredLabel: React.FC<{ label: string }> = ({ label }) => (
   </>
 );
 
-const MenuItems: React.FC = () => {
-  const [apiErrors, setApiErrors] = useState<{ [key: string]: string[] }>({});
-  const [notification, setNotification] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({
+const MenuItems = () => {
+  const [items, setItems] = useState<any[]>([]);
+  // No separate categories state; categories will be derived from items
+  const [itemLoading, setItemLoading] = useState(false);
+  const [itemError, setItemError] = useState<string | null>(null);
+  // No separate category loading/error state
+
+  // Fetch items from backend
+  useEffect(() => {
+    setItemLoading(true);
+    fetch('http://localhost:8000/api/item/', {
+      credentials: 'include', // send cookies if using session auth
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          setItemError(`Failed to load items: ${res.status}`);
+          setItems([]);
+          setItemLoading(false);
+          return;
+        }
+        const data = await res.json();
+        console.log('Fetched items:', data); // Debug: log fetched data
+        if (Array.isArray(data)) {
+          setItems(data);
+        } else if (Array.isArray(data.results)) {
+          setItems(data.results);
+        } else {
+          setItems([]);
+        }
+        setItemLoading(false);
+      })
+      .catch((err) => {
+        setItemError('Failed to load items');
+        setItems([]);
+        setItemLoading(false);
+      });
+  }, []);
+
+  // Categories will be derived from items
+  // Example top button handlers
+  // Removed handleBack and handleNew functions
+  // Removed handleExport function
+  const [image, setImage] = useState<string | null>(null);
+
+  // Handle image upload
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setImage(ev.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  const [apiErrors, setApiErrors] = useState<Record<string, string[]>>({});
+  const [notification, setNotification] = useState<{ open: boolean; severity: 'error' | 'success'; message: string }>({
     open: false,
-    message: '',
     severity: 'success',
+    message: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // State for selected items table
+  const [selectedItems, setSelectedItems] = useState<any[]>([]);
+  
+  
+  const schema = yup.object().shape({
+    name: yup.string().required('Item name is required'),
+    category: yup.string().required('Category is required'),
+    price: yup.number()
+      .typeError('Price must be a number')
+      .required('Price is required')
+      .positive('Price must be positive')
+      .max(1000000, 'Price cannot exceed 1,000,000 TSh'),
+    description: yup.string().optional(),
   });
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
-  } = useForm<MenuItemData>({
+    formState: { errors },
+  } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      name: '',
-      category: '',
-      description: '',
-      price: undefined,
-      availability: ''
-    }
   });
 
-  const showNotification = (message: string, severity: 'success' | 'error') => {
-    setNotification({ open: true, message, severity });
-    
-    // Auto-hide success messages after 5 seconds
-    if (severity === 'success') {
-      setTimeout(() => {
-        setNotification(prev => ({ ...prev, open: false }));
-      }, 5000);
-    }
-  };
-
-  const onSubmit = async (data: MenuItemData) => {
-    try {
-      setApiErrors({}); // Clear previous API errors
-      
-      // Get authentication token
-      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
-      
-      if (!token) {
-        showNotification('No authentication token found. Please log in again.', 'error');
-        return;
-      }
-      
-      // Make API call with authentication
-      await axios.post('http://127.0.0.1:8000/api/item/', data, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      showNotification('Menu item saved successfully!', 'success');
-      handleReset(); // Clear all fields including select fields
-    } catch (err: any) {
-      console.error('Error saving item:', err);
-      
-      if (err.response?.status === 401) {
-        showNotification('Authentication required. Please login first.', 'error');
-      } else if (err.response?.data?.errors) {
-        // Handle validation errors from API
-        setApiErrors(err.response.data.errors);
-      } else {
-        showNotification('Failed to save menu item', 'error');
-      }
-    }
-  };
-
   const handleReset = () => {
-    // Reset all form fields to default values and clear all form state
-    reset({
-      name: '',
-      category: '',
-      description: '',
-      price: undefined,
-      availability: ''
-    });
+    reset();
     setApiErrors({});
+  };
+
+  // Add item to table and reset form
+  const handleAddItem = (data: any) => {
+    // Find item name from items array
+    const itemObj = Array.isArray(items) ? items.find((i: any) => String(i.itemID) === String(data.itemid)) : null;
+    const itemName = itemObj ? itemObj.itemName : data.itemid;
+    setSelectedItems((prev) => [
+      ...prev,
+      {
+        itemid: data.itemid,
+        itemName,
+        category: data.category,
+        price: parseFloat(data.price),
+        total: parseFloat(data.price),
+      },
+    ]);
+    handleReset();
+  };
+
+  const onSubmit = async (data: any) => {
+    handleAddItem(data);
   };
 
   return (
     <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
       <Paper elevation={3} className="w-full max-w-6xl p-4 mx-auto">
+        {/* Top Action Buttons */}
+        {/* Top Action Buttons Removed: No Back, New Item, or Export buttons */}
         <Box
           sx={{
             backgroundColor: '#1976d2',
@@ -141,19 +150,16 @@ const MenuItems: React.FC = () => {
             mb: 2,
           }}
         >
-          <Typography
-            variant="h6"
-            sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}
-          >
-            Menu Item Registration Form
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', mb: 1 }}>
+            Menu Item Form
           </Typography>
           <Box sx={{ borderBottom: '1px solid rgba(255, 255, 255, 0.3)', mb: 0 }} />
         </Box>
 
         {/* Display Success Message */}
         {notification.open && notification.severity === 'success' && (
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               mb: 2,
               p: 2,
               backgroundColor: '#f0f8f0',
@@ -161,7 +167,7 @@ const MenuItems: React.FC = () => {
               borderRadius: '4px',
               color: '#2e7d32',
               fontSize: '14px',
-              textAlign: 'center'
+              textAlign: 'center',
             }}
           >
             {notification.message}
@@ -173,49 +179,58 @@ const MenuItems: React.FC = () => {
           <Alert severity="error" sx={{ mb: 2 }}>
             <Typography variant="body2" fontWeight="bold">Please fix the following errors:</Typography>
             <ul>
-              {Object.entries(apiErrors).map(([field, messages]) => (
+              {Object.entries(apiErrors).map(([field, messages]) =>
                 messages.map((message, index) => (
                   <li key={`${field}-${index}`}>
                     <strong>{field}:</strong> {message}
                   </li>
                 ))
-              ))}
+              )}
             </ul>
-          </Alert>
-        )}
-
-        {/* Display Error Message */}
-        {notification.open && notification.severity === 'error' && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {notification.message}
           </Alert>
         )}
 
         <div className="mt-4">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Row 1 */}
+
+            {/* Image Upload Row Removed: No icons or image upload UI */}
+
+            {/* Row 1: Item and Category from backend */}
             <div className="flex gap-4">
               <TextField
                 size="small"
-                variant="outlined"
-                label={<RequiredLabel label="Item Name" />}
+                label={<RequiredLabel label="Item" />}
                 fullWidth
-                {...register('name')}
-                error={!!errors.name || !!apiErrors.name}
-                helperText={errors.name?.message || (apiErrors.name && apiErrors.name[0])}
-                autoComplete="off"
-              />
+                select
+                {...register('itemid')}
+                error={!!errors.itemid || !!apiErrors.itemid}
+                helperText={errors.itemid?.message || (apiErrors.itemid && apiErrors.itemid[0])}
+                disabled={itemLoading}
+              >
+                {itemLoading && <MenuItem value=""><em>Loading...</em></MenuItem>}
+                {itemError && <MenuItem value=""><em>{itemError}</em></MenuItem>}
+                {Array.isArray(items) && items.length > 0 && items.map((item) => (
+                  <MenuItem key={item.itemID} value={item.itemID}>
+                    {item.itemName}
+                  </MenuItem>
+                ))}
+              </TextField>
               <TextField
                 size="small"
-                variant="outlined"
                 label={<RequiredLabel label="Category" />}
                 fullWidth
                 select
                 {...register('category')}
                 error={!!errors.category || !!apiErrors.category}
-                helperText={errors.category?.message || (apiErrors.category && apiErrors.category[0])}
+                helperText={
+                  errors.category?.message ||
+                  (apiErrors.category && apiErrors.category[0])
+                }
+                disabled={itemLoading}
               >
-                {categories.map((cat) => (
+                {itemLoading && <MenuItem value=""><em>Loading...</em></MenuItem>}
+                {itemError && <MenuItem value=""><em>{itemError}</em></MenuItem>}
+                {Array.isArray(items) && items.length > 0 && Array.from(new Set(items.map((item) => item.category))).map((cat) => (
                   <MenuItem key={cat} value={cat}>
                     {cat}
                   </MenuItem>
@@ -227,7 +242,6 @@ const MenuItems: React.FC = () => {
             <div className="flex gap-4">
               <TextField
                 size="small"
-                variant="outlined"
                 label={<RequiredLabel label="Price (TSh)" />}
                 type="number"
                 fullWidth
@@ -246,34 +260,15 @@ const MenuItems: React.FC = () => {
               />
               <TextField
                 size="small"
-                variant="outlined"
-                label={<RequiredLabel label="Availability" />}
+                label="Description (optional)"
                 fullWidth
-                select
-                {...register('availability')}
-                error={!!errors.availability || !!apiErrors.availability}
-                helperText={errors.availability?.message || (apiErrors.availability && apiErrors.availability[0])}
-              >
-                {availabilityOptions.map((opt) => (
-                  <MenuItem key={opt} value={opt}>
-                    {opt}
-                  </MenuItem>
-                ))}
-              </TextField>
+                multiline
+                rows={3}
+                {...register('description')}
+                error={!!errors.description || !!apiErrors.description}
+                helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])}
+              />
             </div>
-
-            {/* Row 3 */}
-            <TextField
-              size="small"
-              variant="outlined"
-              label={<RequiredLabel label="Description" />}
-              fullWidth
-              multiline
-              rows={3}
-              {...register('description')}
-              error={!!errors.description || !!apiErrors.description}
-              helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])}
-            />
 
             <Box display="flex" justifyContent="space-between" mt={3}>
               <Button
@@ -299,7 +294,34 @@ const MenuItems: React.FC = () => {
             </Box>
           </form>
         </div>
-
+        {/* Table of selected items */}
+        {selectedItems.length > 0 && (
+          <Box mt={4}>
+            <Typography variant="subtitle1" gutterBottom>
+              Selected Items
+            </Typography>
+            <table className="min-w-full border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border px-2 py-1">Item Name</th>
+                  <th className="border px-2 py-1">Category</th>
+                  <th className="border px-2 py-1">Unit Price</th>
+                  <th className="border px-2 py-1">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedItems.map((row, idx) => (
+                  <tr key={idx}>
+                    <td className="border px-2 py-1">{row.itemName}</td>
+                    <td className="border px-2 py-1">{row.category}</td>
+                    <td className="border px-2 py-1">{row.price}</td>
+                    <td className="border px-2 py-1">{row.total}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Box>
+        )}
       </Paper>
     </Box>
   );
