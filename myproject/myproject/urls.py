@@ -67,6 +67,7 @@ urlpatterns += [
 
 
 from Items import views as items_views
+from Menus import views as menus_views
 # from Inventory import views as inventory_views
 from OrderItem import views as orderitem_views
 from Payment import views as payment_views
@@ -79,6 +80,7 @@ router = DefaultRouter()
 router.register(r'staff', staff_views.StaffViewSet)
 router.register(r'customer', customer_views.CustomerViewSet)
 router.register(r'item', items_views.ItemViewSet)
+router.register(r'menu', menus_views.MenuViewSet)
 # router.register(r'inventory', inventory_views.InventoryViewSet)
 router.register(r'order', order_views.OrderViewSet)
 router.register(r'order-item', orderitem_views.OrderItemViewSet)
@@ -90,6 +92,8 @@ router.register(r'inventory-items-list', inventoryitems_views.InventoryItemsList
 
 urlpatterns += [
     path('api/', include(router.urls)),
+    # Dedicated endpoint to view items for Menu Item submenu
+    path('api/view-menu-item/', items_views.ItemListCreateView.as_view(), name='view-menu-item'),
 ]
 
 
