@@ -12,8 +12,8 @@ import {
   MenuItem,
   // Avatar,
   // IconButton,
-  Stack
 } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 // import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 
@@ -34,8 +34,14 @@ const MenuItems = () => {
   // Fetch items from backend
   useEffect(() => {
     setItemLoading(true);
+    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
     fetch('http://localhost:8000/api/item/', {
       credentials: 'include', // send cookies if using session auth
+      headers,
     })
       .then(async (res) => {
         if (!res.ok) {
@@ -55,7 +61,7 @@ const MenuItems = () => {
         }
         setItemLoading(false);
       })
-      .catch((err) => {
+      .catch((_err) => {
         setItemError('Failed to load items');
         setItems([]);
         setItemLoading(false);
@@ -66,32 +72,25 @@ const MenuItems = () => {
   // Example top button handlers
   // Removed handleBack and handleNew functions
   // Removed handleExport function
-  const [image, setImage] = useState<string | null>(null);
-
-  // Handle image upload
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setImage(ev.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
   const [apiErrors, setApiErrors] = useState<Record<string, string[]>>({});
   const [notification, setNotification] = useState<{ open: boolean; severity: 'error' | 'success'; message: string }>({
     open: false,
     severity: 'success',
     message: '',
   });
+  const showNotification = (message: string, severity: 'success' | 'error') => {
+    setNotification({ open: true, severity, message });
+    if (severity === 'success') {
+      setTimeout(() => {
+        setNotification((prev) => ({ ...prev, open: false }));
+      }, 5000);
+    }
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // State for selected items table
-  const [selectedItems, setSelectedItems] = useState<any[]>([]);
   
   
   const schema = yup.object().shape({
-    name: yup.string().required('Item name is required'),
+    itemid: yup.string().required('Item is required'),
     category: yup.string().required('Category is required'),
     price: yup.number()
       .typeError('Price must be a number')
@@ -105,37 +104,74 @@ const MenuItems = () => {
     register,
     handleSubmit,
     reset,
+    getValues,
+    trigger,
     formState: { errors },
-  } = useForm({
+  } = useForm<any>({
     resolver: yupResolver(schema),
+    defaultValues: { itemid: '', category: '', price: undefined, description: '' },
   });
 
   const handleReset = () => {
-    reset();
+    // Explicitly clear select fields and inputs
+    reset({ itemid: '', category: '', price: undefined as any, description: '' });
     setApiErrors({});
   };
 
-  // Add item to table and reset form
-  const handleAddItem = (data: any) => {
-    // Find item name from items array
-    const itemObj = Array.isArray(items) ? items.find((i: any) => String(i.itemID) === String(data.itemid)) : null;
-    const itemName = itemObj ? itemObj.itemName : data.itemid;
-    setSelectedItems((prev) => [
-      ...prev,
-      {
-        itemid: data.itemid,
-        itemName,
-        category: data.category,
-        price: parseFloat(data.price),
-        total: parseFloat(data.price),
-      },
-    ]);
-    handleReset();
+  // Removed add-to-table flow
+
+  // Removed selected-rows submit flow and table
+
+  const handleSubmitSingle = async () => {
+    try {
+      // validate needed fields
+      const valid = await trigger(['itemid', 'category', 'price']);
+      if (!valid) return;
+      setIsSubmitting(true);
+      const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const values = getValues();
+      const itemObj = Array.isArray(items) ? items.find((i: any) => String(i.itemID) === String(values.itemid)) : null;
+      const payload = {
+        item: Number(values.itemid),
+        itemid: Number(values.itemid),
+        itemName: itemObj ? itemObj.itemName : String(values.itemid),
+        name: itemObj ? itemObj.itemName : String(values.itemid),
+        category: values.category,
+        price: Number(values.price),
+        description: values.description || '',
+      };
+      console.log('Submitting single payload', payload);
+      const response = await fetch('http://localhost:8000/api/menu/', {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        let maybeJson: any = null;
+        try { maybeJson = await response.json(); } catch (_e) {
+          try { maybeJson = await response.text(); } catch (__e) { maybeJson = null; }
+        }
+        const message = (maybeJson && (maybeJson.detail || maybeJson.message || (typeof maybeJson === 'string' ? maybeJson : JSON.stringify(maybeJson)))) || `Failed to submit: ${response.status}`;
+        console.error('Submit single failed', response.status, maybeJson);
+        showNotification(message, 'error');
+        setIsSubmitting(false);
+        return;
+      }
+      showNotification('Menu item saved successfully!', 'success');
+      handleReset();
+    } catch (err) {
+      showNotification('Network error while submitting item', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const onSubmit = async (data: any) => {
-    handleAddItem(data);
-  };
+  // Removed row selection helpers
 
   return (
     <Box className="flex flex-col min-h-screen p-4" sx={{ mt: 6 }}>
@@ -191,7 +227,10 @@ const MenuItems = () => {
         )}
 
         <div className="mt-4">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form
+            onSubmit={(e) => { e.preventDefault(); handleSubmitSingle(); }}
+            className="space-y-5"
+          >
 
             {/* Image Upload Row Removed: No icons or image upload UI */}
 
@@ -204,13 +243,14 @@ const MenuItems = () => {
                 select
                 {...register('itemid')}
                 error={!!errors.itemid || !!apiErrors.itemid}
-                helperText={errors.itemid?.message || (apiErrors.itemid && apiErrors.itemid[0])}
+                helperText={`${errors.itemid?.message ?? (apiErrors.itemid && apiErrors.itemid[0]) ?? ''}`}
                 disabled={itemLoading}
               >
+                <MenuItem value=""><em>Select item</em></MenuItem>
                 {itemLoading && <MenuItem value=""><em>Loading...</em></MenuItem>}
                 {itemError && <MenuItem value=""><em>{itemError}</em></MenuItem>}
                 {Array.isArray(items) && items.length > 0 && items.map((item) => (
-                  <MenuItem key={item.itemID} value={item.itemID}>
+                  <MenuItem key={item.itemID} value={String(item.itemID)}>
                     {item.itemName}
                   </MenuItem>
                 ))}
@@ -222,16 +262,14 @@ const MenuItems = () => {
                 select
                 {...register('category')}
                 error={!!errors.category || !!apiErrors.category}
-                helperText={
-                  errors.category?.message ||
-                  (apiErrors.category && apiErrors.category[0])
-                }
+                helperText={`${errors.category?.message ?? (apiErrors.category && apiErrors.category[0]) ?? ''}`}
                 disabled={itemLoading}
               >
+                <MenuItem value=""><em>Select category</em></MenuItem>
                 {itemLoading && <MenuItem value=""><em>Loading...</em></MenuItem>}
                 {itemError && <MenuItem value=""><em>{itemError}</em></MenuItem>}
                 {Array.isArray(items) && items.length > 0 && Array.from(new Set(items.map((item) => item.category))).map((cat) => (
-                  <MenuItem key={cat} value={cat}>
+                  <MenuItem key={cat} value={String(cat)}>
                     {cat}
                   </MenuItem>
                 ))}
@@ -245,11 +283,9 @@ const MenuItems = () => {
                 label={<RequiredLabel label="Price (TSh)" />}
                 type="number"
                 fullWidth
-                {...register('price')}
+                {...register('price', { valueAsNumber: true })}
                 error={!!errors.price || !!apiErrors.price}
-                helperText={
-                  errors.price?.message || (apiErrors.price && apiErrors.price[0]) || 'Enter amount in Tanzanian Shillings'
-                }
+                helperText={`${errors.price?.message ?? (apiErrors.price && apiErrors.price[0]) ?? 'Enter amount in Tanzanian Shillings'}`}
                 InputProps={{
                   inputProps: {
                     min: 0,
@@ -266,7 +302,7 @@ const MenuItems = () => {
                 rows={3}
                 {...register('description')}
                 error={!!errors.description || !!apiErrors.description}
-                helperText={errors.description?.message || (apiErrors.description && apiErrors.description[0])}
+                helperText={`${errors.description?.message ?? (apiErrors.description && apiErrors.description[0]) ?? ''}`}
               />
             </div>
 
@@ -282,46 +318,23 @@ const MenuItems = () => {
                 Reset
               </Button>
 
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                size="small"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Menu Item'}
-              </Button>
+              <Box display="flex" gap={1}>
+                <Button
+                  type="button"
+                  variant="contained"
+                  color="success"
+                  size="small"
+                  onClick={handleSubmitSingle}
+                  disabled={isSubmitting}
+                  startIcon={isSubmitting ? <CircularProgress size={18} /> : null}
+                >
+                  {isSubmitting ? 'Saving...' : 'Save Menu Item'}
+                </Button>
+              </Box>
             </Box>
           </form>
         </div>
-        {/* Table of selected items */}
-        {selectedItems.length > 0 && (
-          <Box mt={4}>
-            <Typography variant="subtitle1" gutterBottom>
-              Selected Items
-            </Typography>
-            <table className="min-w-full border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border px-2 py-1">Item Name</th>
-                  <th className="border px-2 py-1">Category</th>
-                  <th className="border px-2 py-1">Unit Price</th>
-                  <th className="border px-2 py-1">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedItems.map((row, idx) => (
-                  <tr key={idx}>
-                    <td className="border px-2 py-1">{row.itemName}</td>
-                    <td className="border px-2 py-1">{row.category}</td>
-                    <td className="border px-2 py-1">{row.price}</td>
-                    <td className="border px-2 py-1">{row.total}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Box>
-        )}
+        {/* Removed table and submit-selected UI */}
       </Paper>
     </Box>
   );

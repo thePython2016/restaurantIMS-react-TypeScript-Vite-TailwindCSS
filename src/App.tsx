@@ -43,7 +43,7 @@ import ViewSMS from "./pages/Forms/ViewSMS";
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
 import Update from './pages/Forms/UpdateStaff';
-import MenuItems from './pages/Forms/menu';
+import MenuItems from './pages/Forms/Menu';
 import Chatbot from './pages/Forms/Chatbot';
 // import MenuItemList from './pages/Forms/MenuItemList';
 import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
@@ -64,6 +64,7 @@ import WhatsAppButtonOut from './pages/Forms/WhatsAppButtonOut.tsx';
 import ItemListUpdate from './pages/Forms/ItemListUpdate.tsx';
 import ItemList from './pages/Forms/ItemList.tsx';
 import InventoryEvaluation from './pages/Forms/InventoryEvaluation.tsx';
+import MenuItemList from './pages/Forms/MenuItemList';
 
 
 
@@ -143,6 +144,7 @@ export default function App() {
           <Route path="/airtime-form" element={<AirtimeForm />} />
           <Route path="/all-sms" element={<ViewSMS />} />
           <Route path="/menu-item" element={<MenuItems />} />
+          <Route path="/menu-item-list" element={<MenuItemList />} />
           <Route path="/item-list" element={<ItemList />} />
           <Route path="/update-menu" element={<UpdateMenuItem />} />
           <Route path="/inventory" element={<Inventory />} />
@@ -164,6 +166,8 @@ export default function App() {
           {/* <Route path="/menu-item-list" element={<MenuItemList />} /> */}
           <Route path="/inventory-evaluation-details" element={<InventoryEvaluation />} />
           <Route path="/inventory-item-details" element={<InventoryItemSummary />} />
+
+        
 
 
 
