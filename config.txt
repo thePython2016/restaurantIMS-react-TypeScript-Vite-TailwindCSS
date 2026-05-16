@@ -1,0 +1,20 @@
+<?php
+/* Servers configuration */
+$i = 0;
+
+/* Server: MariaDB localhost */
+$i++;
+$cfg['Servers'][$i]['host'] = '127.0.0.1'; // or 'localhost'
+$cfg['Servers'][$i]['port'] = '3306'; // default MariaDB/MySQL port
+$cfg['Servers'][$i]['socket'] = ''; // leave empty unless using socket file
+$cfg['Servers'][$i]['connect_type'] = 'tcp';
+$cfg['Servers'][$i]['extension'] = 'mysqli';
+$cfg['Servers'][$i]['auth_type'] = 'cookie'; // 'cookie' = login form, 'config' = fixed login
+$cfg['Servers'][$i]['user'] = 'your_db_user'; // same as Django's DB USER
+$cfg['Servers'][$i]['password'] = 'your_db_password'; // same as Django's DB PASSWORD
+$cfg['Servers'][$i]['AllowNoPassword'] = false;
+
+/* Directories for saving/loading */
+$cfg['UploadDir'] = '';
+$cfg['SaveDir'] = '';
+?>
