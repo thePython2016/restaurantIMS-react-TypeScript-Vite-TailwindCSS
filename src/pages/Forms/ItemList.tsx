@@ -30,17 +30,21 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import axios from 'axios';
 
-interface MenuItem {
+interface MenuItemRecord {
   itemID?: number;
   id?: number;
   itemName: string;
+  name?: string;
   category: string;
   unitOfMeasure: string;
   dateAdded: string;
+  price?: number;
+  description?: string;
+  availability?: string;
 }
 
 const ItemList = () => {
-  const [rows, setRows] = useState<MenuItem[]>([]);
+  const [rows, setRows] = useState<MenuItemRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -110,10 +114,10 @@ const ItemList = () => {
     const amount = parseFloat(priceFilter.amount);
     const matchesPrice =
       !priceFilter.operator || isNaN(amount) ? true :
-      priceFilter.operator === 'gt' ? row.price > amount :
-      priceFilter.operator === 'lt' ? row.price < amount :
-      priceFilter.operator === 'gte' ? row.price >= amount :
-      priceFilter.operator === 'lte' ? row.price <= amount :
+      priceFilter.operator === 'gt' ? (row.price ?? 0) > amount :
+      priceFilter.operator === 'lt' ? (row.price ?? 0) < amount :
+      priceFilter.operator === 'gte' ? (row.price ?? 0) >= amount :
+      priceFilter.operator === 'lte' ? (row.price ?? 0) <= amount :
       true;
     return matchesSearch && matchesPrice;
   });
@@ -187,7 +191,7 @@ const ItemList = () => {
     doc.text('Menu List', 14, 10);
     autoTable(doc, {
       head: [['Name', 'Category', 'Description', 'Price', 'Availability']],
-      body: filteredRows.map(r => [r.name, r.category, r.description, r.price, r.availability]),
+      body: filteredRows.map(r => [r.name ?? r.itemName, r.category, r.description ?? '', r.price ?? '', r.availability ?? '']),
     });
     doc.save('menu_list.pdf');
   };

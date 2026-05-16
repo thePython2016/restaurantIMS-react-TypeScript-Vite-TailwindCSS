@@ -11,7 +11,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TablePagination,
 } from '@mui/material';
 import {
   DataGrid,

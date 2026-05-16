@@ -43,7 +43,7 @@ import ViewSMS from "./pages/Forms/ViewSMS";
 import Staff from './pages/Forms/Staff';
 import StaffList from './pages/Forms/StaffList';
 import Update from './pages/Forms/UpdateStaff';
-import MenuItems from './pages/Forms/Menu';
+import MenuItems from './pages/Forms/menu';
 import Chatbot from './pages/Forms/Chatbot';
 // import MenuItemList from './pages/Forms/MenuItemList';
 import UpdateMenuItem from './pages/Forms/UpdateMenuItem';
@@ -126,7 +126,7 @@ export default function App() {
         <Route path="/password-reset" element={<PasswordResetPage/>} />
         <Route path="/password/reset/confirm" element={<PasswordConfirmPage />} />
         {/* <Route path="/chatbot" element={<Chatbot />} /> */}
-        <Route path="/chatbot" element={<Chatbot roomName="general" />} />
+        <Route path="/chatbot" element={<Chatbot />} />
         
         
         <Route path="/welcome" element={<Welcome />} />

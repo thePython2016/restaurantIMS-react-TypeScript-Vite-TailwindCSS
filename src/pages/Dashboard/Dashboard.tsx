@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
-import StaffCard from '../../components/common/StaffCard';
+import StaffCard from '../../components/ecommerce/StaffCard';
 import MonthlyTarget from '../../components/common/MonthlyTarget';
 
 const Dashboard: React.FC = () => {

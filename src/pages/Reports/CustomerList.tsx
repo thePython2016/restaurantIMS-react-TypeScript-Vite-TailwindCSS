@@ -38,6 +38,8 @@ const generateCustomerData = (count: number) => {
   }));
 };
 
+type CustomerRow = ReturnType<typeof generateCustomerData>[number];
+
 const columns: GridColDef[] = [
   { field: 'name', headerName: 'Full Name', flex: 1, sortable: true, filterable: true },
   { field: 'phone', headerName: 'Phone', flex: 1, sortable: true, filterable: true },
@@ -72,9 +74,12 @@ const CustomerList: React.FC = () => {
     }
     if (sortModel.length > 0) {
       const { field, sort } = sortModel[0];
+      const sortField = field as keyof CustomerRow;
       filtered = [...filtered].sort((a, b) => {
-        if (a[field] > b[field]) return sort === 'asc' ? 1 : -1;
-        if (a[field] < b[field]) return sort === 'asc' ? -1 : 1;
+        const aVal = a[sortField];
+        const bVal = b[sortField];
+        if (aVal > bVal) return sort === 'asc' ? 1 : -1;
+        if (aVal < bVal) return sort === 'asc' ? -1 : 1;
         return 0;
       });
     }

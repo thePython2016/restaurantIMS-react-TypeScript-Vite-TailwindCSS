@@ -37,6 +37,8 @@ const generateInvoices = (count: number) =>
     total: (Math.random() * 50000 + 10000).toFixed(2),
   }));
 
+type InvoiceRow = ReturnType<typeof generateInvoices>[number];
+
 const columns: GridColDef[] = [
   { field: 'invoiceNumber', headerName: 'Invoice No', flex: 1 },
   { field: 'customerName', headerName: 'Customer Name', flex: 1 },
@@ -100,9 +102,12 @@ const InvoiceList: React.FC = () => {
 
     if (sortModel.length > 0) {
       const { field, sort } = sortModel[0];
+      const sortField = field as keyof InvoiceRow;
       filtered = [...filtered].sort((a, b) => {
-        if (a[field] > b[field]) return sort === 'asc' ? 1 : -1;
-        if (a[field] < b[field]) return sort === 'asc' ? -1 : 1;
+        const aVal = a[sortField];
+        const bVal = b[sortField];
+        if (aVal > bVal) return sort === 'asc' ? 1 : -1;
+        if (aVal < bVal) return sort === 'asc' ? -1 : 1;
         return 0;
       });
     }

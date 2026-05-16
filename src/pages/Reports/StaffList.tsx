@@ -39,6 +39,8 @@ const generateOrderData = (count: number) => {
   return data;
 };
 
+type OrderRow = ReturnType<typeof generateOrderData>[number];
+
 const columns: GridColDef[] = [
   { field: 'customerName', headerName: 'Customer Name', flex: 1 },
   { field: 'menuItem', headerName: 'Menu Item', flex: 1 },
@@ -70,9 +72,12 @@ const OrderList: React.FC = () => {
 
     if (sortModel.length > 0) {
       const { field, sort } = sortModel[0];
+      const sortField = field as keyof OrderRow;
       filtered = [...filtered].sort((a, b) => {
-        if (a[field] > b[field]) return sort === 'asc' ? 1 : -1;
-        if (a[field] < b[field]) return sort === 'asc' ? -1 : 1;
+        const aVal = a[sortField];
+        const bVal = b[sortField];
+        if (aVal > bVal) return sort === 'asc' ? 1 : -1;
+        if (aVal < bVal) return sort === 'asc' ? -1 : 1;
         return 0;
       });
     }

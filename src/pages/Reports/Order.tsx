@@ -51,11 +51,11 @@ const OrderForm = () => {
   const quantity = watch('quantity');
 
   useEffect(() => {
-    const price = menuPrices[menuItem] || 0;
+    const price = menuPrices[menuItem as keyof typeof menuPrices] || 0;
     setAmount(price * quantity);
   }, [menuItem, quantity]);
 
-  const onSubmit = (data) => {
+  const onSubmit = (data: yup.InferType<typeof schema>) => {
     const orderData = { ...data, amount };
     console.log('Order submitted:', orderData);
     // Submission logic here

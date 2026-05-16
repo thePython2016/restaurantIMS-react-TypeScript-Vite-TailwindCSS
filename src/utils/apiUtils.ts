@@ -1,5 +1,3 @@
-import { useAuth } from '../context/AuthContext';
-
 // Global fetch wrapper that automatically handles token expiration
 export const createAuthenticatedFetch = (checkTokenExpiration: () => boolean) => {
   return async (url: string, options: RequestInit = {}) => {

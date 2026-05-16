@@ -162,6 +162,12 @@ const UpdateOrder = () => {
               }}
               sx={{ minWidth: 200 }}
             />
+            <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
+              Print
+            </Button>
+            <Button variant="contained" startIcon={<PictureAsPdfIcon />} onClick={handlePDF} color="primary">
+              PDF
+            </Button>
             {selectedRow && (
               <>
                 <Tooltip title="Update">

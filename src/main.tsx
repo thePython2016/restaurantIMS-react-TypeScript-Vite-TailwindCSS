@@ -20,8 +20,8 @@ createRoot(document.getElementById("root")!).render(
           <AppWrapper>
             <GoogleOAuthProvider 
               clientId="378902318323-mts3fdjf8hpqbh15pme2ilat8438iq2r.apps.googleusercontent.com"
-              onScriptLoadError={(error) => {
-                console.error('Google OAuth script failed to load:', error);
+              onScriptLoadError={() => {
+                console.error('Google OAuth script failed to load');
               }}
             >
               <App />

@@ -34,7 +34,7 @@ const PieChart = () => {
   const options = {
     responsive: true,
     plugins: {
-      legend: { position: "top" },
+      legend: { position: "top" as const },
       title: { display: true, text: "Sample Pie Chart" },
       tooltip: { enabled: true },
     },
