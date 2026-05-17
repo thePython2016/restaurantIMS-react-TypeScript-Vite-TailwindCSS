@@ -2,13 +2,18 @@ import React, { useState, useRef, useEffect } from "react";
 import { FaRobot, FaTimes } from "react-icons/fa";
 import axios from "axios";
 
+interface ChatMessage {
+  text: string;
+  sender: string;
+}
+
 export default function ChatBotIcon() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const API_URL = 'http://localhost:8000/api';
 
@@ -60,13 +65,13 @@ export default function ChatBotIcon() {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       sendMessage();
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputMessage(value);
     

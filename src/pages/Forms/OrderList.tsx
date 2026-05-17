@@ -23,6 +23,7 @@ import autoTable from 'jspdf-autotable';
 // import Container from '@mui/material/Container';
 // import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { matchesAmountFilter } from '../../utils/compareAmount';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -106,7 +107,7 @@ const OrderList: React.FC = () => {
   const filteredRows = React.useMemo(() => {
     return rows.filter(row => {
       const matchesSearch = Object.values(row).join(' ').toLowerCase().includes(search.toLowerCase());
-      const matchesAmount = amountFilter ? eval(`${row.amount} ${amountOperator} ${parseFloat(amountFilter) || 0}`) : true;
+      const matchesAmount = matchesAmountFilter(row.amount, amountOperator, amountFilter);
       const rowDate = row.createdAt ? dayjs(row.createdAt) : null;
       const matchesStart = startDate && rowDate ? rowDate.isAfter(startDate.startOf('day')) || rowDate.isSame(startDate.startOf('day')) : true;
       const matchesEnd = endDate && rowDate ? rowDate.isBefore(endDate.endOf('day')) || rowDate.isSame(endDate.endOf('day')) : true;

@@ -47,11 +47,11 @@ const  BarChartOne = () => {
         text: "Monthly Sales Bar Chart",
       },
       datalabels: {
-        anchor: "end",
-        align: "top",
+        anchor: "end" as const,
+        align: "top" as const,
         color: "#444",
         font: {
-          weight: "bold",
+          weight: "bold" as const,
         },
       },
     },

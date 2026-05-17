@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 
+interface CartItem {
+  id: number;
+  quantity: number;
+}
+
 const PublicOrderForm = () => {
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const id = 1;
   const amount = 1;
 

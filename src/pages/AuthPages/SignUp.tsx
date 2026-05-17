@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { TextField, IconButton, InputAdornment } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { Email as EmailIcon } from "@mui/icons-material";
+import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 import ChatBotIcon from "../../components/ChatBotIcon";
 

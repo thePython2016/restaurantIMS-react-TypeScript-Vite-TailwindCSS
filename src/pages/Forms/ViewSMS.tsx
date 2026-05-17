@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { MessageSquare, Phone, Clock, CheckCircle, Circle, RefreshCw, Download, Search, Filter } from 'lucide-react';
 
+interface SMSMessage {
+  id: number;
+  from_phone: string;
+  to_phone: string;
+  message_body: string;
+  received_at: string;
+  is_read: boolean;
+}
+
 // Mock SMS service - replace with your actual service
 const smsService = {
   getSMSMessages: async () => {
@@ -52,7 +61,7 @@ const smsService = {
     ];
   },
   
-  markAsRead: async (smsId) => {
+  markAsRead: async (smsId: number) => {
     await new Promise(resolve => setTimeout(resolve, 500));
     return { status: 'success' };
   },
@@ -64,9 +73,9 @@ const smsService = {
 };
 
 const ViewSMS = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<SMSMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, read, unread
   const [unreadCount, setUnreadCount] = useState(0);
@@ -115,7 +124,7 @@ const ViewSMS = () => {
     setRefreshing(false);
   };
 
-  const handleMarkAsRead = async (smsId) => {
+  const handleMarkAsRead = async (smsId: number) => {
     try {
       await smsService.markAsRead(smsId);
       setMessages(messages.map(msg => 
@@ -127,10 +136,10 @@ const ViewSMS = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.abs(now - date);
+    const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {

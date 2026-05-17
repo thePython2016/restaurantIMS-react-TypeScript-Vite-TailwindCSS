@@ -121,7 +121,14 @@ export default function SentMessages() {
     setSelectedRows([]);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectRowsPerPage = (event: import('@mui/material').SelectChangeEvent<number>) => {
+    const newRowsPerPage = Number(event.target.value);
+    setRowsPerPage(newRowsPerPage);
+    setPage(0);
+    setSelectedRows([]);
+  };
+
+  const handleTableRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setPage(0);
@@ -232,7 +239,7 @@ export default function SentMessages() {
             <Select
               value={rowsPerPage}
               label="Rows per page"
-              onChange={handleChangeRowsPerPage}
+              onChange={handleSelectRowsPerPage}
             >
               {[5, 10, 25, 50].map(size => (
                 <MenuItem key={size} value={size}>{size}</MenuItem>
@@ -334,7 +341,7 @@ export default function SentMessages() {
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            onRowsPerPageChange={handleTableRowsPerPageChange}
           />
         )}
 

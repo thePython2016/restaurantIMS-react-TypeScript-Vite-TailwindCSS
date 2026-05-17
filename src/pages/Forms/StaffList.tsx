@@ -289,15 +289,13 @@ const StaffList: React.FC = () => {
       }
 
       // Prepare data for API (map city back to region for backend)
+      const { city, ...restForm } = updateForm;
       const updateData = {
-        ...updateForm,
-        region: updateForm.city, // Map city to region for backend
+        ...restForm,
+        region: city,
         firstName: updateForm.name.split(' ')[0] || '',
         lastName: updateForm.name.split(' ').slice(1).join(' ') || '',
       };
-      
-      // Remove city field as backend expects region
-      delete updateData.city;
 
       const response = await fetch(`http://127.0.0.1:8000/api/stafflist/${selectedRowId}/`, {
         method: 'PUT',

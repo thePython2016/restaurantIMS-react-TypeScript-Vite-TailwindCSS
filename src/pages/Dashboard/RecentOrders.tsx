@@ -9,6 +9,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { matchesAmountFilter } from '../../utils/compareAmount';
 
 const initialOrders = [
   { id: 1, customer: 'John Doe', amount: 120.5, date: '2025-06-20', status: 'Paid' },
@@ -31,7 +32,7 @@ const RecentOrders: React.FC = () => {
   const filteredRows = useMemo(() => {
     return orders.filter(order => {
       const matchesSearch = Object.values(order).join(' ').toLowerCase().includes(search.toLowerCase());
-      const matchesAmount = amountFilter ? eval(`${order.amount} ${amountOperator} ${parseFloat(amountFilter) || 0}`) : true;
+      const matchesAmount = matchesAmountFilter(order.amount, amountOperator, amountFilter);
       return matchesSearch && matchesAmount;
     });
   }, [orders, search, amountFilter, amountOperator]);

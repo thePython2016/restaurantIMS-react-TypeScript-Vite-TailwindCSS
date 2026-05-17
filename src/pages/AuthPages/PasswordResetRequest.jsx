@@ -5,7 +5,7 @@ import {
   Stack,
   InputAdornment,
 } from "@mui/material";
-import { Email as EmailIcon } from "@mui/icons-material";
+import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 import ChatBotIcon from "../../components/ChatBotIcon";
 

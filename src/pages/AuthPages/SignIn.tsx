@@ -16,7 +16,9 @@ import {
   IconButton,
   Stack,
 } from "@mui/material";
-import { Email as EmailIcon, Visibility, VisibilityOff } from "@mui/icons-material";
+import EmailIcon from "@mui/icons-material/Email";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 function SignIn() {
   const navigate = useNavigate();

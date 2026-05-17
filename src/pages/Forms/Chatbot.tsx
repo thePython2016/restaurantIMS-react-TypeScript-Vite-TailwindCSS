@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Chatbot.css';
 
-
-
+interface ChatMessage {
+  text: string;
+  sender: string;
+}
 
 const Chatbot = () => {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,7 +49,7 @@ const Chatbot = () => {
     }
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       sendMessage();
     }

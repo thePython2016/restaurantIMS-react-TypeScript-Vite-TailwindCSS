@@ -34,6 +34,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useNavigate } from 'react-router-dom';
+import { matchesAmountFilter } from '../../utils/compareAmount';
 
 const initialOrders = [
   { id: 1, customer: 'John Doe', menuItem: 'Chicken Burger', quantity: 2, amount: 17000, status: 'Paid' },
@@ -68,7 +69,7 @@ const UpdateOrder = () => {
 
   const filteredRows = rows.filter(row => {
     const matchesSearch = Object.values(row).join(' ').toLowerCase().includes(search.toLowerCase());
-    const matchesAmount = amountFilter ? eval(`${row.amount} ${amountOperator || '>= '} ${parseFloat(amountFilter) || 0}`) : true;
+    const matchesAmount = matchesAmountFilter(row.amount, amountOperator || ">=", amountFilter);
     return matchesSearch && matchesAmount;
   });
 

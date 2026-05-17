@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties, type FormEvent } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Card, CardContent, Typography } from '@mui/material';
 
@@ -10,7 +10,7 @@ function BulkSMSForm() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Reset states
@@ -58,7 +58,8 @@ function BulkSMSForm() {
       setRecipients('');
       
     } catch (err) {
-      setError(err.message || 'Failed to send SMS. Please try again.');
+      const message = err instanceof Error ? err.message : 'Failed to send SMS. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ function BulkSMSForm() {
 
   const recipientCount = recipients ? recipients.split(',').filter(num => num.trim()).length : 0;
 
-  const styles = {
+  const styles: Record<string, CSSProperties> = {
     container: {
       maxWidth: '600px',
       margin: '2rem auto',
@@ -278,7 +279,6 @@ function BulkSMSForm() {
 
         <button 
           type="submit"
-          onClick={handleSubmit}
           disabled={loading || !message.trim() || !recipients.trim()}
           style={{
             ...styles.button,

@@ -31,7 +31,7 @@ const unitOfMeasureOptions = ['kg', 'grams', 'liters', 'ml', 'pieces', 'boxes', 
 const schema = yup.object({
   itemName: yup.string().required('Item name is required'),
   unitOfMeasure: yup.string().required('Unit of measure is required'),
-  dateAdded: yup.mixed<Dayjs | null>().required('Date is required').test(
+  dateAdded: yup.mixed<Dayjs>().nullable().required('Date is required').test(
     'is-valid-date',
     'Date is required',
     (value) => value !== null && dayjs.isDayjs(value)

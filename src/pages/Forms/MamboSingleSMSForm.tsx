@@ -25,8 +25,8 @@ export default function MamboSMSUserForm() {
   const [status, setStatus] = useState("");
   const { accessToken } = useAuth();
 
-  const sendSMS = async (smsData) => {
-    const headers = { "Content-Type": "application/json" };
+  const sendSMS = async (smsData: { sender_id: string; message: string; mobile: string }) => {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
     try {
@@ -81,7 +81,7 @@ export default function MamboSMSUserForm() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("Sending...");
 
@@ -103,7 +103,8 @@ export default function MamboSMSUserForm() {
         setStatus("");
       }, 3000);
     } catch (error) {
-      setStatus(`Error: ${error.message}`);
+      const message = error instanceof Error ? error.message : 'Failed to send SMS';
+      setStatus(`Error: ${message}`);
     }
   };
 

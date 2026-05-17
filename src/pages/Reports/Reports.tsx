@@ -44,7 +44,7 @@ const Reports: React.FC = () => {
 
         {/* Report Selection Dropdown - Always Visible */}
         <Box sx={{ mb: 4, maxWidth: 400 }}>
-          <FormControl fullWidth size="large">
+          <FormControl fullWidth size="medium">
             <InputLabel>Choose Report</InputLabel>
             <Select
               value={selectedReport}

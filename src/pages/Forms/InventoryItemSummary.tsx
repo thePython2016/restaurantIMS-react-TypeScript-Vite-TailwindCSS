@@ -497,7 +497,7 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => params?.value || '',
+      valueFormatter: (value) => (value != null ? String(value) : ''),
       width: 120
     },
     { 
@@ -506,7 +506,7 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => params?.value || '',
+      valueFormatter: (value) => (value != null ? String(value) : ''),
       width: 150
     },
     { 
@@ -515,7 +515,7 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => params?.value || '',
+      valueFormatter: (value) => (value != null ? String(value) : ''),
       width: 120
     },
     { 
@@ -524,7 +524,7 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => params.value || '-',
+      valueFormatter: (value) => (value != null ? String(value) : '-'),
       width: 130
     },
     { 
@@ -533,10 +533,9 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => {
-        const value = params?.value;
+      valueFormatter: (value: unknown) => {
         if (value === null || value === undefined) return '0';
-        return typeof value === 'number' ? value.toLocaleString() : value;
+        return typeof value === 'number' ? value.toLocaleString() : String(value);
       },
       width: 100
     },
@@ -546,13 +545,12 @@ const InventoryItemSummary = () => {
       flex: 1, 
       sortable: true, 
       filterable: true,
-      valueFormatter: (params) => {
-        const value = params?.value;
+      valueFormatter: (value: unknown) => {
         if (value === null || value === undefined) return '0';
-        return typeof value === 'number' ? value.toLocaleString() : value;
+        return typeof value === 'number' ? value.toLocaleString() : String(value);
       },
       cellClassName: (params) => {
-        const value = params?.value;
+        const value = params.value;
         if (value === null || value === undefined) return '';
         if (typeof value === 'number') {
           if (value < 0) return 'negative-stock';

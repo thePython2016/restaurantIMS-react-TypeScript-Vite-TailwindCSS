@@ -14,8 +14,8 @@ const Reports: React.FC = () => {
   const navigate = useNavigate();
   const [reportType, setReportType] = React.useState('');
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const selectedReport = event.target.value as string;
+  const handleChange = (event: import('@mui/material').SelectChangeEvent) => {
+    const selectedReport = event.target.value;
     setReportType(selectedReport);
 
     // Navigate to the specific report page

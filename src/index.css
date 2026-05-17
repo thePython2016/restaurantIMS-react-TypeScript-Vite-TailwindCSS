@@ -590,7 +590,9 @@
 
   &::-webkit-scrollbar {
 
-    @apply size-1.5;
+    width: 0.375rem;
+
+    height: 0.375rem;
 
   }
 
@@ -598,7 +600,7 @@
 
   &::-webkit-scrollbar-track {
 
-    @apply rounded-full;
+    border-radius: 9999px;
 
   }
 
@@ -606,7 +608,9 @@
 
   &::-webkit-scrollbar-thumb {
 
-    @apply bg-gray-200 rounded-full dark:bg-gray-700;
+    background-color: #e5e7eb;
+
+    border-radius: 9999px;
 
   }
 
@@ -1592,7 +1596,11 @@ span.flatpickr-weekday,
 
 .simplebar-scrollbar::before {
 
-  @apply !bg-gray-200 !rounded-full dark:!bg-gray-700 !opacity-100;
+  background-color: #e5e7eb !important;
+
+  border-radius: 9999px !important;
+
+  opacity: 1 !important;
 
 }
 
@@ -1600,7 +1608,7 @@ span.flatpickr-weekday,
 
 .dark .simplebar-scrollbar::before {
 
-  @apply !bg-gray-700;
+  background-color: #374151 !important;
 
 }
 
@@ -1608,7 +1616,7 @@ span.flatpickr-weekday,
 
 .simplebar-scrollbar.simplebar-visible:before {
 
-  @apply opacity-100;
+  opacity: 1 !important;
 
 }
 
@@ -2420,7 +2428,11 @@ span.flatpickr-weekday,
 
 .simplebar-scrollbar::before {
 
-  @apply !bg-gray-200 !rounded-full dark:!bg-gray-700 !opacity-100;
+  background-color: #e5e7eb !important;
+
+  border-radius: 9999px !important;
+
+  opacity: 1 !important;
 
 }
 
@@ -2428,7 +2440,7 @@ span.flatpickr-weekday,
 
 .dark .simplebar-scrollbar::before {
 
-  @apply !bg-gray-700;
+  background-color: #374151 !important;
 
 }
 
@@ -2436,7 +2448,7 @@ span.flatpickr-weekday,
 
 .simplebar-scrollbar.simplebar-visible:before {
 
-  @apply opacity-100;
+  opacity: 1 !important;
 
 }
 

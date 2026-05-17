@@ -18,7 +18,7 @@ export default function GoogleSignInFixed() {
       try {
         console.log('Google login successful, token received');
         const res = await axios.post("http://localhost:8000/auth/google/", {
-          access_token: tokenResponse.access_token,
+          code: tokenResponse.code,
         });
 
         if (res.data.access_token) {
