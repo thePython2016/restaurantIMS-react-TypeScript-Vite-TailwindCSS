@@ -78,6 +78,13 @@
     "vite": "^6.1.0",
     "vite-plugin-svgr": "^4.3.0"
   },
+  "pnpm": {
+    "allowBuilds": {
+      "@tailwindcss/oxide": true,
+      "core-js": true,
+      "esbuild": true
+    }
+  },
   "overrides": {
     "react-helmet-async": {
       "react": "^16.8.0 || ^17 || ^18 || ^19"
