@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
 interface AuthContextType {
   user: any;
   accessToken: string | null;
@@ -150,7 +152,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         : usernameOrEmail;
 
       // First try with derived username
-      let response = await fetch("http://127.0.0.1:8000/login/", {
+      let response = await fetch(`${API_URL}/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -161,7 +163,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // If that fails and the input looks like an email, try with the email directly
       if (!response.ok && usernameOrEmail?.includes('@')) {
         console.log('First attempt failed, trying with email directly...');
-        response = await fetch("http://127.0.0.1:8000/login/", {
+        response = await fetch(`${API_URL}/login/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -214,7 +216,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log('Sending Google token to backend:', googleAccessToken);
       
-      const response = await fetch("http://127.0.0.1:8000/auth/google/", {
+      const response = await fetch(`${API_URL}/auth/google/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
