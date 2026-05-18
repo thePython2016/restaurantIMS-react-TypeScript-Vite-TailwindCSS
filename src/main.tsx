@@ -12,14 +12,18 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
+const googleClientId =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "378902318323-mts3fdjf8hpqbh15pme2ilat8438iq2r.apps.googleusercontent.com";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
           <AppWrapper>
-            <GoogleOAuthProvider 
-              clientId="378902318323-mts3fdjf8hpqbh15pme2ilat8438iq2r.apps.googleusercontent.com"
+            <GoogleOAuthProvider
+              clientId={googleClientId}
               onScriptLoadError={() => {
                 console.error('Google OAuth script failed to load');
               }}
