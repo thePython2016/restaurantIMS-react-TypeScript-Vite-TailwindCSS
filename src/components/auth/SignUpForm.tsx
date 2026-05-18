@@ -5,7 +5,7 @@ import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { API_URL, BACKEND_UNREACHABLE_MESSAGE } from "../../config/api";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
@@ -180,7 +180,11 @@ export default function SignUpForm() {
                   setIsChecked(false);
 
                 } catch (err: any) {
-                  setErrorMessage(err.message || "Registration failed");
+                  setErrorMessage(
+                    err?.message === "Failed to fetch"
+                      ? BACKEND_UNREACHABLE_MESSAGE
+                      : err.message || "Registration failed"
+                  );
                 } finally {
                   setIsSubmitting(false);
                 }

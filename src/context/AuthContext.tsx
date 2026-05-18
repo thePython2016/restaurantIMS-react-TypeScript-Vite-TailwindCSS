@@ -1,8 +1,7 @@
 // src/context/AuthContext.tsx
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+import { API_URL } from "../config/api";
 
 interface AuthContextType {
   user: any;

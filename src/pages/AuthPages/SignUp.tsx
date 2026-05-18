@@ -10,6 +10,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppButtonOut from "../Forms/WhatsAppButtonOut";
 import ChatBotIcon from "../../components/ChatBotIcon";
+import { API_URL, BACKEND_UNREACHABLE_MESSAGE } from "../../config/api";
 
 // Format phone number function
 const formatPhoneNumber = (value: string) => {
@@ -46,11 +47,6 @@ export function SignupForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({});
 
-  // Debug effect to log fieldErrors changes
-  useEffect(() => {
-    console.log("fieldErrors changed:", fieldErrors);
-  }, [fieldErrors]);
-  
   const [googleSignedIn, setGoogleSignedIn] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
 
@@ -147,7 +143,7 @@ export function SignupForm() {
     setIsSubmitting(true);
     try {
       const derivedUsername = email.includes("@") ? email.split("@")[0] : email;
-      const response = await fetch("http://127.0.0.1:8000/auth/registration/", {
+      const response = await fetch(`${API_URL}/auth/registration/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -326,7 +322,11 @@ export function SignupForm() {
       clearFormFields();
     } catch (err: any) {
       console.error("Network error:", err);
-      setSubmitError(err.message || t("Registration failed"));
+      const message =
+        err?.message === "Failed to fetch"
+          ? BACKEND_UNREACHABLE_MESSAGE
+          : err.message || t("Registration failed");
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
