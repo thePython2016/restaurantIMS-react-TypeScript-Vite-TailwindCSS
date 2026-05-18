@@ -135,28 +135,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     keepLoggedIn: boolean
   ): Promise<boolean> => {
     try {
-      const derivedUsername = usernameOrEmail?.includes('@')
-        ? usernameOrEmail.split('@')[0]
-        : usernameOrEmail;
-
-      let response = await fetch(`${API_URL}/login/`, {
+      const loginId = usernameOrEmail?.trim();
+      const response = await fetch(`${API_URL}/login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: derivedUsername, password }),
+        body: JSON.stringify({ username: loginId, password }),
       });
-
-      if (!response.ok && usernameOrEmail?.includes('@')) {
-        console.log('First attempt failed, trying with email directly...');
-        response = await fetch(`${API_URL}/login/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: usernameOrEmail, password }),
-        });
-      }
 
       if (!response.ok) {
         let errorMessage = "Login failed";

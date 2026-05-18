@@ -163,8 +163,6 @@ export function SignupForm() {
         
         try {
           const err = await response.json();
-          console.log("Error response:", err); // Debug log
-          
           if (typeof err === "object" && err !== null) {
             // Handle various error response formats
             
@@ -307,8 +305,6 @@ export function SignupForm() {
           console.error("Error parsing response:", parseError);
           message = `${t("Registration failed")} (${response.status})`;
         }
-        
-        console.log("Field errors to set:", newFieldErrors); // Debug log
         
         if (Object.keys(newFieldErrors).length > 0) {
           setFieldErrors(newFieldErrors);
