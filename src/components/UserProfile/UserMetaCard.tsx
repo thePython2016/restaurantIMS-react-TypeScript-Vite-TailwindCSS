@@ -4,6 +4,7 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { useAuth } from "../../context/AuthContext";
+import { getEmailInitials, getUserEmail } from "../../utils/userDisplay";
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -15,23 +16,10 @@ export default function UserMetaCard() {
     closeModal();
   };
 
-  // Extract user data with fallbacks
-  const firstName = user?.first_name || user?.firstName || '';
-  const lastName = user?.last_name || user?.lastName || '';
-  const email = user?.email || '';
+  const email = getUserEmail(user);
   const phone = user?.phone || user?.phone_number || '';
   const bio = user?.bio || user?.role || '';
-  const fullName = `${firstName} ${lastName}`.trim() || 'User';
-  // Generate initials from full name
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase())
-      .join('')
-      .slice(0, 2);
-  };
-
-  const initials = getInitials(fullName);
+  const initials = getEmailInitials(email);
 
   return (
     <>
@@ -69,17 +57,17 @@ export default function UserMetaCard() {
 
             {/* User Info */}
             <div>
-              <h4 className="text-lg font-bold text-gray-800 dark:text-white/90">
-                {fullName}
+              <h4 className="text-lg font-bold text-gray-800 dark:text-white/90 break-all">
+                {email || "No email available"}
               </h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {bio || 'User'}
-              </p>
+              {bio ? (
+                <p className="text-sm text-gray-500 dark:text-gray-400">{bio}</p>
+              ) : null}
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Edit Button */}
+            {/* Edit */}
             <button
               onClick={openModal}
               className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
@@ -158,19 +146,9 @@ export default function UserMetaCard() {
                 </h5>
 
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>First Name</Label>
-                    <Input type="text" value={firstName} />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Last Name</Label>
-                    <Input type="text" value={lastName} />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
+                  <div className="col-span-2">
                     <Label>Email Address</Label>
-                    <Input type="text" value={email} />
+                    <Input type="text" value={email} readOnly />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">

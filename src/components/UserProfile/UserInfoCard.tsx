@@ -4,6 +4,7 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import { useAuth } from "../../context/AuthContext";
+import { getUserEmail } from "../../utils/userDisplay";
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -15,10 +16,7 @@ export default function UserInfoCard() {
     closeModal();
   };
 
-  // Extract user data with fallbacks
-  const firstName = user?.first_name || user?.firstName || '';
-  const lastName = user?.last_name || user?.lastName || '';
-  const email = user?.email || '';
+  const email = getUserEmail(user);
   const phone = user?.phone || user?.phone_number || '';
   const bio = user?.bio || user?.role || '';
   return (
@@ -32,28 +30,10 @@ export default function UserInfoCard() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
             <div>
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                First Name
-              </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {firstName || 'Not provided'}
-              </p>
-            </div>
-
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Last Name
-              </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {lastName || 'Not provided'}
-              </p>
-            </div>
-
-            <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Email address
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {email || 'Not provided'}
+              <p className="text-sm font-medium text-gray-800 dark:text-white/90 break-all">
+                {email || "Not provided"}
               </p>
             </div>
 
@@ -151,19 +131,9 @@ export default function UserInfoCard() {
                 </h5>
 
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>First Name</Label>
-                    <Input type="text" value={firstName} />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
-                    <Label>Last Name</Label>
-                    <Input type="text" value={lastName} />
-                  </div>
-
-                  <div className="col-span-2 lg:col-span-1">
+                  <div className="col-span-2">
                     <Label>Email Address</Label>
-                    <Input type="text" value={email} />
+                    <Input type="text" value={email} readOnly />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">

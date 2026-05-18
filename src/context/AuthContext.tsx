@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 interface AuthContextType {
@@ -79,21 +78,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!accessToken) return;
 
-    // Store original fetch
     const originalFetch = window.fetch;
 
-    // Override fetch to intercept 401 responses
     window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
       try {
         const response = await originalFetch(input, init);
         
-        // Check for 401 Unauthorized response
         if (response.status === 401) {
           console.log('Global fetch interceptor caught 401 response');
-          // Check if token is actually expired
           if (accessToken && isTokenExpired(accessToken)) {
             handleTokenExpiration();
-            return response; // Return response but redirect will happen
+            return response;
           }
         }
         
@@ -103,7 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
-    // Cleanup: restore original fetch
     return () => {
       window.fetch = originalFetch;
     };
@@ -112,16 +106,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // ✅ Check if JWT token is expired
   const isTokenExpired = (token: string): boolean => {
     try {
-      // Decode JWT token (without verification - just for expiration check)
       const payload = JSON.parse(atob(token.split('.')[1]));
       const currentTime = Math.floor(Date.now() / 1000);
-      
-      // Check if token has expired (with 5 minute buffer)
-      const bufferTime = 5 * 60; // 5 minutes in seconds
+      const bufferTime = 5 * 60;
       return payload.exp < (currentTime + bufferTime);
     } catch (error) {
       console.error('Error checking token expiration:', error);
-      return true; // If we can't decode, assume expired
+      return true;
     }
   };
 
@@ -136,8 +127,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("user");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("user");
-    
-    // Redirect to welcome page
     window.location.href = "/welcome";
   };
 
@@ -147,12 +136,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     keepLoggedIn: boolean
   ): Promise<boolean> => {
     try {
-      // SimpleJWT default expects the Django username field. Our signup uses the email prefix as username.
       const derivedUsername = usernameOrEmail?.includes('@')
         ? usernameOrEmail.split('@')[0]
         : usernameOrEmail;
 
-      // First try with derived username
       let response = await fetch(`${API_URL}/login/`, {
         method: "POST",
         headers: {
@@ -161,7 +148,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify({ username: derivedUsername, password }),
       });
 
-      // If that fails and the input looks like an email, try with the email directly
       if (!response.ok && usernameOrEmail?.includes('@')) {
         console.log('First attempt failed, trying with email directly...');
         response = await fetch(`${API_URL}/login/`, {
@@ -189,21 +175,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Login response data:', data);
       const token = data.access;
 
-      // ✅ Store token based on keepLoggedIn
+      const userPayload =
+        data.user ||
+        (usernameOrEmail.includes("@") ? { email: usernameOrEmail } : {});
+
       if (keepLoggedIn) {
         localStorage.setItem("access_token", token);
-        if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
+        if (Object.keys(userPayload).length) {
+          localStorage.setItem("user", JSON.stringify(userPayload));
         }
       } else {
         sessionStorage.setItem("access_token", token);
-        if (data.user) {
-          sessionStorage.setItem("user", JSON.stringify(data.user));
+        if (Object.keys(userPayload).length) {
+          sessionStorage.setItem("user", JSON.stringify(userPayload));
         }
       }
 
       setAccessToken(token);
-      setUser(data.user || { username: derivedUsername }); // use response user data or fallback
+      setUser(userPayload);
 
       return true;
     } catch (error) {
@@ -215,8 +204,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // ✅ Google OAuth login function
   const googleLogin = async (googleAccessToken: string): Promise<boolean> => {
     try {
-      console.log('Sending Google token to backend:', googleAccessToken);
-      
       const response = await fetch(`${API_URL}/auth/google/`, {
         method: "POST",
         headers: {
@@ -245,11 +232,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const data = await response.json();
       console.log('Backend success data:', data);
       
-      // Handle different response formats
       const token = data.access_token || data.access || data.token;
       
       if (token) {
-        // Always store Google login in localStorage (keep logged in by default)
         localStorage.setItem("access_token", token);
         
         if (data.refresh_token) {
@@ -259,9 +244,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (data.user) {
           localStorage.setItem("user", JSON.stringify(data.user));
           setUser(data.user);
-        } else if (data.username) {
-          // If backend returns username instead of full user object
-          const userData = { username: data.username, email: data.email };
+        } else if (data.email) {
+          const userData = { email: data.email };
           localStorage.setItem("user", JSON.stringify(userData));
           setUser(userData);
         }
@@ -273,7 +257,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error("No access token received from server");
     } catch (error: any) {
       console.error("Google login error:", error);
-      throw new Error(error.message || "Google login failed");
+      const message =
+        error?.message === "Failed to fetch"
+          ? "Cannot reach the backend server."
+          : error.message || "Google login failed";
+      throw new Error(message);
     }
   };
 
@@ -286,8 +274,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("user");
     sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("user");
-    
-    // Redirect to welcome page after logout
     window.location.href = "/welcome";
   };
 
@@ -295,9 +281,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const checkTokenExpiration = () => {
     if (accessToken && isTokenExpired(accessToken)) {
       handleTokenExpiration();
-      return true; // Token is expired
+      return true;
     }
-    return false; // Token is valid
+    return false;
   };
 
   return (

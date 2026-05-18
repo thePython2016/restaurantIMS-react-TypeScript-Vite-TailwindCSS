@@ -2,9 +2,11 @@ import { useState } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { useAuth } from "../../context/AuthContext";
+import { getUserEmail } from "../../utils/userDisplay";
 
 export default function UserDropdown() {
   const { user, logout } = useAuth();
+  const displayEmail = getUserEmail(user);
   const [isOpen, setIsOpen] = useState(false);
 
   function toggleDropdown() {
@@ -42,8 +44,8 @@ export default function UserDropdown() {
           </svg>
         </span>
 
-        <span className="block mr-1 font-medium text-theme-sm">
-          {user?.username || "Musharof"}
+        <span className="block mr-1 font-medium text-theme-sm truncate max-w-[180px]">
+          {displayEmail || "Account"}
         </span>
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
@@ -71,11 +73,8 @@ export default function UserDropdown() {
         className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
         <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user?.username || "Musharof Chowdhury"}
-          </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user?.email || "No email available"}
+          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400 break-all">
+            {displayEmail || "No email available"}
           </span>
         </div>
 
