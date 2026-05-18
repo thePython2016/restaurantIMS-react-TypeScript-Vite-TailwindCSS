@@ -68,16 +68,14 @@ function SignIn() {
     setToast(null);
 
     try {
-      const success = await login(email, password, keepLoggedIn);
+      const success = await login(email.trim(), password, keepLoggedIn);
       if (success) {
         setToast({ message: "Login successful!", type: "success" });
         setTimeout(() => navigate("/dashboard"), 1500);
-      } else {
-        setToast({ message: "Login failed", type: "error" });
       }
     } catch (error: any) {
       setToast({
-        message: error.message || "Login failed",
+        message: error.message || "Invalid email or password",
         type: "error",
       });
     } finally {

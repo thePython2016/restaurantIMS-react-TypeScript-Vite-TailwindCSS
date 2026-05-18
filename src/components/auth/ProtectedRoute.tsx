@@ -16,7 +16,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!accessToken) {
-    return <Navigate to="/signin" replace />;
+    return <Navigate to="/welcome" replace />;
   }
 
   return children;

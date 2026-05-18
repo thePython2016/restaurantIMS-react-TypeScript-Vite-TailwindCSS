@@ -15,6 +15,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+export const WELCOME_PATH = "/welcome";
+
+const clearAuthStorage = () => {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user");
+  sessionStorage.removeItem("access_token");
+  sessionStorage.removeItem("user");
+};
+
+/** Full navigation so ProtectedRoute cannot intercept to /signin first */
+const redirectToWelcome = () => {
+  const welcomeUrl = `${window.location.origin}${WELCOME_PATH}`;
+  window.location.replace(welcomeUrl);
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -117,16 +133,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // ✅ Handle token expiration
   const handleTokenExpiration = () => {
-    console.log('Token expired, redirecting to welcome page...');
-    setUser(null);
-    setAccessToken(null);
-    setIsLoading(false);
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("access_token");
-    sessionStorage.removeItem("user");
-    window.location.href = "/welcome";
+    clearAuthStorage();
+    redirectToWelcome();
   };
 
   const login = async (
@@ -148,10 +156,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         let errorMessage = "Login failed";
         try {
           const errorData = await response.json();
-          console.log('Login error response:', errorData);
-          errorMessage = errorData.message || errorData.detail || errorData.error || "Login failed";
-        } catch (parseError) {
-          console.log('Could not parse error response');
+          const detail = errorData.detail;
+          const detailText = Array.isArray(detail)
+            ? detail[0]
+            : typeof detail === "string"
+              ? detail
+              : undefined;
+          errorMessage =
+            errorData.message ||
+            detailText ||
+            errorData.error ||
+            (response.status === 401 || response.status === 400
+              ? "Invalid email or password. Sign up on this site first, or use Google sign-in."
+              : "Login failed");
+        } catch {
+          // ignore parse errors
         }
         throw new Error(errorMessage);
       }
@@ -182,7 +201,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return true;
     } catch (error) {
       console.error("Login error:", error);
-      return false;
+      throw error;
     }
   };
 
@@ -251,15 +270,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    setUser(null);
-    setAccessToken(null);
-    setIsLoading(false);
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("access_token");
-    sessionStorage.removeItem("user");
-    window.location.href = "/welcome";
+    clearAuthStorage();
+    redirectToWelcome();
   };
 
   // ✅ Public function to check token expiration (can be called from other components)
