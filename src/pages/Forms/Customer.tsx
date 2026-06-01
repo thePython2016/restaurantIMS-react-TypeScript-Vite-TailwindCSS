@@ -100,7 +100,7 @@ const Customer: React.FC = () => {
       });
 
       if (!response.ok) {
-        let message = `Request failed with status ${response.status}`;
+        let message = `Request failed with status_ ${response.status}`;
         try {
           const errJson = await response.json();
           const fieldErrors = errJson || {};
