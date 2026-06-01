@@ -90,7 +90,7 @@ const Customer: React.FC = () => {
     };
 
     try {
-      const response = await fetch('https://restaurant-management-system-dun-kappa.vercel.app/customer/', {
+      const response = await fetch('https://restaurant-management-system-dun-kappa.vercel.app/customers/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
